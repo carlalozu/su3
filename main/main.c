@@ -5,15 +5,19 @@
 
 int main(int argc, char *argv[])
 {
-    printf("Hello, C project!\n");
+    printf("SU(3) algebra!\n");
 
     su3_cdble u;
     su3_cdble w;
     su3_vector_cdble v;
 
-    unit_su3_cdble(&w, 1.0);
-    unit_su3_cdble(&u, 2.0);
-    unit_su3_vector_cdble(&v, 3.0);
+    unit_su3_cdble(&w);
+    unit_su3_cdble(&u);
+    unit_su3_vector_cdble(&v);
+    printf("v vector:\n");
+    printf("c1 = (%f, %f)\n", v.c1.re, v.c1.im);
+    printf("c2 = (%f, %f)\n", v.c2.re, v.c2.im);
+    printf("c3 = (%f, %f)\n", v.c3.re, v.c3.im);
 
     // multiply u and v
     su3_vector_cdble result_vec;

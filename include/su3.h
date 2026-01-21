@@ -22,10 +22,11 @@ typedef struct
 
 // SU3 initialization and allocation
 int alloc_su3_cdble(su3_cdble **su3);
-void unit_su3_cdble(su3_cdble *su3, int value);
+void unit_su3_cdble(su3_cdble *su3);
+void random_su3_cdble(su3_cdble *su3);
 
-int alloc_su3_vector_cdble(su3_vector_cdble **vec); //TODO: define
-void unit_su3_vector_cdble(su3_vector_cdble *vec, int value); //TODO: define
+int alloc_su3_vector_cdble(su3_vector_cdble **vec);
+void unit_su3_vector_cdble(su3_vector_cdble *vec);
 
 // Algebra
 complex_dble add(complex_dble a, complex_dble b);

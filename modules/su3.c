@@ -13,6 +13,9 @@
 #define SU3PROD_C
 
 #include "su3.h"
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 int alloc_su3_cdble(su3_cdble **su3)
 {
@@ -42,26 +45,35 @@ int alloc_su3_vector_cdble(su3_vector_cdble **su3_vec)
     return 0;
 }
 
-void unit_su3_cdble(su3_cdble *su3, int value)
+void unit_su3_cdble(su3_cdble *su3)
 {
 
     _Static_assert(sizeof(su3_cdble) == 18 * sizeof(double),
                    "su3_cdble layout assumption broken");
-    memset(su3, 0, sizeof *su3);
-    su3->c11.re = (double)value;
-    su3->c22.re = (double)value;
-    su3->c33.re = (double)value;
+    double *d = (double *)su3;
+    for (int i = 0; i < 18; i++)
+        d[i] = 1.0;
 }
 
-void unit_su3_vector_cdble(su3_vector_cdble *vec, int value)
+void random_su3_cdble(su3_cdble *su3)
+{
+    _Static_assert(sizeof(su3_cdble) == 18 * sizeof(double),
+                   "su3_cdble layout assumption broken");
+
+    // Generate random values for each component
+    double *d = (double *)su3;
+    for (int i = 0; i < 18; i++)
+        d[i] = (double)rand() / RAND_MAX;
+}
+
+void unit_su3_vector_cdble(su3_vector_cdble *vec)
 {
     
     _Static_assert(sizeof(su3_vector_cdble) == 6 * sizeof(double),
                    "su3_vector_cdble layout assumption broken");
-    memset(vec, 0, sizeof *vec);
-    vec->c1.re = (double)value;
-    vec->c2.re = (double)value;
-    vec->c3.re = (double)value;
+    double *d = (double *)vec;
+    for (int i = 0; i < 6; i++)
+        d[i] = 1.0;
 }
 
 
