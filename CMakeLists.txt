@@ -9,4 +9,14 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
+add_library(su3lib
+    ${PROJECT_SOURCE_DIR}/modules/ufields.c
+    ${PROJECT_SOURCE_DIR}/modules/su3.c
+)
+
+target_include_directories(su3lib
+    PRIVATE
+    ${PROJECT_SOURCE_DIR}/include
+)
+
 add_subdirectory(main)

@@ -1,29 +1,24 @@
 /*******************************************************************************
 *
-* File global.h
+* File uflds.h
 *
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
 *
-* Global parameters and arrays
-*
 *******************************************************************************/
 
-#ifndef GLOBAL_H
-#define GLOBAL_H
+#ifndef UFLDS_H
+#define UFLDS_H
 
-#define L0 16
-#define L1 16
-#define L2 16
-#define L3 16
 
-#define L0_TRD 16
-#define L1_TRD 16
-#define L2_TRD 16
-#define L3_TRD 16
+#include "su3.h"
+#include "global.h"
 
-#define VOLUME (L0*L1*L2*L3)
-#define ALIGN 9
+int alloc_su3_cdble(su3_cdble **su3);
+void unit_su3_cdble(su3_cdble *su3, int value);
 
-#endif
+
+// void alloc_su3_cdble_field(su3_cdble_field *field, int size);
+
+# endif // UFLDS_H
