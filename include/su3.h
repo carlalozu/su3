@@ -20,12 +20,9 @@ typedef struct
     complex_dble c11, c12, c13, c21, c22, c23, c31, c32, c33;
 } su3_cdble;
 
-// SU3 initialization and allocation
-int alloc_su3_cdble(su3_cdble **su3);
+// SU3 initialization
 void unit_su3_cdble(su3_cdble *su3);
 void random_su3_cdble(su3_cdble *su3);
-
-int alloc_su3_vector_cdble(su3_vector_cdble **vec);
 void unit_su3_vector_cdble(su3_vector_cdble *vec);
 
 // Algebra

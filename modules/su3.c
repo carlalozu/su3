@@ -19,7 +19,6 @@
 
 void unit_su3_cdble(su3_cdble *su3)
 {
-
     _Static_assert(sizeof(su3_cdble) == 18 * sizeof(double),
                    "su3_cdble layout assumption broken");
     double *d = (double *)su3;
@@ -31,8 +30,6 @@ void random_su3_cdble(su3_cdble *su3)
 {
     _Static_assert(sizeof(su3_cdble) == 18 * sizeof(double),
                    "su3_cdble layout assumption broken");
-
-    // Generate random values for each component
     double *d = (double *)su3;
     for (int i = 0; i < 18; i++)
         d[i] = (double)rand() / RAND_MAX;
@@ -40,14 +37,12 @@ void random_su3_cdble(su3_cdble *su3)
 
 void unit_su3_vector_cdble(su3_vector_cdble *vec)
 {
-    
     _Static_assert(sizeof(su3_vector_cdble) == 6 * sizeof(double),
                    "su3_vector_cdble layout assumption broken");
     double *d = (double *)vec;
     for (int i = 0; i < 6; i++)
         d[i] = 1.0;
 }
-
 
 complex_dble add(complex_dble a, complex_dble b)
 {
@@ -105,40 +100,41 @@ void su3xsu3vec(su3_vector_cdble *res, su3_cdble *u, su3_vector_cdble *s)
  *
  * res = u * v
  */
-void su3xsu3(su3_cdble *res, su3_cdble *u,su3_cdble *v)
+void su3xsu3(su3_cdble *res, su3_cdble *u, su3_cdble *v)
 {
-   su3_vector_cdble psi,chi;
+    su3_vector_cdble psi, chi;
 
-   psi.c1=(*v).c11;
-   psi.c2=(*v).c21;
-   psi.c3=(*v).c31;
-   su3xsu3vec(&chi,u,&psi);
-   (*res).c11=chi.c1;
-   (*res).c21=chi.c2;
-   (*res).c31=chi.c3;
+    psi.c1 = (*v).c11;
+    psi.c2 = (*v).c21;
+    psi.c3 = (*v).c31;
+    su3xsu3vec(&chi, u, &psi);
+    (*res).c11 = chi.c1;
+    (*res).c21 = chi.c2;
+    (*res).c31 = chi.c3;
 
-   psi.c1=(*v).c12;
-   psi.c2=(*v).c22;
-   psi.c3=(*v).c32;
-   su3xsu3vec(&chi,u,&psi);
-   (*res).c12=chi.c1;
-   (*res).c22=chi.c2;
-   (*res).c32=chi.c3;
+    psi.c1 = (*v).c12;
+    psi.c2 = (*v).c22;
+    psi.c3 = (*v).c32;
+    su3xsu3vec(&chi, u, &psi);
+    (*res).c12 = chi.c1;
+    (*res).c22 = chi.c2;
+    (*res).c32 = chi.c3;
 
-   psi.c1=(*v).c13;
-   psi.c2=(*v).c23;
-   psi.c3=(*v).c33;
-   su3xsu3vec(&chi,u,&psi);
-   (*res).c13=chi.c1;
-   (*res).c23=chi.c2;
-   (*res).c33=chi.c3;
+    psi.c1 = (*v).c13;
+    psi.c2 = (*v).c23;
+    psi.c3 = (*v).c33;
+    su3xsu3vec(&chi, u, &psi);
+    (*res).c13 = chi.c1;
+    (*res).c23 = chi.c2;
+    (*res).c33 = chi.c3;
 }
 
 /* SU(3) trace
  *
  * tr = trace(u)
  */
-complex_dble su3_trace(su3_cdble *u){
+complex_dble su3_trace(su3_cdble *u)
+{
     complex_dble tr;
     tr.re = u->c11.re + u->c22.re + u->c33.re;
     tr.im = u->c11.im + u->c22.im + u->c33.im;
