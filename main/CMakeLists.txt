@@ -11,3 +11,6 @@ configure_exec(main)
 
 add_executable(main_fields main_fields.c)
 configure_exec(main_fields)
+
+add_executable(main_fieldsv main_fieldsv.c)
+configure_exec(main_fieldsv)
