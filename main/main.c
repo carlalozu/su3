@@ -2,49 +2,41 @@
 #include <stdlib.h>
 #include "su3.h"
 #include "global.h"
-#include "ufields.h"
 
 int main(int argc, char *argv[])
 {
     printf("Hello, C project!\n");
 
-    su3_cdble *u, *v;
-    // Initialize u as needed
-    int ru = alloc_su3_cdble(&u);
-    int rv = alloc_su3_cdble(&v);
-    if (ru != 0 || rv != 0) {
-        printf("Allocation failed\n");
-        return -1;
-    }
-    unit_su3_cdble(u, 8.0);
-    unit_su3_cdble(v, 8.0);
+    su3_cdble u;
+    su3_cdble w;
+    su3_vector_cdble v;
 
-    // print volume
-    printf("Volume: %d\n", VOLUME);
-    su3_cdble *u_field[VOLUME];
-    int r_uf = alloc_ufield(&u_field, VOLUME);
-    if (r_uf != 0) {
-        printf("Allocation of u_field failed\n");
-        return -1;
-    }
-    
-    for (int i = 0; i < VOLUME; i++) {
-        unit_su3_cdble(u_field[i], i);
-    }
-    int idx = 17; // example index
-    
-    printf("u[%i]->c11 = (%f, %f)\n", idx, u_field[idx]->c11.re, u_field[idx]->c11.im);
-    printf("u[%i]->c12 = (%f, %f)\n", idx, u_field[idx]->c12.re, u_field[idx]->c12.im);
-    printf("u[%i]->c13 = (%f, %f)\n", idx, u_field[idx]->c13.re, u_field[idx]->c13.im);
-    printf("u[%i]->c21 = (%f, %f)\n", idx, u_field[idx]->c21.re, u_field[idx]->c21.im);
-    printf("u[%i]->c22 = (%f, %f)\n", idx, u_field[idx]->c22.re, u_field[idx]->c22.im);
-    printf("u[%i]->c23 = (%f, %f)\n", idx, u_field[idx]->c23.re, u_field[idx]->c23.im);
-    printf("u[%i]->c31 = (%f, %f)\n", idx, u_field[idx]->c31.re, u_field[idx]->c31.im);
-    printf("u[%i]->c32 = (%f, %f)\n", idx, u_field[idx]->c32.re, u_field[idx]->c32.im);
-    printf("u[%i]->c33 = (%f, %f)\n", idx, u_field[idx]->c33.re, u_field[idx]->c33.im);
+    unit_su3_cdble(&w, 1.0);
+    unit_su3_cdble(&u, 2.0);
+    unit_su3_vector_cdble(&v, 3.0);
 
-    free(u);
-    free(v);
+    // multiply u and v
+    su3_vector_cdble result_vec;
+    su3xsu3vec(&result_vec, &u, &v);
+    printf("result_vec vector:\n");
+    printf("c1 = (%f, %f)\n", result_vec.c1.re, result_vec.c1.im);
+    printf("c2 = (%f, %f)\n", result_vec.c2.re, result_vec.c2.im);
+    printf("c3 = (%f, %f)\n", result_vec.c3.re, result_vec.c3.im);
+
+    // multiply u and w
+    su3_cdble result_mat;
+    su3xsu3(&result_mat, &u, &w);
+    printf("result matrix:\n");
+    printf("c11 = (%f, %f)\n", result_mat.c11.re, result_mat.c11.im);
+    printf("c12 = (%f, %f)\n", result_mat.c12.re, result_mat.c12.im);
+    printf("c13 = (%f, %f)\n", result_mat.c13.re, result_mat.c13.im);
+    printf("c21 = (%f, %f)\n", result_mat.c21.re, result_mat.c21.im);
+    printf("c22 = (%f, %f)\n", result_mat.c22.re, result_mat.c22.im);
+    printf("c23 = (%f, %f)\n", result_mat.c23.re, result_mat.c23.im);
+    printf("c31 = (%f, %f)\n", result_mat.c31.re, result_mat.c31.im);
+    printf("c32 = (%f, %f)\n", result_mat.c32.re, result_mat.c32.im);
+    printf("c33 = (%f, %f)\n", result_mat.c33.re, result_mat.c33.im);
+
 
     return 0;
 }
