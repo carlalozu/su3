@@ -1,0 +1,13 @@
+# SU(3) Lattice QCD
+
+A repository for SU(3) lattice quantum chromodynamics calculations and
+simulations.
+
+## Description
+
+This project implements SU(3) gauge theory computations for lattice QCD
+research.
+The idea is to provide efficient data structures and algorithms for manipulating
+SU(3) matrices and vectors, which are essential in lattice QCD simulations.
+We want to explore the difference in using an array of structures (AoS) versus a
+structure of arrays (SoA) for representing SU(3) fields.
