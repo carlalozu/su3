@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+
 typedef struct
 {
     double re, im;
@@ -14,11 +15,6 @@ typedef struct
     complex_dble c11, c12, c13, c21, c22, c23, c31, c32, c33;
 } su3_cdble;
 
-// typedef struct
-// {
-//     complex_dble *c11, *c12, *c13, *c21, *c22, *c23, *c31, *c32, *c33;
-// } su3_cdble_field;
-// 
 // typedef struct
 // {
 //     double *c11r, *c12r, *c13r, *c21r, *c22r, *c23r, *c31r, *c32r, *c33r;

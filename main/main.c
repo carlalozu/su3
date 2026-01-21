@@ -8,26 +8,43 @@ int main(int argc, char *argv[])
 {
     printf("Hello, C project!\n");
 
-    su3_cdble *u;
+    su3_cdble *u, *v;
     // Initialize u as needed
-    int r = alloc_su3_cdble(&u);
-    if (r != 0) {
+    int ru = alloc_su3_cdble(&u);
+    int rv = alloc_su3_cdble(&v);
+    if (ru != 0 || rv != 0) {
         printf("Allocation failed\n");
         return -1;
     }
     unit_su3_cdble(u, 8.0);
+    unit_su3_cdble(v, 8.0);
 
-    printf("u->c11 = (%f, %f)\n", u->c11.re, u->c11.im);
-    printf("u->c12 = (%f, %f)\n", u->c12.re, u->c12.im);
-    printf("u->c13 = (%f, %f)\n", u->c13.re, u->c13.im);
-    printf("u->c21 = (%f, %f)\n", u->c21.re, u->c21.im);
-    printf("u->c22 = (%f, %f)\n", u->c22.re, u->c22.im);
-    printf("u->c23 = (%f, %f)\n", u->c23.re, u->c23.im);
-    printf("u->c31 = (%f, %f)\n", u->c31.re, u->c31.im);
-    printf("u->c32 = (%f, %f)\n", u->c32.re, u->c32.im);
-    printf("u->c33 = (%f, %f)\n", u->c33.re, u->c33.im);
+    // print volume
+    printf("Volume: %d\n", VOLUME);
+    su3_cdble *u_field[VOLUME];
+    int r_uf = alloc_ufield(&u_field, VOLUME);
+    if (r_uf != 0) {
+        printf("Allocation of u_field failed\n");
+        return -1;
+    }
+    
+    for (int i = 0; i < VOLUME; i++) {
+        unit_su3_cdble(u_field[i], i);
+    }
+    int idx = 17; // example index
+    
+    printf("u[%i]->c11 = (%f, %f)\n", idx, u_field[idx]->c11.re, u_field[idx]->c11.im);
+    printf("u[%i]->c12 = (%f, %f)\n", idx, u_field[idx]->c12.re, u_field[idx]->c12.im);
+    printf("u[%i]->c13 = (%f, %f)\n", idx, u_field[idx]->c13.re, u_field[idx]->c13.im);
+    printf("u[%i]->c21 = (%f, %f)\n", idx, u_field[idx]->c21.re, u_field[idx]->c21.im);
+    printf("u[%i]->c22 = (%f, %f)\n", idx, u_field[idx]->c22.re, u_field[idx]->c22.im);
+    printf("u[%i]->c23 = (%f, %f)\n", idx, u_field[idx]->c23.re, u_field[idx]->c23.im);
+    printf("u[%i]->c31 = (%f, %f)\n", idx, u_field[idx]->c31.re, u_field[idx]->c31.im);
+    printf("u[%i]->c32 = (%f, %f)\n", idx, u_field[idx]->c32.re, u_field[idx]->c32.im);
+    printf("u[%i]->c33 = (%f, %f)\n", idx, u_field[idx]->c33.re, u_field[idx]->c33.im);
 
     free(u);
+    free(v);
 
     return 0;
 }

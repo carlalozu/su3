@@ -19,6 +19,6 @@ int alloc_su3_cdble(su3_cdble **su3);
 void unit_su3_cdble(su3_cdble *su3, int value);
 
 
-// void alloc_su3_cdble_field(su3_cdble_field *field, int size);
+int alloc_ufield(su3_cdble **field, int size);
 
 # endif // UFLDS_H
