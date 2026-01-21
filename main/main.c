@@ -37,6 +37,9 @@ int main(int argc, char *argv[])
     printf("c32 = (%f, %f)\n", result_mat.c32.re, result_mat.c32.im);
     printf("c33 = (%f, %f)\n", result_mat.c33.re, result_mat.c33.im);
 
+    // take trace of result_mat
+    complex_dble tr = su3_trace(&result_mat);
+    printf("Trace of result matrix: (%f, %f)\n", tr.re, tr.im);
 
     return 0;
 }

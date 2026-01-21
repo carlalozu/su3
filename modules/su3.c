@@ -116,6 +116,11 @@ void su3xsu3vec(su3_vector_cdble *res, su3_cdble *u, su3_vector_cdble *s)
                  u->c33.re * s->c3.im + u->c33.im * s->c3.re;
 }
 
+/*
+ * SU(3) matrix multiplication
+ *
+ * res = u * v
+ */
 void su3xsu3(su3_cdble *res, su3_cdble *u,su3_cdble *v)
 {
    su3_vector_cdble psi,chi;
@@ -145,4 +150,14 @@ void su3xsu3(su3_cdble *res, su3_cdble *u,su3_cdble *v)
    (*res).c33=chi.c3;
 }
 
+/* SU(3) trace
+ *
+ * tr = trace(u)
+ */
+complex_dble su3_trace(su3_cdble *u){
+    complex_dble tr;
+    tr.re = u->c11.re + u->c22.re + u->c33.re;
+    tr.im = u->c11.im + u->c22.im + u->c33.im;
+    return tr;
+}
 #endif // SU3PROD_C

@@ -32,5 +32,6 @@ complex_dble add(complex_dble a, complex_dble b);
 void vec_add(su3_vector_cdble *res, su3_vector_cdble *a, su3_vector_cdble *b);
 void su3xsu3vec(su3_vector_cdble *res, su3_cdble *mat, su3_vector_cdble *vec);
 void su3xsu3(su3_cdble *res, su3_cdble *u,su3_cdble *v);
+complex_dble su3_trace(su3_cdble *u);
 
 #endif // SU3_H
