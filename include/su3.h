@@ -3,7 +3,7 @@
  * File su3.h
  *
  * Everything is in double precision.
- * 
+ *
  * This software is distributed under the terms of the GNU General Public
  * License (GPL)
  *
@@ -36,10 +36,9 @@ void random_su3mat(su3_mat *su3_mat);
 void unit_su3vec(su3_vec *su3_vec);
 
 // Algebra
-complex add(complex a, complex b);
-void vec_add(su3_vec *res, su3_vec *u, su3_vec *v);
-void su3matxsu3vec(su3_vec *res, su3_mat *u, su3_vec *v);
-void su3matxsu3mat(su3_mat *res, su3_mat *u,su3_mat *v);
-complex su3_trace(su3_mat *u);
-
+complex add(const complex a, const complex b);
+void vec_add(su3_vec *res, const su3_vec *u, const su3_vec *v);
+void su3matxsu3vec(su3_vec *res, const su3_mat *u, const su3_vec *v);
+void su3matxsu3mat(su3_mat *res, const su3_mat *u, const su3_mat *v);
+complex su3_trace(const su3_mat *u);
 #endif // SU3_H

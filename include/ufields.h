@@ -16,12 +16,12 @@
 #include "global.h"
 
 // AoS operations
-void usu3matxusu3vec(su3_vec *res_field, su3_mat *u_field, su3_vec *v_field, size_t size);
-void usu3matxusu3mat(su3_mat *res, su3_mat *u_field, su3_mat *v_field, size_t size);
+void usu3matxusu3vec(su3_vec *res_field, su3_mat *u_field, su3_vec *v_field, const size_t size);
+void usu3matxusu3mat(su3_mat *res, su3_mat *u_field, su3_mat *v_field, const size_t size);
 
 // SoA operations
-void fsu3matxsu3vec(su3_vec_field *res, su3_mat_field *m_field, su3_vec_field *v_field, size_t size);
-void fsu3matxsu3mat(su3_mat_field *res, su3_mat_field *m_field, su3_mat_field *v_field, size_t size);
+void fsu3matxsu3vec(su3_vec_field *res, const su3_mat_field *m_field, const su3_vec_field *v_field, const size_t size);
+void fsu3matxsu3mat(su3_mat_field *res, const su3_mat_field *m_field, const su3_mat_field *v_field, const size_t size);
 // TODO: trace
 
 #endif // UFLDS_H

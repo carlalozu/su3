@@ -45,7 +45,7 @@ void unit_su3vec(su3_vec *vec)
         d[i] = 1.0;
 }
 
-complex add(complex a, complex b)
+complex add(const complex a, const complex b)
 {
     return (complex){a.re + b.re, a.im + b.im};
 }
@@ -57,7 +57,7 @@ complex add(complex a, complex b)
  * r.c2=s1.c2+s2.c2
  * r.c3=s1.c3+s2.c3
  */
-void vec_add(su3_vec *res, su3_vec *s1, su3_vec *s2)
+void vec_add(su3_vec *res, const su3_vec *s1, const su3_vec *s2)
 {
     res->c1.re = s1->c1.re + s2->c1.re;
     res->c1.im = s1->c1.im + s2->c1.im;
@@ -74,7 +74,7 @@ void vec_add(su3_vec *res, su3_vec *s1, su3_vec *s2)
  * r.c2=(u*s).c2
  * r.c3=(u*s).c3
  */
-void su3matxsu3vec(su3_vec *res, su3_mat *u, su3_vec *s)
+void su3matxsu3vec(su3_vec *res, const su3_mat *u, const su3_vec *s)
 {
     res->c1.re = u->c11.re * s->c1.re - u->c11.im * s->c1.im +
                  u->c12.re * s->c2.re - u->c12.im * s->c2.im +
@@ -101,7 +101,7 @@ void su3matxsu3vec(su3_vec *res, su3_mat *u, su3_vec *s)
  *
  * res = u * v
  */
-void su3matxsu3mat(su3_mat *res, su3_mat *u, su3_mat *v)
+void su3matxsu3mat(su3_mat *res, const su3_mat *u, const su3_mat *v)
 {
     su3_vec psi, chi;
 
@@ -134,7 +134,7 @@ void su3matxsu3mat(su3_mat *res, su3_mat *u, su3_mat *v)
  *
  * tr = trace(u)
  */
-complex su3_trace(su3_mat *u)
+complex su3_trace(const su3_mat *u)
 {
     complex tr;
     tr.re = u->c11.re + u->c22.re + u->c33.re;
