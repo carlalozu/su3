@@ -8,18 +8,18 @@
 #include "global.h"
 
 
-void random_su3_field_vdble(su3_vec_field *su3vf)
+void random_su3vec_field(su3_vec_field *su3vf)
 {
     double *d = (double *)su3vf;
     for (int i = 0; i < 6*VOLUME; i++)
         d[i] = (double)rand() / RAND_MAX;
 }
 
-void random_su3_matrix_field(su3_mat_field *su3mf)
+void random_su3mat_field(su3_mat_field *su3mf)
 {
-    random_su3_field_vdble(&su3mf->c1);
-    random_su3_field_vdble(&su3mf->c2);
-    random_su3_field_vdble(&su3mf->c3);
+    random_su3vec_field(&su3mf->c1);
+    random_su3vec_field(&su3mf->c2);
+    random_su3vec_field(&su3mf->c3);
 }
 
 #endif // SU3V_C

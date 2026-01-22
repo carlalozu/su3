@@ -16,11 +16,26 @@ int main(int argc, char *argv[])
     printf("Volume: %d\n", VOLUME);
 
     su3_vec_field v_field;
-
-    v_field.c1im[idx] = (idx + 1) * 1.0;
-    printf("v_field[%i]->c1im[%i] = %f\n", idx, idx, v_field.c1im[idx]);
-
     su3_mat_field m_field;
+    su3_mat_field u_field;
+    su3_vec_field res_field;
 
+    random_su3vec_field(&v_field);
+    random_su3mat_field(&m_field);
+    random_su3mat_field(&u_field);
+    printf("v_field[%i]->c1re[%i] = %f\n", idx, idx, v_field.c1re[idx]);
+    printf("v_field[%i]->c2im[%i] = %f\n", idx, idx, v_field.c2im[idx]);
+    printf("m_field[%i]->c2.c3re[%i] = %f\n", idx, idx, m_field.c2.c3re[idx]);
+    printf("m_field[%i]->c3.c1im[%i] = %f\n", idx, idx, m_field.c3.c1im[idx]);
+
+    // matrix-vector field multiplication
+    fsu3matxsu3vec(&res_field, &m_field, &v_field, VOLUME);
+    printf("res_field[%i]->c1re[%i] = %f\n", idx, idx, res_field.c1re[idx]);
+    printf("res_field[%i]->c2im[%i] = %f\n", idx, idx, res_field.c2im[idx]);
+
+    // matrix-matrix field multiplication
+    fsu3matxsu3mat(&m_field, &u_field, &m_field, VOLUME);
+    printf("m_field[%i]->c1.c1re[%i] = %f\n", idx, idx, m_field.c1.c1re[idx]);
+    printf("m_field[%i]->c3.c3im[%i] = %f\n", idx, idx, m_field.c3.c3im[idx]);
     return 0;
 }

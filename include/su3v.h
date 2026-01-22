@@ -27,5 +27,7 @@ typedef struct
 
 } su3_mat_field;
 
+void random_su3mat_field(su3_mat_field *su3_mat);
+void random_su3vec_field(su3_vec_field *su3_vec);
 
 #endif // SU3V_H
