@@ -15,9 +15,9 @@
 #include "su3v.h"
 #include "global.h"
 
-void usu3xusu3(su3_cdble *res, su3_cdble *u_field, su3_cdble *v_field, size_t size);
-void usu3xusu3vec(su3_vector_cdble *res_field, su3_cdble *u_field, su3_vector_cdble *v_field, size_t size);
+void usu3matxusu3vec(su3_vec *res_field, su3_mat *u_field, su3_vec *v_field, size_t size);
+void usu3matxusu3mat(su3_mat *res, su3_mat *u_field, su3_mat *v_field, size_t size);
 
-void usu3xusu3v(su3_field_dble *res, su3_field_dble *u_field, su3_field_dble *v_field, size_t size);
+void fusu3matxusu3vec(su3_vec_field *res, su3_mat_field *m_field, su3_vec_field *v_field, size_t size);
 
 #endif // UFLDS_H

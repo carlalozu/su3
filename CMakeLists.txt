@@ -12,6 +12,7 @@ set(CMAKE_C_EXTENSIONS OFF)
 add_library(su3lib
     ${PROJECT_SOURCE_DIR}/modules/ufields.c
     ${PROJECT_SOURCE_DIR}/modules/su3.c
+    ${PROJECT_SOURCE_DIR}/modules/su3v.c
 )
 
 target_include_directories(su3lib

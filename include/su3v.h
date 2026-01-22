@@ -15,17 +15,17 @@ typedef struct
     double c1re[VOLUME], c1im[VOLUME];
     double c2re[VOLUME], c2im[VOLUME];
     double c3re[VOLUME], c3im[VOLUME];
-} su3_vector_field_vdble;
+} su3_vec_field;
 
 /* SU3 matrix 
-* Each element is a su3_vector_vdble
+* Each element is a su3_vec_vdble
 * Represents a column of the SU3 matrix
 */
 typedef struct
 {
-    su3_vector_field_vdble c1, c2, c3;
+    su3_vec_field c1, c2, c3;
 
-} su3_field_dble;
+} su3_mat_field;
 
 
 #endif // SU3V_H

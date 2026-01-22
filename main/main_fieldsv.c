@@ -15,12 +15,12 @@ int main(int argc, char *argv[])
     printf("Testing ufields structures\n");
     printf("Volume: %d\n", VOLUME);
 
-    su3_vector_field_vdble v_field;
+    su3_vec_field v_field;
 
     v_field.c1im[idx] = (idx + 1) * 1.0;
     printf("v_field[%i]->c1im[%i] = %f\n", idx, idx, v_field.c1im[idx]);
 
-    su3_field_dble m_field;
+    su3_mat_field m_field;
 
     return 0;
 }

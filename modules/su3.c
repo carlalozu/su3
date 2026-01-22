@@ -17,36 +17,36 @@
 #include <string.h>
 #include <stdio.h>
 
-void unit_su3_cdble(su3_cdble *su3)
+void unit_su3mat(su3_mat *su3)
 {
-    _Static_assert(sizeof(su3_cdble) == 18 * sizeof(double),
-                   "su3_cdble layout assumption broken");
+    _Static_assert(sizeof(su3_mat) == 18 * sizeof(double),
+                   "su3 layout assumption broken");
     double *d = (double *)su3;
     for (int i = 0; i < 18; i++)
         d[i] = 1.0;
 }
 
-void random_su3_cdble(su3_cdble *su3)
+void random_su3mat(su3_mat *su3)
 {
-    _Static_assert(sizeof(su3_cdble) == 18 * sizeof(double),
-                   "su3_cdble layout assumption broken");
+    _Static_assert(sizeof(su3_mat) == 18 * sizeof(double),
+                   "su3 layout assumption broken");
     double *d = (double *)su3;
     for (int i = 0; i < 18; i++)
         d[i] = (double)rand() / RAND_MAX;
 }
 
-void unit_su3_vector_cdble(su3_vector_cdble *vec)
+void unit_su3vec(su3_vec *vec)
 {
-    _Static_assert(sizeof(su3_vector_cdble) == 6 * sizeof(double),
-                   "su3_vector_cdble layout assumption broken");
+    _Static_assert(sizeof(su3_vec) == 6 * sizeof(double),
+                   "su3_vec layout assumption broken");
     double *d = (double *)vec;
     for (int i = 0; i < 6; i++)
         d[i] = 1.0;
 }
 
-complex_dble add(complex_dble a, complex_dble b)
+complex add(complex a, complex b)
 {
-    return (complex_dble){a.re + b.re, a.im + b.im};
+    return (complex){a.re + b.re, a.im + b.im};
 }
 
 /*
@@ -56,7 +56,7 @@ complex_dble add(complex_dble a, complex_dble b)
  * r.c2=s1.c2+s2.c2
  * r.c3=s1.c3+s2.c3
  */
-void vec_add(su3_vector_cdble *res, su3_vector_cdble *s1, su3_vector_cdble *s2)
+void vec_add(su3_vec *res, su3_vec *s1, su3_vec *s2)
 {
     res->c1.re = s1->c1.re + s2->c1.re;
     res->c1.im = s1->c1.im + s2->c1.im;
@@ -73,7 +73,7 @@ void vec_add(su3_vector_cdble *res, su3_vector_cdble *s1, su3_vector_cdble *s2)
  * r.c2=(u*s).c2
  * r.c3=(u*s).c3
  */
-void su3xsu3vec(su3_vector_cdble *res, su3_cdble *u, su3_vector_cdble *s)
+void su3matxsu3vec(su3_vec *res, su3_mat *u, su3_vec *s)
 {
     res->c1.re = u->c11.re * s->c1.re - u->c11.im * s->c1.im +
                  u->c12.re * s->c2.re - u->c12.im * s->c2.im +
@@ -100,14 +100,14 @@ void su3xsu3vec(su3_vector_cdble *res, su3_cdble *u, su3_vector_cdble *s)
  *
  * res = u * v
  */
-void su3xsu3(su3_cdble *res, su3_cdble *u, su3_cdble *v)
+void su3matxsu3mat(su3_mat *res, su3_mat *u, su3_mat *v)
 {
-    su3_vector_cdble psi, chi;
+    su3_vec psi, chi;
 
     psi.c1 = (*v).c11;
     psi.c2 = (*v).c21;
     psi.c3 = (*v).c31;
-    su3xsu3vec(&chi, u, &psi);
+    su3matxsu3vec(&chi, u, &psi);
     (*res).c11 = chi.c1;
     (*res).c21 = chi.c2;
     (*res).c31 = chi.c3;
@@ -115,7 +115,7 @@ void su3xsu3(su3_cdble *res, su3_cdble *u, su3_cdble *v)
     psi.c1 = (*v).c12;
     psi.c2 = (*v).c22;
     psi.c3 = (*v).c32;
-    su3xsu3vec(&chi, u, &psi);
+    su3matxsu3vec(&chi, u, &psi);
     (*res).c12 = chi.c1;
     (*res).c22 = chi.c2;
     (*res).c32 = chi.c3;
@@ -123,7 +123,7 @@ void su3xsu3(su3_cdble *res, su3_cdble *u, su3_cdble *v)
     psi.c1 = (*v).c13;
     psi.c2 = (*v).c23;
     psi.c3 = (*v).c33;
-    su3xsu3vec(&chi, u, &psi);
+    su3matxsu3vec(&chi, u, &psi);
     (*res).c13 = chi.c1;
     (*res).c23 = chi.c2;
     (*res).c33 = chi.c3;
@@ -133,9 +133,9 @@ void su3xsu3(su3_cdble *res, su3_cdble *u, su3_cdble *v)
  *
  * tr = trace(u)
  */
-complex_dble su3_trace(su3_cdble *u)
+complex su3_trace(su3_mat *u)
 {
-    complex_dble tr;
+    complex tr;
     tr.re = u->c11.re + u->c22.re + u->c33.re;
     tr.im = u->c11.im + u->c22.im + u->c33.im;
     return tr;
