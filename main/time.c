@@ -13,11 +13,11 @@ int main(int argc, char *argv[])
     double init_SoA_time = 0.0;
     double compute_SoA_time = 0.0;
 
-    // read idx from command line
-    int idx = 0;
+    // read reps from command line
+    int reps = 100;
     if (argc > 1)
     {
-        idx = atoi(argv[1]);
+        reps = atoi(argv[1]);
     }
 
     printf("Timing SoA vs AoS structures\n");
@@ -32,8 +32,6 @@ int main(int argc, char *argv[])
     su3_mat_field u_fieldv;
     su3_mat_field v_fieldv;
     su3_mat_field w_fieldv;
-
-    int reps = 20;
 
     for (int r = 0; r < reps; r++)
     {
