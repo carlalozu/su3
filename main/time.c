@@ -56,14 +56,14 @@ int main(int argc, char *argv[])
             random_su3mat(&w_field[i]);
         }
         end_time = (double)clock() / CLOCKS_PER_SEC;
-        init_AoS_time += end_time - start_time;
+        if (r>10) init_AoS_time += end_time - start_time;
 
         // u*v*w AoS
         start_time = (double)clock() / CLOCKS_PER_SEC;
         usu3matxusu3mat(u_field, u_field, v_field, VOLUME);
         usu3matxusu3mat(u_field, u_field, w_field, VOLUME);
         end_time = (double)clock() / CLOCKS_PER_SEC;
-        compute_AoS_time += end_time - start_time;
+        if (r>10) compute_AoS_time += end_time - start_time;
 
         // initialize SoA fields
         start_time = (double)clock() / CLOCKS_PER_SEC;
@@ -71,14 +71,14 @@ int main(int argc, char *argv[])
         random_su3mat_field(&v_fieldv);
         random_su3mat_field(&w_fieldv);
         end_time = (double)clock() / CLOCKS_PER_SEC;
-        init_SoA_time += end_time - start_time;
+        if (r>10) init_SoA_time += end_time - start_time;
 
         // u*v*w SoA
         start_time = (double)clock() / CLOCKS_PER_SEC;
         fsu3matxsu3mat(&u_fieldv, &u_fieldv, &v_fieldv, VOLUME);
         fsu3matxsu3mat(&u_fieldv, &u_fieldv, &w_fieldv, VOLUME);
         end_time = (double)clock() / CLOCKS_PER_SEC;
-        compute_SoA_time += end_time - start_time;
+        if (r>10) compute_SoA_time += end_time - start_time;
     }
     printf("AoS initialization time: %f seconds\n", init_AoS_time/(double)reps);
     printf("AoS time for u*v*w: %f seconds\n", compute_AoS_time/(double)reps);
