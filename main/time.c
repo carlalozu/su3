@@ -4,6 +4,9 @@
 #include "global.h"
 #include "ufields.h"
 #include <time.h>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -12,6 +15,15 @@ int main(int argc, char *argv[])
     double compute_AoS_time = 0.0;
     double init_SoA_time = 0.0;
     double compute_SoA_time = 0.0;
+
+
+    // print if openmp is enabled
+    #ifdef _OPENMP
+    printf("OpenMP is enabled\n");
+    printf("Number of threads: %d\n", omp_get_max_threads());
+    #else
+    printf("OpenMP is not enabled\n");
+    #endif
 
     // read reps from command line
     int reps = 100;

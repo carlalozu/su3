@@ -1,13 +1,10 @@
-# set compile flags
-# set(CMAKE_CXX_FLAGS -Wall -Wextra -Wpedantic -fno-tree-vectorize -funroll-loops)
-set(CMAKE_CXX_FLAGS -Wall -Wextra -Wpedantic -ffast-math -O3 -funroll-loops)
 
 function(configure_exec target)
     target_include_directories(${target} PRIVATE
         ${PROJECT_SOURCE_DIR}/include
     )
     target_link_libraries(${target} PRIVATE su3lib)
-    target_compile_options(${target} PRIVATE ${CMAKE_CXX_FLAGS})
+    target_compile_options(${target} PRIVATE ${CMAKE_C_FLAGS})
 endfunction()
 
 add_executable(su3_alg su3_alg.c)

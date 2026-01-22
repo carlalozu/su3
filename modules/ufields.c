@@ -16,14 +16,18 @@
 #include "global.h"
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 /* SU(3) field AoS multiplication
  * Wrapper to perform
  * res_field = u_field * v_field
  * Where each field is an array of su3_mat of given size
  */
-void usu3matxusu3mat(su3_mat *res, su3_mat *u_field, su3_mat *v_field, size_t size)
+void usu3matxusu3mat(su3_mat *res, su3_mat *u_field, su3_mat *v_field, const size_t size)
 {
+    #pragma omp parallel for schedule(static)
     for (size_t i = 0; i < size; i++)
     {
         su3matxsu3mat(&res[i], &u_field[i], &v_field[i]);
@@ -35,8 +39,9 @@ void usu3matxusu3mat(su3_mat *res, su3_mat *u_field, su3_mat *v_field, size_t si
  * res_field = u_field * v_field
  * Where each field is an array of su3_mat and su3_vec of given size
  */
-void usu3matxusu3vec(su3_vec *res_field, su3_mat *u_field, su3_vec *v_field, size_t size)
+void usu3matxusu3vec(su3_vec *res_field, su3_mat *u_field, su3_vec *v_field, const size_t size)
 {
+    #pragma omp parallel for schedule(static)
     for (size_t i = 0; i < size; i++)
     {
         su3matxsu3vec(&res_field[i], &u_field[i], &v_field[i]);
@@ -50,8 +55,9 @@ void usu3matxusu3vec(su3_vec *res_field, su3_mat *u_field, su3_vec *v_field, siz
  * r.c2=(u*s).c2
  * r.c3=(u*s).c3
  */
-void fsu3matxsu3vec(su3_vec_field *res, su3_mat_field *u, su3_vec_field *v, size_t size)
+void fsu3matxsu3vec(su3_vec_field *res, const su3_mat_field *u, const su3_vec_field *v, const size_t size)
 {
+    #pragma omp parallel for schedule(static)
     for (size_t i = 0; i < size; i++)
     {
         res->c1re[i] = u->c1.c1re[i] * v->c1re[i] - u->c1.c1im[i] * v->c1im[i] +
@@ -80,7 +86,7 @@ void fsu3matxsu3vec(su3_vec_field *res, su3_mat_field *u, su3_vec_field *v, size
  * res_field = m_field * v_field
  * Where each field is a su3_mat_field of given size
  */
-void fsu3matxsu3mat(su3_mat_field *res, su3_mat_field *u_field, su3_mat_field *v_field, size_t size)
+void fsu3matxsu3mat(su3_mat_field *res, const su3_mat_field *u_field, const su3_mat_field *v_field, const size_t size)
 {
     // call fsu3matxsu3vec three times, once for each column
     fsu3matxsu3vec(&res->c1, u_field, &v_field->c1, size);
