@@ -105,29 +105,29 @@ void su3matxsu3mat(su3_mat *res, const su3_mat *u, const su3_mat *v)
 {
     su3_vec psi, chi;
 
-    psi.c1 = (*v).c11;
-    psi.c2 = (*v).c21;
-    psi.c3 = (*v).c31;
+    psi.c1 = v->c11;
+    psi.c2 = v->c21;
+    psi.c3 = v->c31;
     su3matxsu3vec(&chi, u, &psi);
-    (*res).c11 = chi.c1;
-    (*res).c21 = chi.c2;
-    (*res).c31 = chi.c3;
+    res->c11 = chi.c1;
+    res->c21 = chi.c2;
+    res->c31 = chi.c3;
 
-    psi.c1 = (*v).c12;
-    psi.c2 = (*v).c22;
-    psi.c3 = (*v).c32;
+    psi.c1 = v->c12;
+    psi.c2 = v->c22;
+    psi.c3 = v->c32;
     su3matxsu3vec(&chi, u, &psi);
-    (*res).c12 = chi.c1;
-    (*res).c22 = chi.c2;
-    (*res).c32 = chi.c3;
+    res->c12 = chi.c1;
+    res->c22 = chi.c2;
+    res->c32 = chi.c3;
 
-    psi.c1 = (*v).c13;
-    psi.c2 = (*v).c23;
-    psi.c3 = (*v).c33;
+    psi.c1 = v->c13;
+    psi.c2 = v->c23;
+    psi.c3 = v->c33;
     su3matxsu3vec(&chi, u, &psi);
-    (*res).c13 = chi.c1;
-    (*res).c23 = chi.c2;
-    (*res).c33 = chi.c3;
+    res->c13 = chi.c1;
+    res->c23 = chi.c2;
+    res->c33 = chi.c3;
 }
 
 /* SU(3) trace
