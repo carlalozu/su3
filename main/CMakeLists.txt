@@ -14,3 +14,6 @@ configure_exec(su3_fields)
 
 add_executable(su3_fieldsv su3_fieldsv.c)
 configure_exec(su3_fieldsv)
+
+add_executable(time time.c)
+configure_exec(time)

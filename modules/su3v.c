@@ -17,9 +17,12 @@ void random_su3vec_field(su3_vec_field *su3vf)
 
 void random_su3mat_field(su3_mat_field *su3mf)
 {
-    random_su3vec_field(&su3mf->c1);
-    random_su3vec_field(&su3mf->c2);
-    random_su3vec_field(&su3mf->c3);
+    // random_su3vec_field(&su3mf->c1);
+    // random_su3vec_field(&su3mf->c2);
+    // random_su3vec_field(&su3mf->c3);
+    double *d = (double *)su3mf;
+    for (int i = 0; i < 18*VOLUME; i++)
+        d[i] = (double)rand() / RAND_MAX;
 }
 
 #endif // SU3V_C
