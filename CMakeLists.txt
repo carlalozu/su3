@@ -37,6 +37,8 @@ target_compile_options(su3lib PRIVATE
     -Wall
     -Wextra
     -Wpedantic
+    -O3 -march=native
 )
-
+#  AVX-512
+target_compile_options(su3lib PRIVATE -mavx512f -mavx512dq -mavx512bw -mavx512vl -fopt-info-vec-missed=vec_missed.txt)
 add_subdirectory(main)

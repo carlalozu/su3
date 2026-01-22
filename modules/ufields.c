@@ -57,7 +57,7 @@ void usu3matxusu3vec(su3_vec *res_field, su3_mat *u_field, su3_vec *v_field, con
  */
 void fsu3matxsu3vec(su3_vec_field *res, const su3_mat_field *u, const su3_vec_field *v, const size_t size)
 {
-    #pragma omp parallel for schedule(static)
+    #pragma omp simd
     for (size_t i = 0; i < size; i++)
     {
         res->c1re[i] = u->c1.c1re[i] * v->c1re[i] - u->c1.c1im[i] * v->c1im[i] +

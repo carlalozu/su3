@@ -39,11 +39,15 @@ int main(int argc, char *argv[])
     su3_mat u_field[VOLUME];
     su3_mat v_field[VOLUME];
     su3_mat w_field[VOLUME];
+    su3_mat temp_field[VOLUME];
+    su3_mat res_field[VOLUME];
 
     // SoA
     su3_mat_field u_fieldv;
     su3_mat_field v_fieldv;
     su3_mat_field w_fieldv;
+    su3_mat_field temp_fieldv;
+    su3_mat_field res_fieldv;
 
     for (int r = 0; r < reps; r++)
     {
@@ -60,8 +64,8 @@ int main(int argc, char *argv[])
 
         // u*v*w AoS
         start_time = (double)clock() / CLOCKS_PER_SEC;
-        usu3matxusu3mat(u_field, u_field, v_field, VOLUME);
-        usu3matxusu3mat(u_field, u_field, w_field, VOLUME);
+        usu3matxusu3mat(temp_field, u_field, v_field, VOLUME);
+        usu3matxusu3mat(res_field, temp_field, w_field, VOLUME);
         end_time = (double)clock() / CLOCKS_PER_SEC;
         if (r>10) compute_AoS_time += end_time - start_time;
 
@@ -75,8 +79,8 @@ int main(int argc, char *argv[])
 
         // u*v*w SoA
         start_time = (double)clock() / CLOCKS_PER_SEC;
-        fsu3matxsu3mat(&u_fieldv, &u_fieldv, &v_fieldv, VOLUME);
-        fsu3matxsu3mat(&u_fieldv, &u_fieldv, &w_fieldv, VOLUME);
+        fsu3matxsu3mat(&temp_fieldv, &u_fieldv, &v_fieldv, VOLUME);
+        fsu3matxsu3mat(&res_fieldv, &temp_fieldv, &w_fieldv, VOLUME);
         end_time = (double)clock() / CLOCKS_PER_SEC;
         if (r>10) compute_SoA_time += end_time - start_time;
     }
