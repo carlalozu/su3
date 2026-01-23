@@ -4,26 +4,26 @@
 #include "global.h"
 #include "ufields.h"
 #include <time.h>
+#include "profiler.h"
 #ifdef _OPENMP
 #include <omp.h>
 #endif
 
 int main(int argc, char *argv[])
 {
-    double start_time, end_time;
-    double init_AoS_time = 0.0;
-    double compute_AoS_time = 0.0;
-    double init_SoA_time = 0.0;
-    double compute_SoA_time = 0.0;
-
-
-    // print if openmp is enabled
-    #ifdef _OPENMP
+#ifdef _OPENMP
+    // Make OpenMP behavior predictable for benchmarking:
     printf("OpenMP is enabled\n");
     printf("Number of threads: %d\n", omp_get_max_threads());
-    #else
+    omp_set_dynamic(0); // no changing thread counts behind your back
+    omp_set_nested(0);
+// Optional: warm up the runtime once (thread team creation can cost time)
+#pragma omp parallel
+    { /* nothing */
+    }
+#else
     printf("OpenMP is not enabled\n");
-    #endif
+#endif
 
     // read reps from command line
     int reps = 100;
@@ -37,10 +37,13 @@ int main(int argc, char *argv[])
         idx = atoi(argv[2]);
     }
 
-
     printf("Timing SoA vs AoS structures\n");
     printf("Volume: %d\n", VOLUME);
-    printf("Repetitions: %d\n", reps);
+
+    prof_section init_AoS = {.name = "AoS init"};
+    prof_section comp_AoS = {.name = "AoS compute"};
+    prof_section init_SoA = {.name = "SoA init"};
+    prof_section comp_SoA = {.name = "SoA compute"};
 
     // AoS
     su3_mat u_field[VOLUME];
@@ -58,55 +61,56 @@ int main(int argc, char *argv[])
     su3_mat_field res_fieldv;
     complexv res2;
 
-    for (int r = 0; r < reps; r++)
+    #pragma omp parallel
     {
-        // initialize AoS fields
-        start_time = (double)clock() / CLOCKS_PER_SEC;
-        for (size_t i = 0; i < VOLUME; i++)
+        for (int r = 0; r < reps; r++)
         {
-            unit_su3mat(&u_field[i]);
-            unit_su3mat(&v_field[i]);
-            unit_su3mat(&w_field[i]);
-        }
-        end_time = (double)clock() / CLOCKS_PER_SEC;
-        if (r>10) init_AoS_time += end_time - start_time;
+            #pragma omp single
+            prof_begin(&init_AoS);
+            #pragma omp for schedule(static)
+            for (size_t i = 0; i < VOLUME; i++)
+            {
+                unit_su3mat(&u_field[i]);
+                unit_su3mat(&v_field[i]);
+                unit_su3mat(&w_field[i]);
+            }
+            #pragma omp single
+            prof_end(&init_AoS);
 
-        // u*v*w AoS
-        #pragma omp barrier
-        start_time = (double)clock() / CLOCKS_PER_SEC;
-        #pragma omp parallel
-        {
+            #pragma omp single
+            prof_begin(&comp_AoS);
             usu3matxusu3mat(temp_field, u_field, v_field, VOLUME);
             usu3matxusu3mat(res_field, temp_field, w_field, VOLUME);
             usu3mattrace(res1, res_field, VOLUME);
+            #pragma omp single
+            prof_end(&comp_AoS);
         }
-        #pragma omp barrier
-        end_time = (double)clock() / CLOCKS_PER_SEC;
-        if (r>10) compute_AoS_time += end_time - start_time;
-
-        // initialize SoA fields
-        start_time = (double)clock() / CLOCKS_PER_SEC;
-        unit_su3mat_field(&u_fieldv);
-        unit_su3mat_field(&v_fieldv);
-        unit_su3mat_field(&w_fieldv);
-        end_time = (double)clock() / CLOCKS_PER_SEC;
-        if (r>10) init_SoA_time += end_time - start_time;
-
-        // u*v*w SoA
-        start_time = (double)clock() / CLOCKS_PER_SEC;
-        fsu3matxsu3mat(&temp_fieldv, &u_fieldv, &v_fieldv, VOLUME);
-        fsu3matxsu3mat(&res_fieldv, &temp_fieldv, &w_fieldv, VOLUME);
-        fsu3mattrace(&res2, &res_fieldv, VOLUME);
-        end_time = (double)clock() / CLOCKS_PER_SEC;
-        if (r>10) compute_SoA_time += end_time - start_time;
     }
-    printf("AoS initialization time: %f seconds\n", init_AoS_time/(double)reps);
-    printf("AoS time for u*v*w: %f seconds\n", compute_AoS_time/(double)reps);
-    printf("SoA initialization time: %f seconds\n", init_SoA_time/(double)reps);
-    printf("SoA time for u*v*w: %f seconds\n", compute_SoA_time/(double)reps);
 
-    // print some results
-    printf("res1[%i] (re[%i], im[%i]) = (%f, %f) \n", idx, idx, idx, res1[idx].re, res1[idx].im);
-    printf("res2[%i] (re[%i], im[%i]) = (%f, %f) \n", idx, idx, idx, res2.re[idx], res2.im[idx]);
-    return 0;
+    #pragma omp parallel
+    {
+        for (int r = 0; r < reps; r++)
+        {   
+            #pragma omp single
+            prof_begin(&init_SoA);
+            unit_su3mat_field(&u_fieldv);
+            unit_su3mat_field(&v_fieldv);
+            unit_su3mat_field(&w_fieldv);
+            #pragma omp single
+            prof_end(&init_SoA);
+
+            #pragma omp single
+            prof_begin(&comp_SoA);
+            fsu3matxsu3mat(&temp_fieldv, &u_fieldv, &v_fieldv, VOLUME);
+            fsu3matxsu3mat(&res_fieldv, &temp_fieldv, &w_fieldv, VOLUME);
+            fsu3mattrace(&res2, &res_fieldv, VOLUME);
+            #pragma omp single
+            prof_end(&comp_SoA);
+        }
+    }
+
+    prof_report(&init_AoS);
+    prof_report(&comp_AoS);
+    prof_report(&init_SoA);
+    prof_report(&comp_SoA);
 }
