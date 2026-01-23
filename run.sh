@@ -24,4 +24,3 @@ do
     ./build/main/time $repetitions $idx >> $file_name
     echo "" >> $file_name
 done
-# ./build/main/time 1000 > output_no_openmp.txt
