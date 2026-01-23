@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
 
     printf("Timing SoA vs AoS structures\n");
     printf("Volume: %d\n", VOLUME);
+    printf("Idx: %d\n", idx);
 
     // AoS
     su3_mat u_field[VOLUME];
@@ -55,7 +56,7 @@ int main(int argc, char *argv[])
     su3_mat_field w_fieldv;
     su3_mat_field temp_fieldv;
     su3_mat_field res_fieldv;
-    complexv res2[VOLUME];
+    complexv res2;
 
     for (int r = 0; r < reps; r++)
     {
@@ -72,9 +73,13 @@ int main(int argc, char *argv[])
 
         // u*v*w AoS
         start_time = (double)clock() / CLOCKS_PER_SEC;
-        usu3matxusu3mat(temp_field, u_field, v_field, VOLUME);
-        usu3matxusu3mat(res_field, temp_field, w_field, VOLUME);
-        usu3mattrace(res1, res_field, VOLUME);
+        #pragma omp parallel
+        {
+            usu3matxusu3mat(temp_field, u_field, v_field, VOLUME);
+            usu3matxusu3mat(res_field, temp_field, w_field, VOLUME);
+            usu3mattrace(res1, res_field, VOLUME);
+        }
+        #pragma omp barrier
         end_time = (double)clock() / CLOCKS_PER_SEC;
         if (r>10) compute_AoS_time += end_time - start_time;
 
@@ -90,7 +95,7 @@ int main(int argc, char *argv[])
         start_time = (double)clock() / CLOCKS_PER_SEC;
         fsu3matxsu3mat(&temp_fieldv, &u_fieldv, &v_fieldv, VOLUME);
         fsu3matxsu3mat(&res_fieldv, &temp_fieldv, &w_fieldv, VOLUME);
-        fsu3mattrace(res2, &res_fieldv, VOLUME);
+        fsu3mattrace(&res2, &res_fieldv, VOLUME);
         end_time = (double)clock() / CLOCKS_PER_SEC;
         if (r>10) compute_SoA_time += end_time - start_time;
     }
@@ -101,6 +106,6 @@ int main(int argc, char *argv[])
 
     // print some results
     printf("res1[%i] (re[%i], im[%i]) = (%f, %f) \n", idx, idx, idx, res1[idx].re, res1[idx].im);
-    printf("res2[%i] (re[%i], im[%i]) = (%f, %f) \n", idx, idx, idx, res2->re[idx], res2->im[idx]);
+    printf("res2[%i] (re[%i], im[%i]) = (%f, %f) \n", idx, idx, idx, res2.re[idx], res2.im[idx]);
     return 0;
 }
