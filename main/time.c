@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
     printf("OpenMP is enabled\n");
     int n_threads = omp_get_max_threads();
     printf("Number of threads: %d\n", n_threads);
+    printf("Number of size per thread: %d\n", VOLUME/n_threads);
     omp_set_dynamic(0); // no changing thread counts behind your back
     omp_set_nested(0);
 // Optional: warm up the runtime once (thread team creation can cost time)

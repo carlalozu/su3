@@ -1,0 +1,75 @@
+OpenMP is not enabled
+Timing SoA vs AoS structures
+Volume: 1536
+AoS init                 total   0.017543 s | avg   0.000035 s | n=500
+AoS compute              total   0.057944 s | avg   0.000116 s | n=500
+SoA init                 total   0.011673 s | avg   0.000023 s | n=500
+SoA compute              total   0.389375 s | avg   0.000779 s | n=500
+res1[50] (re[50], im[50]) = (-54.000000, 54.000000) 
+res2[50] (re[50], im[50]) = (-54.000000, 54.000000) 
+
+Running with 1 threads
+OpenMP is enabled
+Number of threads: 1
+Number of size per thread: 1536
+Timing SoA vs AoS structures
+Volume: 1536
+AoS init                 total   0.015083 s | avg   0.000030 s | n=500
+AoS compute              total   0.051888 s | avg   0.000104 s | n=500
+SoA init                 total   0.012276 s | avg   0.000025 s | n=500
+SoA compute              total   0.387848 s | avg   0.000776 s | n=500
+res1[50] (re[50], im[50]) = (-54.000000, 54.000000) 
+res2[50] (re[50], im[50]) = (-54.000000, 54.000000) 
+
+Running with 2 threads
+OpenMP is enabled
+Number of threads: 2
+Number of size per thread: 768
+Timing SoA vs AoS structures
+Volume: 1536
+AoS init                 total   0.011333 s | avg   0.000023 s | n=500
+AoS compute              total   0.034285 s | avg   0.000069 s | n=500
+SoA init                 total   0.048044 s | avg   0.000096 s | n=500
+SoA compute              total   0.218019 s | avg   0.000436 s | n=500
+res1[50] (re[50], im[50]) = (-54.000000, 54.000000) 
+res2[50] (re[50], im[50]) = (-54.000000, 54.000000) 
+
+Running with 4 threads
+OpenMP is enabled
+Number of threads: 4
+Number of size per thread: 384
+Timing SoA vs AoS structures
+Volume: 1536
+AoS init                 total   0.008437 s | avg   0.000017 s | n=500
+AoS compute              total   0.023681 s | avg   0.000047 s | n=500
+SoA init                 total   0.054740 s | avg   0.000109 s | n=500
+SoA compute              total   0.131882 s | avg   0.000264 s | n=500
+res1[50] (re[50], im[50]) = (-54.000000, 54.000000) 
+res2[50] (re[50], im[50]) = (-54.000000, 54.000000) 
+
+Running with 8 threads
+OpenMP is enabled
+Number of threads: 8
+Number of size per thread: 192
+Timing SoA vs AoS structures
+Volume: 1536
+AoS init                 total   0.006279 s | avg   0.000013 s | n=500
+AoS compute              total   0.015977 s | avg   0.000032 s | n=500
+SoA init                 total   0.031524 s | avg   0.000063 s | n=500
+SoA compute              total   0.072544 s | avg   0.000145 s | n=500
+res1[50] (re[50], im[50]) = (-54.000000, 54.000000) 
+res2[50] (re[50], im[50]) = (-54.000000, 54.000000) 
+
+Running with 16 threads
+OpenMP is enabled
+Number of threads: 16
+Number of size per thread: 96
+Timing SoA vs AoS structures
+Volume: 1536
+AoS init                 total   0.005650 s | avg   0.000011 s | n=500
+AoS compute              total   0.014829 s | avg   0.000030 s | n=500
+SoA init                 total   0.020226 s | avg   0.000040 s | n=500
+SoA compute              total   0.040294 s | avg   0.000081 s | n=500
+res1[50] (re[50], im[50]) = (-54.000000, 54.000000) 
+res2[50] (re[50], im[50]) = (-54.000000, 54.000000) 
+

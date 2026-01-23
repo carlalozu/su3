@@ -37,8 +37,16 @@ target_compile_options(su3lib PRIVATE
     -Wall
     -Wextra
     -Wpedantic
-    -O3 -march=native
 )
 #  AVX-512
-target_compile_options(su3lib PRIVATE -mavx512f -mavx512dq -mavx512bw -mavx512vl -fopt-info-vec-missed=vec_missed.txt)
+target_compile_options(su3lib PRIVATE -O3 -march=native -mavx512f -mavx512dq -mavx512bw
+-mavx512vl -fopt-info-vec-missed=vec_missed.txt)
+
+# # No autovectorization
+# target_compile_options(su3lib PRIVATE
+# -fno-tree-vectorize
+# -fno-tree-loop-vectorize
+# -fno-tree-slp-vectorize
+# )
+
 add_subdirectory(main)
