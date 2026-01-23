@@ -64,9 +64,8 @@ void usu3mattrace(complex *res, const su3_mat *ufield, const size_t size)
  * r.c2=(u*s).c2
  * r.c3=(u*s).c3
  */
-void fsu3matxsu3vec(su3_vec_field *res, const su3_mat_field *u, const su3_vec_field *v, const size_t begin, const size_t end)
+void fsu3matxsu3vec(su3_vec_field *restrict res , const su3_mat_field *restrict u, const su3_vec_field *restrict v, const size_t begin, const size_t end)
 {
-    #pragma omp simd
     for (size_t i = begin; i < end; i++)
     {
         res->c1re[i] = u->c1.c1re[i] * v->c1re[i] - u->c1.c1im[i] * v->c1im[i] +
@@ -111,7 +110,6 @@ void fsu3matxsu3mat(su3_mat_field *res, const su3_mat_field *u_field, const su3_
 
 void fsu3mattrace(complexv *res, const su3_mat_field *ufield, const size_t begin, const size_t end)
 {
-    #pragma omp simd
     for (size_t i = begin; i < end; i++)
     {
         res->re[i] = ufield->c1.c1re[i] + ufield->c2.c2re[i] + ufield->c3.c3re[i];

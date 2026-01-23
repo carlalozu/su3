@@ -13,10 +13,10 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#define L0 3
-#define L1 3
-#define L2 3
-#define L3 3
+#define L0 48
+#define L1 4
+#define L2 4
+#define L3 2
 
 #define L0_TRD 3
 #define L1_TRD 3
