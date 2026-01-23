@@ -29,12 +29,12 @@ int main(int argc, char *argv[])
     printf("m_field[%i]->c3.c1im[%i] = %f\n", idx, idx, m_field.c3.c1im[idx]);
 
     // matrix-vector field multiplication
-    fsu3matxsu3vec(&res_field, &m_field, &v_field, VOLUME);
+    fsu3matxsu3vec(&res_field, &m_field, &v_field, 0, VOLUME);
     printf("res_field[%i]->c1re[%i] = %f\n", idx, idx, res_field.c1re[idx]);
     printf("res_field[%i]->c2im[%i] = %f\n", idx, idx, res_field.c2im[idx]);
 
     // matrix-matrix field multiplication
-    fsu3matxsu3mat(&m_field, &u_field, &m_field, VOLUME);
+    fsu3matxsu3mat(&m_field, &u_field, &m_field, 0, VOLUME);
     printf("m_field[%i]->c1.c1re[%i] = %f\n", idx, idx, m_field.c1.c1re[idx]);
     printf("m_field[%i]->c3.c3im[%i] = %f\n", idx, idx, m_field.c3.c3im[idx]);
     return 0;

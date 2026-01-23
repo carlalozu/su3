@@ -14,7 +14,8 @@ int main(int argc, char *argv[])
 #ifdef _OPENMP
     // Make OpenMP behavior predictable for benchmarking:
     printf("OpenMP is enabled\n");
-    printf("Number of threads: %d\n", omp_get_max_threads());
+    int n_threads = omp_get_max_threads();
+    printf("Number of threads: %d\n", n_threads);
     omp_set_dynamic(0); // no changing thread counts behind your back
     omp_set_nested(0);
 // Optional: warm up the runtime once (thread team creation can cost time)
@@ -89,6 +90,15 @@ int main(int argc, char *argv[])
 
     #pragma omp parallel
     {
+        #ifdef _OPENMP
+        int tid = omp_get_thread_num();
+        int begin = VOLUME/n_threads*tid;
+        int end = VOLUME/n_threads*(tid+1);
+        #else
+        int begin = 0;
+        int end = VOLUME;
+        #endif
+
         for (int r = 0; r < reps; r++)
         {   
             #pragma omp single
@@ -101,9 +111,9 @@ int main(int argc, char *argv[])
 
             #pragma omp single
             prof_begin(&comp_SoA);
-            fsu3matxsu3mat(&temp_fieldv, &u_fieldv, &v_fieldv, VOLUME);
-            fsu3matxsu3mat(&res_fieldv, &temp_fieldv, &w_fieldv, VOLUME);
-            fsu3mattrace(&res2, &res_fieldv, VOLUME);
+            fsu3matxsu3mat(&temp_fieldv, &u_fieldv, &v_fieldv, begin, end);
+            fsu3matxsu3mat(&res_fieldv, &temp_fieldv, &w_fieldv, begin, end);
+            fsu3mattrace(&res2, &res_fieldv, begin, end);
             #pragma omp single
             prof_end(&comp_SoA);
         }
@@ -113,4 +123,7 @@ int main(int argc, char *argv[])
     prof_report(&comp_AoS);
     prof_report(&init_SoA);
     prof_report(&comp_SoA);
+
+    printf("res1[%i] (re[%i], im[%i]) = (%f, %f) \n", idx, idx, idx, res1[idx].re, res1[idx].im);
+    printf("res2[%i] (re[%i], im[%i]) = (%f, %f) \n", idx, idx, idx, res2.re[idx], res2.im[idx]);
 }
