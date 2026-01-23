@@ -38,7 +38,7 @@ void unit_su3vec(su3_vec *su3_vec);
 // Algebra
 complex add(const complex a, const complex b);
 void vec_add(su3_vec *res, const su3_vec *u, const su3_vec *v);
+complex su3_trace(const su3_mat *u);
 void su3matxsu3vec(su3_vec *res, const su3_mat *u, const su3_vec *v);
 void su3matxsu3mat(su3_mat *res, const su3_mat *u, const su3_mat *v);
-complex su3_trace(const su3_mat *u);
 #endif // SU3_H

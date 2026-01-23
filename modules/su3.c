@@ -134,7 +134,7 @@ void su3matxsu3mat(su3_mat *res, const su3_mat *u, const su3_mat *v)
  *
  * tr = trace(u)
  */
-complex su3_trace(const su3_mat *u)
+inline complex su3_trace(const su3_mat *u)
 {
     complex tr;
     tr.re = u->c11.re + u->c22.re + u->c33.re;

@@ -6,6 +6,13 @@
 #include <string.h>
 #include "global.h"
 
+typedef struct
+{
+    /* data */
+    double re[VOLUME];
+    double im[VOLUME];
+} complexv;
+
 /* SU3 vector
 * Each component is a pointer to an array of doubles
 * Real and imaginary parts are stored separately
@@ -29,5 +36,6 @@ typedef struct
 
 void random_su3mat_field(su3_mat_field *su3_mat);
 void random_su3vec_field(su3_vec_field *su3_vec);
+void unit_su3mat_field(su3_mat_field *su3_mat);
 
 #endif // SU3V_H
