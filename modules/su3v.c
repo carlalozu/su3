@@ -25,4 +25,14 @@ void random_su3mat_field(su3_mat_field *su3mf)
         d[i] = (double)rand() / RAND_MAX;
 }
 
+void unit_su3mat_field(su3_mat_field *su3mf)
+{
+    // random_su3vec_field(&su3mf->c1);
+    // random_su3vec_field(&su3mf->c2);
+    // random_su3vec_field(&su3mf->c3);
+    double *d = (double *)su3mf;
+    for (int i = 0; i < 18*VOLUME; i++)
+        d[i] = 1.0;
+}
+
 #endif // SU3V_C
