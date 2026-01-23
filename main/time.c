@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 
     printf("Timing SoA vs AoS structures\n");
     printf("Volume: %d\n", VOLUME);
-    printf("Idx: %d\n", idx);
+    printf("Repetitions: %d\n", reps);
 
     // AoS
     su3_mat u_field[VOLUME];
@@ -72,6 +72,7 @@ int main(int argc, char *argv[])
         if (r>10) init_AoS_time += end_time - start_time;
 
         // u*v*w AoS
+        #pragma omp barrier
         start_time = (double)clock() / CLOCKS_PER_SEC;
         #pragma omp parallel
         {

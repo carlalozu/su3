@@ -27,7 +27,7 @@
  */
 void usu3matxusu3mat(su3_mat *res, su3_mat *u_field, su3_mat *v_field, const size_t size)
 {
-#pragma omp parallel for schedule(static)
+#pragma omp for schedule(static)
     for (size_t i = 0; i < size; i++)
     {
         su3matxsu3mat(&res[i], &u_field[i], &v_field[i]);
@@ -41,7 +41,7 @@ void usu3matxusu3mat(su3_mat *res, su3_mat *u_field, su3_mat *v_field, const siz
  */
 void usu3matxusu3vec(su3_vec *res_field, su3_mat *u_field, su3_vec *v_field, const size_t size)
 {
-#pragma omp parallel for schedule(static)
+#pragma omp for schedule(static)
     for (size_t i = 0; i < size; i++)
     {
         su3matxsu3vec(&res_field[i], &u_field[i], &v_field[i]);
@@ -50,6 +50,7 @@ void usu3matxusu3vec(su3_vec *res_field, su3_mat *u_field, su3_vec *v_field, con
 
 void usu3mattrace(complex *res, const su3_mat *ufield, const size_t size)
 {
+#pragma omp for schedule(static)
     for (size_t i = 0; i < size; i++)
     {
         res[i] = su3_trace(&ufield[i]);
@@ -65,11 +66,6 @@ void usu3mattrace(complex *res, const su3_mat *ufield, const size_t size)
  */
 void fsu3matxsu3vec(su3_vec_field *res, const su3_mat_field *u, const su3_vec_field *v, const size_t size)
 {
-    if (res == u || res == v || u == v) {
-        fprintf(stderr,
-                "Error in fsu3matxsu3mat: res aliases input field (res == u_field or res == v_field)\n");
-        abort();
-    }
 #pragma omp simd
     for (size_t i = 0; i < size; i++)
     {
@@ -101,7 +97,8 @@ void fsu3matxsu3vec(su3_vec_field *res, const su3_mat_field *u, const su3_vec_fi
  */
 void fsu3matxsu3mat(su3_mat_field *res, const su3_mat_field *u_field, const su3_mat_field *v_field, const size_t size)
 {
-    if (res == u_field || res == v_field || u_field == v_field) {
+    if (res == u_field || res == v_field || u_field == v_field)
+    {
         fprintf(stderr,
                 "Error in fsu3matxsu3mat: res aliases input field (res == u_field or res == v_field)\n");
         abort();
@@ -114,7 +111,7 @@ void fsu3matxsu3mat(su3_mat_field *res, const su3_mat_field *u_field, const su3_
 
 void fsu3mattrace(complexv *res, const su3_mat_field *ufield, const size_t size)
 {
-    #pragma omp simd
+#pragma omp simd
     for (size_t i = 0; i < size; i++)
     {
         res->re[i] = ufield->c1.c1re[i] + ufield->c2.c2re[i] + ufield->c3.c3re[i];
