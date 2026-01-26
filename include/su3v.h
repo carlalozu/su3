@@ -37,8 +37,8 @@ typedef struct
 void complexv_init(complexv *x, size_t volume);
 void complexv_free(complexv *x);
 
-void random_su3mat_field(su3_mat_field *su3_mat);
-void random_su3vec_field(su3_vec_field *su3_vec);
-void unit_su3mat_field(su3_mat_field *su3_mat);
+void random_su3mat_field(su3_mat_field *su3_mat, const size_t volume);
+void random_su3vec_field(su3_vec_field *su3_vec, const size_t volume);
+void unit_su3mat_field(su3_mat_field *su3_mat, const size_t volume);
 
 #endif // SU3V_H

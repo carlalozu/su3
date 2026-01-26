@@ -9,25 +9,25 @@
 #include "global.h"
 
 
-void random_su3vec_field(su3_vec_field *su3vf)
+void random_su3vec_field(su3_vec_field *su3vf, const size_t volume)
 {
     double *d = (double *)su3vf;
-    for (int i = 0; i < 6*VOLUME; i++)
+    for (size_t i = 0; i < 6*volume; i++)
         d[i] = (double)rand() / RAND_MAX;
 }
 
-void random_su3mat_field(su3_mat_field *su3mf)
+void random_su3mat_field(su3_mat_field *su3mf, const size_t volume)
 {
     double *d = (double *)su3mf;
-    for (int i = 0; i < 18*VOLUME; i++)
+    for (size_t i = 0; i < 18*volume; i++)
         d[i] = (double)rand() / RAND_MAX;
 }
 
-void unit_su3mat_field(su3_mat_field *su3mf)
+void unit_su3mat_field(su3_mat_field *su3mf, const size_t volume)
 {
     double *d = (double *)su3mf;
     #pragma omp for schedule(static)
-    for (int i = 0; i < 18*VOLUME; i++)
+    for (size_t i = 0; i < 18*volume; i++)
         d[i] = 1.0;
 }
 

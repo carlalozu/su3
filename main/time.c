@@ -106,9 +106,9 @@ int main(int argc, char *argv[])
         {   
             #pragma omp single
             prof_begin(&init_SoA);
-            unit_su3mat_field(&u_fieldv);
-            unit_su3mat_field(&v_fieldv);
-            unit_su3mat_field(&w_fieldv);
+            unit_su3mat_field(&u_fieldv, VOLUME);
+            unit_su3mat_field(&v_fieldv, VOLUME);
+            unit_su3mat_field(&w_fieldv, VOLUME);
             #pragma omp single
             prof_end(&init_SoA);
 
