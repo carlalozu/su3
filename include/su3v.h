@@ -19,9 +19,11 @@ typedef struct
 */
 typedef struct
 {
-    double c1re[VOLUME], c1im[VOLUME];
-    double c2re[VOLUME], c2im[VOLUME];
-    double c3re[VOLUME], c3im[VOLUME];
+    size_t volume;
+    double *base;
+    double *c1re, *c1im;
+    double *c2re, *c2im;
+    double *c3re, *c3im;
 } su3_vec_field;
 
 /* SU3 matrix 
@@ -37,8 +39,14 @@ typedef struct
 void complexv_init(complexv *x, size_t volume);
 void complexv_free(complexv *x);
 
-void random_su3mat_field(su3_mat_field *su3_mat, const size_t volume);
-void random_su3vec_field(su3_vec_field *su3_vec, const size_t volume);
-void unit_su3mat_field(su3_mat_field *su3_mat, const size_t volume);
+void su3_vec_field_init(su3_vec_field *u, size_t volume);
+void su3_vec_field_free(su3_vec_field *u);
+
+void su3_mat_field_init(su3_mat_field *u, size_t volume);
+void su3_mat_field_free(su3_mat_field *u);
+
+void random_su3mat_field(su3_mat_field *su3_mat);
+void random_su3vec_field(su3_vec_field *su3_vec);
+void unit_su3mat_field(su3_mat_field *su3_mat);
 
 #endif // SU3V_H

@@ -63,6 +63,11 @@ int main(int argc, char *argv[])
     su3_mat_field res_fieldv;
     complexv res2;
 
+    su3_mat_field_init(&u_fieldv, VOLUME);
+    su3_mat_field_init(&v_fieldv, VOLUME);
+    su3_mat_field_init(&w_fieldv, VOLUME);
+    su3_mat_field_init(&temp_fieldv, VOLUME);
+    su3_mat_field_init(&res_fieldv, VOLUME);
     complexv_init(&res2, VOLUME);
 
     #pragma omp parallel
@@ -106,9 +111,9 @@ int main(int argc, char *argv[])
         {   
             #pragma omp single
             prof_begin(&init_SoA);
-            unit_su3mat_field(&u_fieldv, VOLUME);
-            unit_su3mat_field(&v_fieldv, VOLUME);
-            unit_su3mat_field(&w_fieldv, VOLUME);
+            unit_su3mat_field(&u_fieldv);
+            unit_su3mat_field(&v_fieldv);
+            unit_su3mat_field(&w_fieldv);
             #pragma omp single
             prof_end(&init_SoA);
 
@@ -129,4 +134,11 @@ int main(int argc, char *argv[])
 
     printf("res1[%i] (re[%i], im[%i]) = (%f, %f) \n", idx, idx, idx, res1[idx].re, res1[idx].im);
     printf("res2[%i] (re[%i], im[%i]) = (%f, %f) \n", idx, idx, idx, res2.re[idx], res2.im[idx]);
+
+    su3_mat_field_free(&u_fieldv);
+    su3_mat_field_free(&v_fieldv);
+    su3_mat_field_free(&w_fieldv);
+    su3_mat_field_free(&temp_fieldv);
+    su3_mat_field_free(&res_fieldv);
+    complexv_free(&res2);
 }
