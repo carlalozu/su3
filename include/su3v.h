@@ -8,9 +8,9 @@
 
 typedef struct
 {
-    /* data */
-    double re[VOLUME];
-    double im[VOLUME];
+    size_t volume;
+    double *re;
+    double *im;
 } complexv;
 
 /* SU3 vector
@@ -33,6 +33,9 @@ typedef struct
     su3_vec_field c1, c2, c3;
 
 } su3_mat_field;
+
+void complexv_init(complexv *x, size_t volume);
+void complexv_free(complexv *x);
 
 void random_su3mat_field(su3_mat_field *su3_mat);
 void random_su3vec_field(su3_vec_field *su3_vec);

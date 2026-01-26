@@ -94,28 +94,29 @@ void fsu3matxsu3vec(su3_vec_field *res, const su3_mat_field *u, const su3_vec_fi
  * res_field = m_field * v_field
  * Where each field is a su3_mat_field of given size
  *
- *  Bandwidth
- *  from u = 18 load streams, 9 complex numbers
- *  from v = 18 load streams
- *  from res = 18 write streams
- *  total = 54 doubles = 54 x 8 bytes = 432 bytes
+ * Bandwidth
+ * from u = 18 load streams, 9 complex numbers
+ * from v = 18 load streams
+ * from res = 18 write streams
+ * total = 54 doubles = 54 x 8 bytes = 432 bytes
  *
- *  FLOPS
- *  per matrix element = 11 operations, 6 muls, 5 adds
- *  par complex matrix element = 22 operations
- *  per matrix = 18 * 11 = 198 FLOPS
+ * FLOPS
+ * per matrix element = 11 operations, 6 muls, 5 adds
+ * par complex matrix element = 22 operations
+ * total = 9 * 22 = 198 FLOPS
  *
- *  Intensity
- *  198 / 432 ≈ 0.46 flops/byte
+ * Intensity
+ * 198 / 432 ≈ 0.46 flops/byte
+ * = Memory bound
  */
 void fsu3matxsu3mat(su3_mat_field *restrict res, const su3_mat_field *restrict u, const su3_mat_field *restrict v, const size_t begin, const size_t end)
 {
-    // if (res == u || res == v || u == v)
-    // {
-    //     fprintf(stderr,
-    //             "Error in fsu3matxsu3mat: res aliases input field (res == u_field or res == v_field)\n");
-    //     abort();
-    // }
+    if (res == u || res == v || u == v)
+    {
+        fprintf(stderr,
+                "Error in fsu3matxsu3mat: res aliases input field (res == u_field or res == v_field)\n");
+        abort();
+    }
 
     for (size_t i = begin; i < end; i++)
     {
@@ -180,7 +181,6 @@ void fsu3matxsu3mat(su3_mat_field *restrict res, const su3_mat_field *restrict u
 
 void fsu3mattrace(complexv *res, const su3_mat_field *ufield, const size_t begin, const size_t end)
 {
-#pragma omp simd
     for (size_t i = begin; i < end; i++)
     {
         res->re[i] = ufield->c1.c1re[i] + ufield->c2.c2re[i] + ufield->c3.c3re[i];

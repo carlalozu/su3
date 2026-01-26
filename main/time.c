@@ -63,6 +63,8 @@ int main(int argc, char *argv[])
     su3_mat_field res_fieldv;
     complexv res2;
 
+    complexv_init(&res2, VOLUME);
+
     #pragma omp parallel
     {
         for (int r = 0; r < reps; r++)
