@@ -118,6 +118,7 @@ void fsu3matxsu3mat(su3_mat_field *restrict res, const su3_mat_field *restrict u
         abort();
     }
 
+    #pragma omp simd
     for (size_t i = begin; i < end; i++)
     {
         res->c1.c1re[i] = u->c1.c1re[i] * v->c1.c1re[i] - u->c1.c1im[i] * v->c1.c1im[i] +
