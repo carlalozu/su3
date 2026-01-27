@@ -110,9 +110,13 @@ int main(int argc, char *argv[])
 
             #pragma omp single
             prof_begin(&comp_AoS);
-            usu3matxusu3mat(temp_field, u_field, v_field, VOLUME);
-            usu3matxusu3mat(res_field, temp_field, w_field, VOLUME);
-            usu3mattrace(res_aos, res_field, VOLUME);
+            #pragma omp for schedule(static)
+            for (size_t i = 0; i < VOLUME; i++)
+            {
+                su3matxsu3mat(&temp_field[i], &u_field[i], &v_field[i]);
+                su3matxsu3mat(&res_field[i], &temp_field[i], &w_field[i]);
+                res_aos[i] = su3_trace(&res_field[i]);
+            }
             #pragma omp single
             prof_end(&comp_AoS);
         }

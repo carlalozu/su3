@@ -29,8 +29,10 @@ int main(int argc, char *argv[])
     printf("u[%i]->c32 = (%f, %f)\n", idx, u_field[idx].c32.re, u_field[idx].c32.im);
     printf("u[%i]->c33 = (%f, %f)\n", idx, u_field[idx].c33.re, u_field[idx].c33.im);
 
-    usu3matxusu3mat(w_field, u_field, w_field, VOLUME);
-    usu3matxusu3mat(w_field, w_field, v_field, VOLUME);
+    for (size_t i = 0; i < VOLUME; i++) {
+        su3matxsu3mat(&w_field[i], &u_field[i], &w_field[i]);
+        su3matxsu3mat(&w_field[i], &w_field[i], &v_field[i]);
+    }
 
     printf("w[%i]->c11 = (%f, %f)\n", idx, w_field[idx].c11.re, w_field[idx].c11.im);
     printf("w[%i]->c12 = (%f, %f)\n", idx, w_field[idx].c12.re, w_field[idx].c12.im);

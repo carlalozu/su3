@@ -20,43 +20,6 @@
 #include <omp.h>
 #endif
 
-/* SU(3) field AoS multiplication
- * Wrapper to perform
- * res_field = u_field * v_field
- * Where each field is an array of su3_mat of given size
- */
-void usu3matxusu3mat(su3_mat *res, su3_mat *u_field, su3_mat *v_field, const size_t size)
-{
-#pragma omp for schedule(static)
-    for (size_t i = 0; i < size; i++)
-    {
-        su3matxsu3mat(&res[i], &u_field[i], &v_field[i]);
-    }
-}
-
-/* SU(3) matrix-vector field multiplication AoS
- * Wrapper to perform
- * res_field = u_field * v_field
- * Where each field is an array of su3_mat and su3_vec of given size
- */
-void usu3matxusu3vec(su3_vec *res_field, su3_mat *u_field, su3_vec *v_field, const size_t size)
-{
-#pragma omp for schedule(static)
-    for (size_t i = 0; i < size; i++)
-    {
-        su3matxsu3vec(&res_field[i], &u_field[i], &v_field[i]);
-    }
-}
-
-void usu3mattrace(complex *res, const su3_mat *ufield, const size_t size)
-{
-#pragma omp for schedule(static)
-    for (size_t i = 0; i < size; i++)
-    {
-        res[i] = su3_trace(&ufield[i]);
-    }
-}
-
 /*
  * SU(3) matrix u times SU(3) vector SoA
  *
