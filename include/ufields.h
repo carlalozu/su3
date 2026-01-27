@@ -22,7 +22,7 @@ void usu3mattrace(complex *res, su3_mat *u_field, const size_t size);
 
 // SoA operations
 void fsu3matxsu3vec(su3_vec_field *res, const su3_mat_field *m_field, const su3_vec_field *v_field, const size_t begin, const size_t end);
-void fsu3matxsu3mat(su3_mat_field *res, const su3_mat_field *m_field, const su3_mat_field *v_field, const size_t begin, const size_t end);
+void fsu3matxsu3mat(su3_mat_field *restrict res, const su3_mat_field *restrict u, const su3_mat_field *restrict v, const size_t begin, const size_t end);
 void fsu3mattrace(complexv *res, const su3_mat_field *ufield, const size_t begin, const size_t end);
 
 #endif // UFLDS_H

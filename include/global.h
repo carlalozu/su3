@@ -25,5 +25,6 @@
 
 #define VOLUME (L0*L1*L2*L3)
 #define ALIGN 9
+#define CACHELINE 8
 
 #endif
