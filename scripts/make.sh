@@ -14,5 +14,5 @@ cmake -S . -B build \
 cmake --build build -- -j8
 
 # ./build/main/time 10 0
-> $path/output_su3_aosoa.txt
-./build/main/su3_aosoa 10 0 >> $path/output_su3_aosoa.txt
+> $path/output_su3_time.txt
+./build/main/time 10 0 >> $path/output_su3_time.txt
