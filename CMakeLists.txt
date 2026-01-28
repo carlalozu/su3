@@ -4,8 +4,6 @@ project(su3_alg
     VERSION 1.0
     LANGUAGES C
 )
-message(STATUS "C Compiler: ${CMAKE_C_COMPILER}")
-message(STATUS "C Compiler Version: ${CMAKE_C_COMPILER_VERSION}")
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -22,6 +20,32 @@ target_include_directories(su3lib
     ${PROJECT_SOURCE_DIR}/include
 )
 
+target_compile_options(su3lib PRIVATE
+    -Wall
+    -Wextra
+    -Wpedantic
+    -O
+    -std=c11
+)
+
+
+option(ENABLE_GPU_OFFLOAD "Enable OpenMP GPU Offloading" OFF)
+if(ENABLE_GPU_OFFLOAD)
+    set(ENABLE_OPENMP ON)
+    target_compile_definitions(su3lib PUBLIC SU3_USE_GPU_OFFLOAD)
+
+    if(CMAKE_C_COMPILER_ID MATCHES "GNU")
+        target_compile_options(su3lib PRIVATE -foffload=nvptx-none)
+    elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
+        target_compile_options(su3lib PRIVATE -fopenmp-targets=nvptx64-nvidia-cuda -fopenmp-cuda-mode -Xopenmp-target)
+    endif()
+
+    message(STATUS "GPU Offloading Enabled")
+    message(STATUS "AVX disabled when using GPU")
+    set(ENABLE_AVX OFF)
+endif()
+
+
 option(ENABLE_OPENMP "Enable OpenMP parallelization" ON)
 if(ENABLE_OPENMP)
     find_package(OpenMP)
@@ -33,27 +57,21 @@ if(ENABLE_OPENMP)
     endif()
 endif()
 
-target_compile_options(su3lib PRIVATE
-    -Wall
-    -Wextra
-    -Wpedantic
-    -O
-)
 
 option(ENABLE_AVX "Enable AVX vectorization" ON)
-#  AVX-512
 if(ENABLE_AVX)
+    #  AVX-512
     target_compile_options(su3lib PRIVATE -mavx512f -mavx512dq -mavx512bw
-    -mavx512vl -fopt-info-vec-missed=vec_missed.txt)
+        -mavx512vl -fopt-info-vec-missed=vec_missed.txt)
     message(STATUS "AVX enabled")
 else()
     # No autovectorization
     target_compile_options(su3lib PRIVATE
         -fno-tree-vectorize
-        -fno-tree-loop-vectorize
         -fno-tree-slp-vectorize
     )
     message(STATUS "AVX not enabled")
 endif()
+
 
 add_subdirectory(main)
