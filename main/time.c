@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     printf("Number of threads: %d\n", n_threads);
     printf("Number of size per thread: %d\n", VOLUME/n_threads);
     omp_set_dynamic(0); // no changing thread counts behind your back
-    omp_set_nested(0);
+    omp_set_max_active_levels(0);
 // Optional: warm up the runtime once (thread team creation can cost time)
 #pragma omp parallel
     { /* nothing */
