@@ -108,7 +108,7 @@ def plot_phase(data, phase: str, volume: int, avx_on:bool):
     plt.legend()
 
     plt.tight_layout()
-    plt.savefig(f"plot_{phase}_avx{avx_on}_log.pdf", dpi=200)
+    plt.savefig(f"output/plot_{phase}_avx{avx_on}_log.pdf", dpi=200)
 
 def main():
     path = sys.argv[1] if len(sys.argv) > 1 else None
