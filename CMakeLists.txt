@@ -31,7 +31,6 @@ target_compile_options(su3lib PRIVATE
 
 option(ENABLE_GPU_OFFLOAD "Enable OpenMP GPU Offloading" OFF)
 if(ENABLE_GPU_OFFLOAD)
-    set(ENABLE_OPENMP ON)
     target_compile_definitions(su3lib PUBLIC SU3_USE_GPU_OFFLOAD)
 
     if(CMAKE_C_COMPILER_ID MATCHES "GNU")
@@ -62,7 +61,7 @@ option(ENABLE_AVX "Enable AVX vectorization" ON)
 if(ENABLE_AVX)
     #  AVX-512
     target_compile_options(su3lib PRIVATE -mavx512f -mavx512dq -mavx512bw
-        -mavx512vl -fopt-info-vec-missed=vec_missed.txt)
+        -mavx512vl)
     message(STATUS "AVX enabled")
 else()
     # No autovectorization

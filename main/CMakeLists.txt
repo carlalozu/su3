@@ -16,5 +16,10 @@ configure_exec(su3_fields)
 add_executable(su3_fieldsv su3_fieldsv.c)
 configure_exec(su3_fieldsv)
 
-add_executable(time time.c)
-configure_exec(time)
+if(ENABLE_GPU_OFFLOAD)
+    add_executable(time_gpu time_gpu.c)
+    configure_exec(time_gpu)
+endif()
+
+add_executable(time_cpu time_cpu.c)
+configure_exec(time_cpu)
