@@ -55,5 +55,10 @@ dkms.conf
 *.dwo
 *.txt
 
+# plot
+*.png
+*-env/*
+*.pdf
+
 # build files
 build/*
