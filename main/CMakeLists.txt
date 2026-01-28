@@ -4,7 +4,19 @@ function(configure_exec target)
         ${PROJECT_SOURCE_DIR}/include
     )
     target_link_libraries(${target} PRIVATE su3lib)
-    target_compile_options(${target} PRIVATE ${CMAKE_C_FLAGS})
+
+    if(ENABLE_GPU_OFFLOAD)
+        target_compile_options(${target} PRIVATE
+        -fopenmp
+        -fopenmp-targets=nvptx64-nvidia-cuda
+        --offload-arch=sm_86
+        )
+        target_link_options(${target} PRIVATE
+        -fopenmp
+        -fopenmp-targets=nvptx64-nvidia-cuda
+        --offload-arch=sm_86
+        )
+    endif()
 endfunction()
 
 add_executable(su3_alg su3_alg.c)
