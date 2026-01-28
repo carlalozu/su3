@@ -39,14 +39,14 @@ typedef struct
 void complexv_init(complexv *x, size_t volume);
 void complexv_free(complexv *x);
 
+#pragma omp declare target
 void su3_vec_field_init(su3_vec_field *u, size_t volume);
 void su3_vec_field_free(su3_vec_field *u);
-
 void su3_mat_field_init(su3_mat_field *u, size_t volume);
 void su3_mat_field_free(su3_mat_field *u);
-
+void unit_su3mat_field(su3_mat_field *su3_mat);
 void random_su3mat_field(su3_mat_field *su3_mat);
 void random_su3vec_field(su3_vec_field *su3_vec);
-void unit_su3mat_field(su3_mat_field *su3_mat);
+#pragma omp end declare target
 
 #endif // SU3V_H

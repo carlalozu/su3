@@ -30,15 +30,16 @@ typedef struct
     complex c11, c12, c13, c21, c22, c23, c31, c32, c33;
 } su3_mat;
 
+#pragma omp declare target
 // SU3 initialization
 void unit_su3mat(su3_mat *su3_mat);
-void random_su3mat(su3_mat *su3_mat);
 void unit_su3vec(su3_vec *su3_vec);
-
+void random_su3mat(su3_mat *su3_mat);
 // Algebra
 complex add(const complex a, const complex b);
 void vec_add(su3_vec *res, const su3_vec *u, const su3_vec *v);
-complex su3_trace(const su3_mat *u);
 void su3matxsu3vec(su3_vec *res, const su3_mat *u, const su3_vec *v);
 void su3matxsu3mat(su3_mat *res, const su3_mat *u, const su3_mat *v);
+complex su3_trace(const su3_mat *u);
+#pragma omp end declare target
 #endif // SU3_H
