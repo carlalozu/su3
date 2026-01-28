@@ -12,14 +12,14 @@
 int main(int argc, char *argv[])
 {
 #ifdef _OPENMP
-    // Make OpenMP behavior predictable for benchmarking:
+
     printf("OpenMP is enabled\n");
     int n_threads = omp_get_max_threads();
     printf("Number of threads: %d\n", n_threads);
     printf("Number of size per thread: %d\n", VOLUME/n_threads);
-    omp_set_dynamic(0); // no changing thread counts behind your back
-    omp_set_max_active_levels(0);
-// Optional: warm up the runtime once (thread team creation can cost time)
+    omp_set_dynamic(0);
+
+    // warm up the runtime once
 #pragma omp parallel
     { /* nothing */
     }
