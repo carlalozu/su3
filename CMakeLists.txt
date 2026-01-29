@@ -10,25 +10,20 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
 add_library(su3lib
-    ${PROJECT_SOURCE_DIR}/modules/ufields.c
-    ${PROJECT_SOURCE_DIR}/modules/su3.c
-    ${PROJECT_SOURCE_DIR}/modules/su3v.c
+    modules/ufields.c
+    modules/su3.c
+    modules/su3v.c
 )
 
-target_include_directories(su3lib
-    PRIVATE
-    ${PROJECT_SOURCE_DIR}/include
-)
+
+target_include_directories(su3lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
 
 option(ENABLE_OPENMP "Enable OpenMP parallelization" ON)
 if(ENABLE_OPENMP)
-    find_package(OpenMP)
-    if(OpenMP_C_FOUND)
-        target_link_libraries(su3lib PUBLIC OpenMP::OpenMP_C)
-        target_compile_definitions(su3lib PUBLIC SU3_USE_OPENMP)
-    else()
-        message(WARNING "OpenMP requested but not found; building without OpenMP")
-    endif()
+    find_package(OpenMP REQUIRED)
+    target_link_libraries(su3lib PUBLIC OpenMP::OpenMP_C)
+    target_compile_definitions(su3lib PUBLIC SU3_USE_OPENMP)
 endif()
 
 
@@ -36,18 +31,16 @@ option(ENABLE_GPU_OFFLOAD "Enable OpenMP GPU Offloading" OFF)
 if(ENABLE_GPU_OFFLOAD)
     target_compile_definitions(su3lib PUBLIC SU3_USE_GPU_OFFLOAD)
 
-    target_compile_options(su3lib PUBLIC -fopenmp
+    set(OMP_OFFLOAD_FLAGS
+        -fopenmp
         -fopenmp-targets=nvptx64-nvidia-cuda
-        --offload-arch=sm_86
+        -Xopenmp-target=nvptx64-nvidia-cuda --offload-arch=sm_86
     )
-    target_link_options(su3lib PUBLIC -fopenmp
-        -fopenmp-targets=nvptx64-nvidia-cuda
-        --offload-arch=sm_86
-    )
+    target_compile_options(su3lib PUBLIC ${OMP_OFFLOAD_FLAGS})
+    target_link_options(su3lib PUBLIC ${OMP_OFFLOAD_FLAGS})
 
-    message(STATUS "GPU Offloading Enabled")
-    message(STATUS "AVX disabled when using GPU")
-    set(ENABLE_AVX OFF)
+    message(STATUS "GPU Offloading Enabled (SM_86)")
+    set(ENABLE_AVX OFF CACHE BOOL "" FORCE) # Force override if user set it
 else()
     message(STATUS "GPU Offloading NOT Enabled")
 endif()
@@ -55,25 +48,21 @@ endif()
 
 option(ENABLE_AVX "Enable AVX vectorization" OFF)
 if(ENABLE_AVX)
-    #  AVX-512
-    target_compile_options(su3lib PRIVATE -mavx512f -mavx512dq -mavx512bw
-        -mavx512vl)
-    message(STATUS "AVX enabled")
+    target_compile_options(su3lib PRIVATE -mavx512f -mavx512dq -mavx512bw -mavx512vl)
+    message(STATUS "AVX-512 enabled")
 else()
-    # No autovectorization
-    target_compile_options(su3lib PRIVATE
-        -fno-tree-vectorize
-        -fno-tree-slp-vectorize
-    )
-    message(STATUS "AVX NOT enabled")
+
+    if(NOT ENABLE_GPU_OFFLOAD)
+        target_compile_options(su3lib PRIVATE -fno-tree-vectorize -fno-tree-slp-vectorize)
+        message(STATUS "CPU Vectorization disabled")
+    endif()
 endif()
 
 target_compile_options(su3lib PRIVATE
     -Wall
     -Wextra
     -Wpedantic
-    -O
-    -std=c11
+    -O3
 )
 
 
