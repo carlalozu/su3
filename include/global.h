@@ -15,18 +15,18 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#define L0 42
+#define L0 64
 #define L1 4
 #define L2 4
 #define L3 2
 
-#define L0_TRD 4
+#define L0_TRD 8
 #define L1_TRD 4
 #define L2_TRD 4
 #define L3_TRD 2
 
 #define VOLUME (L0*L1*L2*L3)
-#define VOLUME_TRD (L0_TRD*L1_TRD*L2_TRD*L3_TRD)
+#define VOLUME_TRD 96
 #define ALIGN 9
 #define CACHELINE 8
 

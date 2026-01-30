@@ -15,7 +15,7 @@ void random_su3vec_field(su3_vec_field *su3vf)
     // double *d = su3vf->base;
     double *d = (double *)su3vf;
 
-    for (size_t i = 0; i < sizeof(su3_vec_field); i++)
+    for (size_t i = 0; i < 6*VOLUME_TRD; i++)
         d[i] = (double)rand() / (double)RAND_MAX;
 }
 
@@ -25,7 +25,7 @@ void unit_su3vec_field(su3_vec_field *su3vf)
     // double *d = su3vf->base;
     double *d = (double *)su3vf;
 
-    for (size_t i = 0; i < sizeof(su3_vec_field); i++)
+    for (size_t i = 0; i < 6*VOLUME_TRD; i++)
         d[i] = 1.0;
 }
 
@@ -33,7 +33,7 @@ void random_su3mat_field(su3_mat_field *su3mf)
 {
     double *d = (double *)su3mf;
 
-    for (size_t i = 0; i < sizeof(su3_mat_field); i++)
+    for (size_t i = 0; i < 3*6*VOLUME_TRD; i++)
         d[i] = (double)rand() / (double)RAND_MAX;
 }
 
@@ -41,7 +41,7 @@ void unit_su3mat_field(su3_mat_field *su3mf)
 {
     double *d = (double *)su3mf;
 
-    for (size_t i = 0; i < sizeof(su3_mat_field); i++)
+    for (size_t i = 0; i < 3*6*VOLUME_TRD; i++)
         d[i] = 1.0;
 }
 

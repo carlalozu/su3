@@ -16,7 +16,6 @@ int main(int argc, char *argv[])
         idx = atoi(argv[1]);
     }
 
-    // NOTE: Careful with VOLUME size
     printf("Testing ufields structures\n");
     printf("Volume: %d\n", VOLUME);
     printf("Local volume: %i\n", VOLUME_TRD);
@@ -26,14 +25,12 @@ int main(int argc, char *argv[])
     printf("Number of blocks in the array: %i\n", n_blocks);
     printf("Extra elements: %i\n ", n_rem);
 
-    // 1. Declare the pointers
     su3_vec_field *v_field;
     su3_mat_field *m_field;
     su3_mat_field *u_field;
     su3_mat_field *t_field;
     su3_vec_field *res_field;
 
-    // 2. Allocate the memory
     v_field = malloc(n_blocks * sizeof(su3_vec_field));
     m_field = malloc(n_blocks * sizeof(su3_mat_field));
     u_field = malloc(n_blocks * sizeof(su3_mat_field));
