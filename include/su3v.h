@@ -9,8 +9,8 @@
 typedef struct
 {
     // size_t volume;
-    double re[VOLUME];
-    double im[VOLUME];
+    double re[VOLUME_TRD];
+    double im[VOLUME_TRD];
 } complexv;
 
 /* SU3 vector
@@ -19,9 +19,9 @@ typedef struct
 */
 typedef struct
 {
-    double c1re[VOLUME], c1im[VOLUME];
-    double c2re[VOLUME], c2im[VOLUME];
-    double c3re[VOLUME], c3im[VOLUME];
+    double c1re[VOLUME_TRD], c1im[VOLUME_TRD];
+    double c2re[VOLUME_TRD], c2im[VOLUME_TRD];
+    double c3re[VOLUME_TRD], c3im[VOLUME_TRD];
 } su3_vec_field;
 
 /* SU3 matrix 
@@ -30,17 +30,17 @@ typedef struct
 */
 typedef struct
 {
-    double c11re[VOLUME], c11im[VOLUME];
-    double c12re[VOLUME], c12im[VOLUME];
-    double c13re[VOLUME], c13im[VOLUME];
+    double c11re[VOLUME_TRD], c11im[VOLUME_TRD];
+    double c12re[VOLUME_TRD], c12im[VOLUME_TRD];
+    double c13re[VOLUME_TRD], c13im[VOLUME_TRD];
 
-    double c21re[VOLUME], c21im[VOLUME];
-    double c22re[VOLUME], c22im[VOLUME];
-    double c23re[VOLUME], c23im[VOLUME];
+    double c21re[VOLUME_TRD], c21im[VOLUME_TRD];
+    double c22re[VOLUME_TRD], c22im[VOLUME_TRD];
+    double c23re[VOLUME_TRD], c23im[VOLUME_TRD];
 
-    double c31re[VOLUME], c31im[VOLUME];
-    double c32re[VOLUME], c32im[VOLUME];
-    double c33re[VOLUME], c33im[VOLUME];
+    double c31re[VOLUME_TRD], c31im[VOLUME_TRD];
+    double c32re[VOLUME_TRD], c32im[VOLUME_TRD];
+    double c33re[VOLUME_TRD], c33im[VOLUME_TRD];
 
 } su3_mat_field;
 

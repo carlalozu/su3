@@ -7,6 +7,7 @@ endmacro()
 add_su3_executable(su3_alg su3_alg.c)
 add_su3_executable(su3_fields su3_fields.c)
 add_su3_executable(su3_fieldsv su3_fieldsv.c)
+add_su3_executable(su3_fieldsva su3_fieldsva.c)
 
 # 
 # if(ENABLE_GPU_OFFLOAD)

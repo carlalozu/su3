@@ -16,9 +16,8 @@ int main(int argc, char *argv[])
         idx = atoi(argv[1]);
     }
 
-    // NOTE: Careful with VOLUME size
     printf("Testing ufields structures\n");
-    printf("Volume: %d\n", VOLUME);
+    printf("Volume: %d\n", VOLUME_TRD);
 
     su3_vec_field *v_field = malloc(sizeof(su3_vec_field));
     su3_mat_field *m_field = malloc(sizeof(su3_mat_field));
@@ -64,12 +63,8 @@ int main(int argc, char *argv[])
 
 // matrix-vector field multiplication
 #pragma omp target teams distribute parallel for map(to : v_field[0 : 1], m_field[0 : 1]) map(from : res_field[0 : 1])
-    for (size_t i = 0; i < VOLUME; i++)
+    for (size_t i = 0; i < VOLUME_TRD; i++)
     {
-        if (omp_is_initial_device())
-        {
-            printf("Running on host\n");
-        }
         fsu3matxsu3vec(res_field, m_field, v_field, i);
     }
 
@@ -83,12 +78,8 @@ int main(int argc, char *argv[])
 
 // matrix-matrix field multiplication
 #pragma omp target teams distribute parallel for map(to : u_field[0 : 1], m_field[0 : 1]) map(from : t_field[0 : 1])
-    for (size_t i = 0; i < VOLUME; i++)
+    for (size_t i = 0; i < VOLUME_TRD; i++)
     {
-        if (omp_is_initial_device())
-        {
-            printf("Running on host\n");
-        }
         fsu3matxsu3mat(t_field, u_field, m_field, i);
     }
     printf("Result of t_field: \n");
