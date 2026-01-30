@@ -10,7 +10,6 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
 add_library(su3lib
-    modules/ufields.c
     modules/su3.c
     modules/su3v.c
 )
