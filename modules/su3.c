@@ -13,7 +13,6 @@
 #define SU3PROD_C
 
 #include "su3.h"
-#include "su3v.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
