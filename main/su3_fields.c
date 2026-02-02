@@ -3,6 +3,7 @@
 #include "su3.h"
 #include "global.h"
 #include "ufields.h"
+#include "utils.h"
 
 #ifdef _OPENMP
 #include <omp.h>

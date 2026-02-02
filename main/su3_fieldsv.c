@@ -58,11 +58,8 @@ int main(int argc, char *argv[])
     printf("res_field->c2im[%i] = %f\n", idx, res_field->c2im[idx]);
 
 // matrix-vector field multiplication
-#pragma omp target teams distribute parallel for map(to : v_field[0 : 1], m_field[0 : 1]) map(from : res_field[0 : 1])
-    for (size_t i = 0; i < VOLUME; i++)
-    {
-        fsu3matxsu3vec(res_field, m_field, v_field, i);
-    }
+#pragma omp target teams map(to : v_field[0 : 1], m_field[0 : 1]) map(from : res_field[0 : 1])
+    fsu3matxsu3vec(res_field, m_field, v_field, 0, VOLUME);
 
     printf("Result on host: \n");
     printf("res_field->c1re[%i] = %f\n", idx, res_field->c1re[idx]);
@@ -73,11 +70,8 @@ int main(int argc, char *argv[])
     printf("t_field->c3im[%i] = %f\n", idx, t_field->c21im[idx]);
 
 // matrix-matrix field multiplication
-#pragma omp target teams distribute parallel for map(to : u_field[0 : 1], m_field[0 : 1]) map(from : t_field[0 : 1])
-    for (size_t i = 0; i < VOLUME; i++)
-    {
-        fsu3matxsu3mat(t_field, u_field, m_field, i);
-    }
+#pragma omp target teams map(to : u_field[0 : 1], m_field[0 : 1]) map(from : t_field[0 : 1])
+    fsu3matxsu3mat(t_field, u_field, m_field, 0, VOLUME);
     printf("Result of t_field: \n");
     printf("t_field->c1re[%i] = %f\n", idx, t_field->c11re[idx]);
     printf("t_field->c3im[%i] = %f\n", idx, t_field->c21im[idx]);

@@ -1,3 +1,4 @@
 # source plot-env/bin/activate
-python plot.py ../output/time_avx_2801.txt ../output/time_avx_2801.pdf
-python plot.py ../output/time_gpu_2801.txt ../output/time_gpu_2801.pdf 
+file_path="../output"
+file_name=$file_path/st_scaling_omp_clang_0202
+python plot.py ../output/$file_name.txt ../output/$file_name.pdf

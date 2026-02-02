@@ -82,10 +82,7 @@ int main(int argc, char *argv[])
 #pragma omp target teams distribute parallel for map(to : v_field[0 : n_blocks], m_field[0 : n_blocks]) map(from : res_field[0 : n_blocks])
     for (size_t n = 0; n < n_blocks; n++)
     {
-        for (size_t i = 0; i < VOLUME_TRD; i++)
-        {
-            fsu3matxsu3vec(&res_field[n], &m_field[n], &v_field[n], i);
-        }
+        fsu3matxsu3vec(&res_field[n], &m_field[n], &v_field[n], 0, VOLUME_TRD);
     }
 
     printf("Result on host: \n");
@@ -100,10 +97,7 @@ int main(int argc, char *argv[])
 #pragma omp target teams distribute parallel for map(to : u_field[0 : n_blocks], m_field[0 : n_blocks]) map(from : t_field[0 : n_blocks])
     for (size_t n = 0; n < n_blocks; n++)
     {
-        for (size_t i = 0; i < VOLUME_TRD; i++)
-        {
-            fsu3matxsu3mat(&t_field[n], &u_field[n], &m_field[n], i);
-        }
+        fsu3matxsu3mat(&t_field[n], &u_field[n], &m_field[n], 0, VOLUME_TRD);
     }
     printf("Result of t_field: \n");
     printf("t_field[%i]->c23re[%i] = %f\n", idxo, idxi, t_field[idxo].c23re[idxi]);
