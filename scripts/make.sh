@@ -8,6 +8,8 @@ export GCC="$(which clang)"
 path="output"
 
 export OMP_TARGET_OFFLOAD=MANDATORY
+export LIBOMPTARGET_DEBUG=1
+export LIBOMPTARGET_INFO=16
 
 cd ..
 rm -rf build
@@ -16,5 +18,4 @@ cmake -S . -B build \
   -DCMAKE_BUILD_TYPE=Debug -DENABLE_OPENMP=ON -DENABLE_AVX=ON -DENABLE_GPU_OFFLOAD=ON
 cmake --build build -- -j8
 
-> $path/su3_fields_gpu.txt
-./build/main/su3_fields 0
+./build/main/su3_fieldsv 100

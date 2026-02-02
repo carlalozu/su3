@@ -1,19 +1,20 @@
 export HOME="/scratch/calopez"
 export LLVM_HOME=$HOME/clang+llvm-18.1.8-x86_64-linux-gnu-ubuntu-18.04
 export PATH=$LLVM_HOME/bin:$PATH
+export LD_LIBRARY_PATH=$LLVM_HOME/lib:$LD_LIBRARY_PATH
 export GCC="$(which clang)"
 # export GCC="$(which gcc)"
 
 
 repetitions=500
-idx=103
+idx=53
 avx=OFF
-date=2801
+date=0202
+cd ..
 
-file_name=output/time_omp_$date
+file_name=output/st_scaling_omp_clang_$date
 > "$file_name.txt"
 
-cd ..
 rm -rf build
 cmake -S . -B build \
   -DCMAKE_C_COMPILER=$GCC \
@@ -36,5 +37,3 @@ do
     ./build/main/time_cpu $repetitions $idx >> "$file_name.txt"
     echo "" >> "$file_name.txt"
 done
-
-python scripts/plot.py $file_name.txt $file_name.pdf 

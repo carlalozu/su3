@@ -11,14 +11,17 @@ void is_gpu()
 {
     int th_id = omp_get_team_num();
     int te_id = omp_get_thread_num();
+    int nteams = omp_get_num_teams();
+    int nthreads = omp_get_num_threads();
     if (omp_is_initial_device())
     {
-        printf("Running on host\n");
+        if (te_id == 0 && th_id == 0)
+        {
+        printf("Running on host with %i threads\n", nthreads);
+        }
     }
     else
     {
-        int nteams = omp_get_num_teams();
-        int nthreads = omp_get_num_threads();
         if (te_id == 0 && th_id == 0)
         {
             printf("Running on device with %d teams in total and %d threads in each team\n", nteams, nthreads);

@@ -1,37 +1,29 @@
-repetitions=500
-idx=103
-avx=OFF
-gpu=OFF
-date=2801
+export HOME="/scratch/calopez"
+export LLVM_HOME=$HOME/clang+llvm-18.1.8-x86_64-linux-gnu-ubuntu-18.04
+export PATH=$LLVM_HOME/bin:$PATH
+export LD_LIBRARY_PATH=$LLVM_HOME/lib:$LD_LIBRARY_PATH
+export GCC="$(which clang)"
 
-file_name=output/time_omp_$date
+repetitions=10
+idx=103
+avx=ON
+gpu=OFF
+date=0202
+
+cd ..
+file_name=output/time_cpu_$date
 > "$file_name.txt"
 
 export OMP_TARGET_OFFLOAD=MANDATORY
-
-cd ..
-rm -rf build
-cmake -S . -B build \
-  -DCMAKE_C_COMPILER=/usr/bin/gcc \
-  -DCMAKE_BUILD_TYPE=Debug -DENABLE_OPENMP=OFF -DENABLE_AVX=$avx -DENABLE_GPU_OFFLOAD=$gpu
-cmake --build build -- -j8
-
-./build/main/time_gpu $repetitions $idx > "$file_name.txt"
-echo "" >> "$file_name.txt"
+export LIBOMPTARGET_INFO=4
 
 rm -rf build
 cmake -S . -B build \
-  -DCMAKE_C_COMPILER=/usr/bin/gcc \
+  -DCMAKE_C_COMPILER=$GCC \
   -DCMAKE_BUILD_TYPE=Debug -DENABLE_OPENMP=ON -DENABLE_AVX=$avx -DENABLE_GPU_OFFLOAD=$gpu
 cmake --build build -- -j8
 
-for i in 1 2 4 8 16;
-do
-    export OMP_NUM_THREADS=$i
-    echo "Running with $i threads" >> "$file_name.txt"
-    ./build/main/time_gpu $repetitions $idx >> "$file_name.txt"
-    echo "" >> "$file_name.txt"
-done
+time ./build/main/time_gpu $repetitions $idx >> "$file_name.txt"
 
-echo "Runing plot script with $file_name"
-python scripts/plot.py $file_name.txt $file_name.pdf 
+# echo "Runing plot script with $file_name"
+# python scripts/plot.py $file_name.txt $file_name.pdf 
