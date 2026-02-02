@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 
         if (te_id == 0 && th_id == 0)
             prof_begin(&init_AoS);
-        #pragma omp for
+        #pragma omp distribute parallel for
         for (size_t i = 0; i < VOLUME; i++)
         {
             unit_su3mat(&u_field[i]);
@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
 
         if (te_id == 0 && th_id == 0)
             prof_begin(&init_AoSoA);
-#pragma omp distribute parallel for
+        #pragma omp distribute parallel for
         for (size_t i = 0; i < n_blocks; i++)
         {
             unit_su3mat_field(&u_fieldva[i]);

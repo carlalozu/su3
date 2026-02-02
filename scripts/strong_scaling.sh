@@ -1,9 +1,8 @@
-# export HOME="/scratch/calopez"
-# export LLVM_HOME=$HOME/clang+llvm-18.1.8-x86_64-linux-gnu-ubuntu-18.04
-# export PATH=$LLVM_HOME/bin:$PATH
-# export LD_LIBRARY_PATH=$LLVM_HOME/lib:$LD_LIBRARY_PATH
-# export GCC="$(which clang)"
-export GCC="$(which gcc)"
+export HOME="/scratch/calopez"
+export LLVM_HOME=$HOME/clang+llvm-18.1.8-x86_64-linux-gnu-ubuntu-18.04
+export PATH=$LLVM_HOME/bin:$PATH
+export LD_LIBRARY_PATH=$LLVM_HOME/lib:$LD_LIBRARY_PATH
+export GCC="$(which clang)"
 
 export OMP_TARGET_OFFLOAD=MANDATORY
 export LIBOMPTARGET_INFO=4
@@ -14,7 +13,7 @@ avx=OFF
 date=0202
 cd ..
 
-file_name=output/st_scaling_omp_gcc_noavx_$date
+file_name=output/st_scaling_omp_clang_noavx_$date
 > "$file_name.txt"
 
 rm -rf build
