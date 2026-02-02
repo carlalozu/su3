@@ -148,9 +148,13 @@ int main(int argc, char *argv[])
 
             #pragma omp single
             prof_begin(&comp_SoA);
-            fsu3matxsu3mat(&temp_fieldv, &u_fieldv, &v_fieldv, begin, end);
-            fsu3matxsu3mat(&res_fieldv, &temp_fieldv, &w_fieldv, begin, end);
-            fsu3mattrace(&res_soa, &res_fieldv, begin, end);
+            #pragma omp simd
+            for (size_t i = begin; i < end; i++)
+            {
+                    fsu3matxsu3mat(&temp_fieldv, &u_fieldv, &v_fieldv, i);
+                    fsu3matxsu3mat(&res_fieldv, &temp_fieldv, &w_fieldv, i);
+                    fsu3mattrace(&res_soa, &res_fieldv, i);
+            }
             #pragma omp single
             prof_end(&comp_SoA);
         }
@@ -178,9 +182,13 @@ int main(int argc, char *argv[])
             #pragma omp for schedule(static)
             for (size_t i = 0; i < n_blocks; i++)
             {
-                fsu3matxsu3mat(&temp_fieldva[i], &u_fieldva[i], &v_fieldva[i], 0, CACHELINE);
-                fsu3matxsu3mat(&res_fieldva[i], &temp_fieldva[i], &w_fieldva[i], 0, CACHELINE);
-                fsu3mattrace(&res_aosoa[i], &res_fieldva[i], 0, CACHELINE);
+                #pragma omp simd
+                for (size_t n = 0; n < CACHELINE; n++)
+                {
+                    fsu3matxsu3mat(&temp_fieldva[i], &u_fieldva[i], &v_fieldva[i], n);
+                    fsu3matxsu3mat(&res_fieldva[i], &temp_fieldva[i], &w_fieldva[i], n);
+                    fsu3mattrace(&res_aosoa[i], &res_fieldva[i], n);
+                }
             }
             #pragma omp single
             prof_end(&comp_AoSoA);

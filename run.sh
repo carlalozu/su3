@@ -2,7 +2,7 @@ repetitions=500
 idx=103
 avx=ON
 
-file_name=output_openmp_avx_$avx.txt
+file_name=output/d_output_openmp_avx_$avx.txt
 > $file_name
 
 rm -rf build
