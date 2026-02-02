@@ -5,9 +5,6 @@
 #include "ufields.h"
 #include <time.h>
 #include "profiler.h"
-#ifdef _OPENMP
-#include <omp.h>
-#endif
 
 int main(int argc, char *argv[])
 {

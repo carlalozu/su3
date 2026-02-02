@@ -11,7 +11,6 @@
 #ifndef UFLDS_C
 #define UFLDS_C
 
-#include "su3.h"
 #include "su3v.h"
 #include "global.h"
 #include <stdio.h>
@@ -29,6 +28,7 @@
  */
 void fsu3matxsu3vec(su3_vec_field *restrict res , const su3_mat_field *restrict u, const su3_vec_field *restrict v, const size_t begin, const size_t end)
 {
+    #pragma omp simd
     for (size_t i = begin; i < end; i++)
     {
         res->c1re[i] = u->c1.c1re[i] * v->c1re[i] - u->c1.c1im[i] * v->c1im[i] +

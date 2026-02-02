@@ -6,11 +6,15 @@
 
 int main(int argc, char *argv[])
 {
-    // read idx from command line
+    int reps = 100;
     int idx = 0;
     if (argc > 1)
     {
-        idx = atoi(argv[1]);
+        reps = atoi(argv[1]);
+    }
+    if (argc > 2)
+    {
+        idx = atoi(argv[2]);
     }
 
     printf("Testing ufields structures\n");
