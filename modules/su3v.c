@@ -75,7 +75,7 @@ void unit_su3mat_field(su3_mat_field *su3mf)
 //     v->base = (double*)malloc((size_t)6 * volume * sizeof(double));
 //     if (!v->base) {
 //         v->volume = 0;
-//         ERROR("Erorr allocating su3_vec_field");
+//         ERROR("Error allocating su3_vec_field");
 //         abort();
 //     }
 // 

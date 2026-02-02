@@ -26,7 +26,7 @@
 #define L3_TRD 2
 
 #define VOLUME (L0*L1*L2*L3)
-#define VOLUME_TRD 96
+#define VOLUME_TRD 8
 #define ALIGN 9
 #define CACHELINE 8
 
@@ -42,5 +42,16 @@
 //         exit(EXIT_FAILURE); \
 //     } while(0)
 // #endif
+
+#ifdef _OPENMP
+#include <omp.h>
+#else
+    #define omp_get_num_threads() 1
+    #define omp_get_num_teams() 1
+    #define omp_is_initial_device() 1
+    #define omp_get_team_num() 0
+    #define omp_get_thread_num() 0
+#endif
+
 
 #endif

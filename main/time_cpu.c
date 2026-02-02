@@ -5,27 +5,10 @@
 #include "ufields.h"
 #include <time.h>
 #include "profiler.h"
-#ifdef _OPENMP
-#include <omp.h>
-#endif
+#include "utils.h"
 
 int main(int argc, char *argv[])
 {
-#ifdef _OPENMP
-
-    printf("OpenMP is enabled\n");
-    int n_threads = omp_get_max_threads();
-    printf("Number of threads: %d\n", n_threads);
-    printf("Number of size per thread: %d\n", VOLUME/n_threads);
-    omp_set_dynamic(0);
-
-    // warm up the runtime once
-#pragma omp parallel
-    { /* nothing */
-    }
-#else
-    printf("OpenMP is not enabled\n");
-#endif
 
     // read reps from command line
     int reps = 100;
@@ -41,6 +24,8 @@ int main(int argc, char *argv[])
 
     printf("Timing SoA vs AoS structures\n");
     printf("Volume: %d\n", VOLUME);
+    printf("Volume block: %d\n", VOLUME_TRD);
+    print_parallel_info();
 
     prof_section init_AoS = {.name = "AoS init"};
     prof_section comp_AoS = {.name = "AoS compute"};
@@ -53,69 +38,56 @@ int main(int argc, char *argv[])
     su3_mat u_field[VOLUME];
     su3_mat v_field[VOLUME];
     su3_mat w_field[VOLUME];
-    su3_mat temp_field[VOLUME];
-    su3_mat res_field[VOLUME];
     complex res_aos[VOLUME];
 
     // SoA
-    su3_mat_field u_fieldv;
-    su3_mat_field v_fieldv;
-    su3_mat_field w_fieldv;
-    su3_mat_field temp_fieldv;
-    su3_mat_field res_fieldv;
-    complexv res_soa;
-
-    su3_mat_field_init(&u_fieldv, VOLUME);
-    su3_mat_field_init(&v_fieldv, VOLUME);
-    su3_mat_field_init(&w_fieldv, VOLUME);
-    su3_mat_field_init(&temp_fieldv, VOLUME);
-    su3_mat_field_init(&res_fieldv, VOLUME);
-    complexv_init(&res_soa, VOLUME);
+    su3_mat_field *u_fieldv = malloc(sizeof(su3_mat_field));
+    su3_mat_field *v_fieldv = malloc(sizeof(su3_mat_field));
+    su3_mat_field *w_fieldv = malloc(sizeof(su3_mat_field));
+    su3_mat_field *temp_fieldv = malloc(sizeof(su3_mat_field));
+    su3_mat_field *res_fieldv = malloc(sizeof(su3_mat_field));
+    complexv *res_soa = malloc(sizeof(complexv));
 
     // AoSoA
-    int n_blocks = VOLUME/CACHELINE;
-    su3_mat_field u_fieldva[n_blocks];
-    su3_mat_field v_fieldva[n_blocks];
-    su3_mat_field w_fieldva[n_blocks];
-    su3_mat_field temp_fieldva[n_blocks];
-    su3_mat_field res_fieldva[n_blocks];
-    complexv res_aosoa[n_blocks];
+    su3_mat_field *u_fieldva;
+    su3_mat_field *v_fieldva;
+    su3_mat_field *w_fieldva;
+    complexv *res_aosoa;
 
-    for (size_t i = 0; i < n_blocks; i++)
-    {
-        su3_mat_field_init(&u_fieldva[i], CACHELINE);
-        su3_mat_field_init(&v_fieldva[i], CACHELINE);
-        su3_mat_field_init(&w_fieldva[i], CACHELINE);
-        su3_mat_field_init(&temp_fieldva[i], CACHELINE);
-        su3_mat_field_init(&res_fieldva[i], CACHELINE);
-        complexv_init(&res_aosoa[i], CACHELINE);
-    }
+    int n_blocks = (VOLUME + VOLUME_TRD - 1) / VOLUME_TRD;
+    u_fieldva = malloc(n_blocks * sizeof(su3_mat_field));
+    v_fieldva = malloc(n_blocks * sizeof(su3_mat_field));
+    w_fieldva = malloc(n_blocks * sizeof(su3_mat_field));
+    res_aosoa = malloc(n_blocks * sizeof(complexv));
 
     // AoS
     #pragma omp parallel
     {
+        #pragma omp single
+        prof_begin(&init_AoS);
+        #pragma omp for schedule(static)
+        for (size_t i = 0; i < VOLUME; i++)
+        {
+            unit_su3mat(&u_field[i]);
+            unit_su3mat(&v_field[i]);
+            unit_su3mat(&w_field[i]);
+        }
+        #pragma omp single
+        prof_end(&init_AoS);
+
         for (int r = 0; r < reps; r++)
         {
-            #pragma omp single
-            prof_begin(&init_AoS);
-            #pragma omp for schedule(static)
-            for (size_t i = 0; i < VOLUME; i++)
-            {
-                unit_su3mat(&u_field[i]);
-                unit_su3mat(&v_field[i]);
-                unit_su3mat(&w_field[i]);
-            }
-            #pragma omp single
-            prof_end(&init_AoS);
 
             #pragma omp single
             prof_begin(&comp_AoS);
             #pragma omp for schedule(static)
             for (size_t i = 0; i < VOLUME; i++)
             {
-                su3matxsu3mat(&temp_field[i], &u_field[i], &v_field[i]);
-                su3matxsu3mat(&res_field[i], &temp_field[i], &w_field[i]);
-                res_aos[i] = su3_trace(&res_field[i]);
+                su3_mat tmp;
+                su3_mat res;
+                su3matxsu3mat(&tmp, &u_field[i], &v_field[i]);
+                su3matxsu3mat(&res, &tmp, &w_field[i]);
+                res_aos[i] = su3_trace(&res);
             }
             #pragma omp single
             prof_end(&comp_AoS);
@@ -125,32 +97,26 @@ int main(int argc, char *argv[])
     // SoA
     #pragma omp parallel
     {
-        #ifdef _OPENMP
-        int tid = omp_get_thread_num();
-        int begin = VOLUME/n_threads*tid;
-        int end = VOLUME/n_threads*(tid+1);
-        if (end > VOLUME) end = VOLUME;
-        #else
-        int begin = 0;
-        int end = VOLUME;
-        #endif
+        #pragma omp single
+        {
+        prof_begin(&init_SoA);
+        unit_su3mat_field(u_fieldv);
+        unit_su3mat_field(v_fieldv);
+        unit_su3mat_field(w_fieldv);
+        prof_end(&init_SoA);
+        }
 
         for (int r = 0; r < reps; r++)
         {   
-            #pragma omp single
-            {
-            prof_begin(&init_SoA);
-            unit_su3mat_field(&u_fieldv);
-            unit_su3mat_field(&v_fieldv);
-            unit_su3mat_field(&w_fieldv);
-            prof_end(&init_SoA);
-            }
 
             #pragma omp single
             prof_begin(&comp_SoA);
-            fsu3matxsu3mat(&temp_fieldv, &u_fieldv, &v_fieldv, begin, end);
-            fsu3matxsu3mat(&res_fieldv, &temp_fieldv, &w_fieldv, begin, end);
-            fsu3mattrace(&res_soa, &res_fieldv, begin, end);
+            for (size_t i = 0; i < VOLUME_TRD; i++)
+            {
+                fsu3matxsu3mat(temp_fieldv, u_fieldv, v_fieldv, i);
+                fsu3matxsu3mat(res_fieldv, temp_fieldv, w_fieldv, i);
+                fsu3mattrace(res_soa, res_fieldv, i);
+            }
             #pragma omp single
             prof_end(&comp_SoA);
         }
@@ -159,6 +125,9 @@ int main(int argc, char *argv[])
     // AoSoA
     #pragma omp parallel
     {
+        su3_mat_field temp_fieldva;
+        su3_mat_field res_fieldva;
+
         for (int r = 0; r < reps; r++)
         {
             #pragma omp single
@@ -176,11 +145,14 @@ int main(int argc, char *argv[])
             #pragma omp single
             prof_begin(&comp_AoSoA);
             #pragma omp for schedule(static)
-            for (size_t i = 0; i < n_blocks; i++)
+            for (size_t b = 0; b < n_blocks; b++)
             {
-                fsu3matxsu3mat(&temp_fieldva[i], &u_fieldva[i], &v_fieldva[i], 0, CACHELINE);
-                fsu3matxsu3mat(&res_fieldva[i], &temp_fieldva[i], &w_fieldva[i], 0, CACHELINE);
-                fsu3mattrace(&res_aosoa[i], &res_fieldva[i], 0, CACHELINE);
+                for (size_t i = 0; i < VOLUME_TRD; i++)
+                {
+                fsu3matxsu3mat(&temp_fieldva, &u_fieldva[b], &v_fieldva[b], i);
+                fsu3matxsu3mat(&res_fieldva, &temp_fieldva, &w_fieldva[b], i);
+                fsu3mattrace(&res_aosoa[b], &res_fieldva, i);
+                }
             }
             #pragma omp single
             prof_end(&comp_AoSoA);
@@ -197,16 +169,9 @@ int main(int argc, char *argv[])
     prof_report(&comp_SoA);
     prof_report(&comp_AoSoA);
 
-    int idx_a = idx/CACHELINE;
-    int idx_b = idx%CACHELINE;
-    printf("res_aos[%i] (re[%i], im[%i]) = (%f, %f) \n", idx, idx, idx, res_aos[idx].re, res_aos[idx].im);
-    printf("res_soa[%i] (re[%i], im[%i]) = (%f, %f) \n", idx, idx, idx, res_soa.re[idx], res_soa.im[idx]);
-    printf("res_aosoa[%i] (re[%i], im[%i]) = (%f, %f) \n", idx, idx, idx, res_aosoa[idx_a].re[idx_b], res_aosoa[idx_a].im[idx_b]);
-
-    su3_mat_field_free(&u_fieldv);
-    su3_mat_field_free(&v_fieldv);
-    su3_mat_field_free(&w_fieldv);
-    su3_mat_field_free(&temp_fieldv);
-    su3_mat_field_free(&res_fieldv);
-    complexv_free(&res_soa);
+    int idx_a = idx/VOLUME_TRD;
+    int idx_b = idx%VOLUME_TRD;
+    printf("res_aos[%i] (re, im) = (%f, %f) \n", idx, res_aos[idx].re, res_aos[idx].im);
+    printf("res_soa[%i] (re[%i], im[%i]) = (%f, %f) \n", idx, idx, idx, res_soa->re[idx], res_soa->im[idx]);
+    printf("res_aosoa[%i] (re[%i], im[%i]) = (%f, %f) \n", idx_a, idx_b, idx_b, res_aosoa[idx_a].re[idx_b], res_aosoa[idx_a].im[idx_b]);
 }

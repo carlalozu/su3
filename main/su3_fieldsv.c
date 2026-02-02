@@ -4,10 +4,6 @@
 #include "global.h"
 #include "ufields.h"
 
-#ifdef _OPENMP
-#include <omp.h>
-#endif
-
 int main(int argc, char *argv[])
 {
     int idx = 0;
@@ -17,13 +13,13 @@ int main(int argc, char *argv[])
     }
 
     printf("Testing ufields structures\n");
-    printf("Volume: %d\n", VOLUME_TRD);
+    printf("Volume: %d\n", VOLUME);
 
-    su3_vec_field *v_field = malloc(sizeof(su3_vec_field));
-    su3_mat_field *m_field = malloc(sizeof(su3_mat_field));
-    su3_mat_field *u_field = malloc(sizeof(su3_mat_field));
-    su3_mat_field *t_field = malloc(sizeof(su3_mat_field));
-    su3_vec_field *res_field = malloc(sizeof(su3_vec_field));
+    su3_vec_field *v_field;
+    su3_mat_field *m_field;
+    su3_mat_field *u_field;
+    su3_mat_field *t_field;
+    su3_vec_field *res_field;
 
     random_su3vec_field(v_field);
     random_su3mat_field(m_field);
@@ -63,7 +59,7 @@ int main(int argc, char *argv[])
 
 // matrix-vector field multiplication
 #pragma omp target teams distribute parallel for map(to : v_field[0 : 1], m_field[0 : 1]) map(from : res_field[0 : 1])
-    for (size_t i = 0; i < VOLUME_TRD; i++)
+    for (size_t i = 0; i < VOLUME; i++)
     {
         fsu3matxsu3vec(res_field, m_field, v_field, i);
     }
@@ -78,7 +74,7 @@ int main(int argc, char *argv[])
 
 // matrix-matrix field multiplication
 #pragma omp target teams distribute parallel for map(to : u_field[0 : 1], m_field[0 : 1]) map(from : t_field[0 : 1])
-    for (size_t i = 0; i < VOLUME_TRD; i++)
+    for (size_t i = 0; i < VOLUME; i++)
     {
         fsu3matxsu3mat(t_field, u_field, m_field, i);
     }
