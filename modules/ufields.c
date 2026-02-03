@@ -71,13 +71,6 @@ void fsu3matxsu3vec(su3_vec_field *restrict res, const su3_mat_field *restrict u
  */
 void fsu3matxsu3mat(su3_mat_field *restrict res, const su3_mat_field *restrict u, const su3_mat_field *restrict v, const size_t i)
 {
-    if (res == u || res == v || u == v)
-    {
-        fprintf(stderr,
-                "Error in fsu3matxsu3mat: res aliases input field (res == u_field or res == v_field)\n");
-        abort();
-    }
-
     res->c1.c1re[i] = u->c1.c1re[i] * v->c1.c1re[i] - u->c1.c1im[i] * v->c1.c1im[i] +
                       u->c1.c2re[i] * v->c1.c2re[i] - u->c1.c2im[i] * v->c1.c2im[i] +
                       u->c1.c3re[i] * v->c1.c3re[i] - u->c1.c3im[i] * v->c1.c3im[i];
