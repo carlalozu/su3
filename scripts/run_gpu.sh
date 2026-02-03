@@ -16,4 +16,4 @@ cmake -S . -B build \
   -DCMAKE_BUILD_TYPE=Debug -DENABLE_OPENMP=ON -DENABLE_AVX=$avx -DENABLE_GPU_OFFLOAD=ON
 cmake --build build -- -j8
 
-./build/main/su3_fieldsv $repetitions $idx
+./build/main/time_gpu $repetitions $idx

@@ -8,4 +8,5 @@ add_su3_executable(su3_alg su3_alg.c)
 add_su3_executable(su3_fields su3_fields.c)
 add_su3_executable(su3_fieldsv su3_fieldsv.c)
 add_su3_executable(time time.c)
+add_su3_executable(time_gpu time_gpu.c)
  

@@ -35,6 +35,7 @@ typedef struct
     su3_vec_field c1, c2, c3;
 
 } su3_mat_field;
+
 void complexv_init(complexv *x, size_t volume);
 void complexv_free(complexv *x);
 
