@@ -6,7 +6,7 @@ export GCC="$(which clang)"
 
 repetitions=500
 idx=103
-avx=OFF
+avx=ON
 
 cd ..
 file_name=output/output_openmp_clang_avx$avx.txt

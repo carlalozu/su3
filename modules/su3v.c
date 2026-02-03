@@ -44,16 +44,14 @@ void unit_su3mat_field(su3_mat_field *su3mf)
 void complexv_init(complexv *x, size_t volume)
 {
     x->volume = volume;
-    x->re = (double*)malloc(volume * sizeof(double));
-    x->im = (double*)malloc(volume * sizeof(double));
-    if (!x->re || !x->im) {
-        free(x->re);
-        free(x->im);
-        x->re = x->im = NULL;
+    x->base = (double*)malloc((size_t)2 * volume * sizeof(double));
+    if (!x->base) {
         x->volume = 0;
         fprintf(stderr, "Erorr allocating complexv");
         abort();
     }
+    x->re = x->base + 0*volume;
+    x->im = x->base + 1*volume;
 }
 
 void complexv_free(complexv *x)
@@ -105,6 +103,15 @@ void su3_mat_field_free(su3_mat_field *m)
     su3_vec_field_free(&m->c2);
     su3_vec_field_free(&m->c1);
 }
+
+#pragma omp declare target
+void complex_field_map_pointers(complexv *v)
+{
+    size_t volume = v->volume;
+    v->re = v->base + 0*volume;
+    v->im = v->base + 1*volume;
+}
+#pragma omp end declare target
 
 #pragma omp declare target
 void su3_vec_field_map_pointers(su3_vec_field *v)

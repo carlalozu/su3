@@ -9,8 +9,8 @@
 typedef struct
 {
     size_t volume;
-    double *re;
-    double *im;
+    double *base;
+    double *re, *im;
 } complexv;
 
 /* SU3 vector
@@ -46,6 +46,7 @@ void su3_mat_field_init(su3_mat_field *m, size_t volume);
 void su3_mat_field_free(su3_mat_field *m);
 
 #pragma omp declare target
+void complex_field_map_pointers(complexv *v);
 void su3_vec_field_map_pointers(su3_vec_field *v);
 void su3_mat_field_map_pointers(su3_mat_field *m);
 #pragma omp end declare target

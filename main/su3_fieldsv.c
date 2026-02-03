@@ -3,6 +3,8 @@
 #include "su3v.h"
 #include "global.h"
 #include "ufields.h"
+#include "utils.c"
+#include "profiler.h"
 
 int main(int argc, char *argv[])
 {
@@ -16,6 +18,8 @@ int main(int argc, char *argv[])
     {
         idx = atoi(argv[2]);
     }
+
+    prof_section comp_SoA = {.name = "SoA compute"};
 
     printf("Testing ufields structures\n");
     printf("Volume: %d\n", VOLUME);
@@ -41,15 +45,10 @@ int main(int argc, char *argv[])
     printf("m_field[%i]->c3.c1im[%i] = %f\n", idx, idx, m_field->c3.c1im[idx]);
 
     // move data to the gpu, move struct pointer and data inside
-    #pragma omp target enter data map(to : v_field[0], v_field->base[0:6*v_field->volume])
-    
-    #pragma omp target enter data map(to : resv_field[0], resv_field->base[0:6*resv_field->volume])
-    
-    #pragma omp target enter data map(to: m_field[0]) \
-    map(to: m_field->c1.base[0 : 6*m_field->c1.volume]) \
-    map(to: m_field->c2.base[0 : 6*m_field->c2.volume]) \
-    map(to: m_field->c3.base[0 : 6*m_field->c3.volume])
-    
+    enter_su3_vec_field(v_field);
+    enter_su3_vec_field(resv_field);    
+    enter_su3_mat_field(m_field);
+
     #pragma omp target
     {
         // remap the pointers on the gpu
@@ -59,17 +58,28 @@ int main(int argc, char *argv[])
             su3_vec_field_map_pointers(resv_field);
             su3_mat_field_map_pointers(m_field);
         }
-        // matrix-vector field multiplication
-        fsu3matxsu3vec(resv_field, m_field, v_field, 0, VOLUME);
     }
+    
+    prof_begin(&comp_SoA);
+    #pragma omp target teams distribute parallel for
+    {
+        // matrix-vector field multiplication
+        for (size_t i = 0; i < VOLUME; i++)
+            fsu3matxsu3vec(resv_field, m_field, v_field, i);
+    }
+    prof_end(&comp_SoA);
+
     #pragma omp target update from(resv_field->base[0 : 6*resv_field->volume])
 
     printf("resv_field[%i]->c1re[%i] = %f\n", idx, idx, resv_field->c1re[idx]);
     printf("resv_field[%i]->c2im[%i] = %f\n", idx, idx, resv_field->c2im[idx]);
 
     // matrix-matrix field multiplication
-    fsu3matxsu3mat(resm_field, u_field, m_field, 0, VOLUME);
+    for (size_t i = 0; i < VOLUME; i++)
+        fsu3matxsu3mat(resm_field, u_field, m_field, i);
     printf("resm_field[%i]->c1.c1re[%i] = %f\n", idx, idx, resm_field->c1.c1re[idx]);
     printf("resm_field[%i]->c3.c3im[%i] = %f\n", idx, idx, resm_field->c3.c3im[idx]);
+
+    prof_report(&comp_SoA);
     return 0;
 }

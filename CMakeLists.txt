@@ -48,7 +48,8 @@ endif()
 
 option(ENABLE_AVX "Enable AVX vectorization" OFF)
 if(ENABLE_AVX)
-    target_compile_options(su3lib PRIVATE -mavx512f -mavx512dq -mavx512bw -mavx512vl)
+    target_compile_options(su3lib PRIVATE -mavx512f -mavx512dq -mavx512bw -mavx512vl
+    -Rpass=loop-vectorize -Rpass-missed=loop-vectorize)
     message(STATUS "AVX-512 enabled")
 else()
 
