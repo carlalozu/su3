@@ -5,7 +5,7 @@
 #include "ufields.h"
 #include <time.h>
 #include "profiler.h"
-#include "utils.c"
+#include "utils.h"
 
 int main(int argc, char *argv[])
 {

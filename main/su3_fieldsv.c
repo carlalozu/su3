@@ -3,7 +3,7 @@
 #include "su3v.h"
 #include "global.h"
 #include "ufields.h"
-#include "utils.c"
+#include "utils.h"
 #include "profiler.h"
 
 int main(int argc, char *argv[])
@@ -48,17 +48,6 @@ int main(int argc, char *argv[])
     enter_su3_vec_field(v_field);
     enter_su3_vec_field(resv_field);    
     enter_su3_mat_field(m_field);
-
-    #pragma omp target
-    {
-        // remap the pointers on the gpu
-        if (!omp_is_initial_device())
-        {
-            su3_vec_field_map_pointers(v_field);
-            su3_vec_field_map_pointers(resv_field);
-            su3_mat_field_map_pointers(m_field);
-        }
-    }
     
     prof_begin(&comp_SoA);
     #pragma omp target teams distribute parallel for
