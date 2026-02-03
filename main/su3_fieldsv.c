@@ -20,34 +20,56 @@ int main(int argc, char *argv[])
     printf("Testing ufields structures\n");
     printf("Volume: %d\n", VOLUME);
 
-    su3_vec_field v_field;
-    su3_mat_field m_field;
-    su3_mat_field u_field;
-    su3_vec_field resv_field;
-    su3_mat_field resm_field;
+    su3_vec_field *v_field = (su3_vec_field*)malloc(sizeof(su3_vec_field));
+    su3_mat_field *m_field = (su3_mat_field*)malloc(sizeof(su3_mat_field));
+    su3_mat_field *u_field = (su3_mat_field*)malloc(sizeof(su3_mat_field));
+    su3_vec_field *resv_field = (su3_vec_field*)malloc(sizeof(su3_vec_field));
+    su3_mat_field *resm_field = (su3_mat_field*)malloc(sizeof(su3_mat_field));
 
-    su3_vec_field_init(&v_field, VOLUME);
-    su3_mat_field_init(&m_field, VOLUME);
-    su3_mat_field_init(&u_field, VOLUME);
-    su3_mat_field_init(&resm_field, VOLUME);
-    su3_vec_field_init(&resv_field, VOLUME);
+    su3_vec_field_init(v_field, VOLUME);
+    su3_mat_field_init(m_field, VOLUME);
+    su3_mat_field_init(u_field, VOLUME);
+    su3_mat_field_init(resm_field, VOLUME);
+    su3_vec_field_init(resv_field, VOLUME);
 
-    random_su3vec_field(&v_field);
-    random_su3mat_field(&m_field);
-    random_su3mat_field(&u_field);
-    printf("v_field[%i]->c1re[%i] = %f\n", idx, idx, v_field.c1re[idx]);
-    printf("v_field[%i]->c2im[%i] = %f\n", idx, idx, v_field.c2im[idx]);
-    printf("m_field[%i]->c2.c3re[%i] = %f\n", idx, idx, m_field.c2.c3re[idx]);
-    printf("m_field[%i]->c3.c1im[%i] = %f\n", idx, idx, m_field.c3.c1im[idx]);
+    random_su3vec_field(v_field);
+    random_su3mat_field(m_field);
+    random_su3mat_field(u_field);
+    printf("v_field[%i]->c1re[%i] = %f\n", idx, idx, v_field->c1re[idx]);
+    printf("v_field[%i]->c2im[%i] = %f\n", idx, idx, v_field->c2im[idx]);
+    printf("m_field[%i]->c2.c3re[%i] = %f\n", idx, idx, m_field->c2.c3re[idx]);
+    printf("m_field[%i]->c3.c1im[%i] = %f\n", idx, idx, m_field->c3.c1im[idx]);
 
-    // matrix-vector field multiplication
-    fsu3matxsu3vec(&resv_field, &m_field, &v_field, 0, VOLUME);
-    printf("resv_field[%i]->c1re[%i] = %f\n", idx, idx, resv_field.c1re[idx]);
-    printf("resv_field[%i]->c2im[%i] = %f\n", idx, idx, resv_field.c2im[idx]);
+    // move data to the gpu, move struct pointer and data inside
+    #pragma omp target enter data map(to : v_field[0], v_field->base[0:6*v_field->volume])
+    
+    #pragma omp target enter data map(to : resv_field[0], resv_field->base[0:6*resv_field->volume])
+    
+    #pragma omp target enter data map(to: m_field[0]) \
+    map(to: m_field->c1.base[0 : 6*m_field->c1.volume]) \
+    map(to: m_field->c2.base[0 : 6*m_field->c2.volume]) \
+    map(to: m_field->c3.base[0 : 6*m_field->c3.volume])
+    
+    #pragma omp target
+    {
+        // remap the pointers on the gpu
+        if (!omp_is_initial_device())
+        {
+            su3_vec_field_map_pointers(v_field);
+            su3_vec_field_map_pointers(resv_field);
+            su3_mat_field_map_pointers(m_field);
+        }
+        // matrix-vector field multiplication
+        fsu3matxsu3vec(resv_field, m_field, v_field, 0, VOLUME);
+    }
+    #pragma omp target update from(resv_field->base[0 : 6*resv_field->volume])
+
+    printf("resv_field[%i]->c1re[%i] = %f\n", idx, idx, resv_field->c1re[idx]);
+    printf("resv_field[%i]->c2im[%i] = %f\n", idx, idx, resv_field->c2im[idx]);
 
     // matrix-matrix field multiplication
-    fsu3matxsu3mat(&resm_field, &u_field, &m_field, 0, VOLUME);
-    printf("resm_field[%i]->c1.c1re[%i] = %f\n", idx, idx, resm_field.c1.c1re[idx]);
-    printf("resm_field[%i]->c3.c3im[%i] = %f\n", idx, idx, resm_field.c3.c3im[idx]);
+    fsu3matxsu3mat(resm_field, u_field, m_field, 0, VOLUME);
+    printf("resm_field[%i]->c1.c1re[%i] = %f\n", idx, idx, resm_field->c1.c1re[idx]);
+    printf("resm_field[%i]->c3.c3im[%i] = %f\n", idx, idx, resm_field->c3.c3im[idx]);
     return 0;
 }

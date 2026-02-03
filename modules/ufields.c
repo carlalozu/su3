@@ -15,9 +15,6 @@
 #include "global.h"
 #include <stdio.h>
 #include <stdlib.h>
-#ifdef _OPENMP
-#include <omp.h>
-#endif
 
 /*
  * SU(3) matrix u times SU(3) vector SoA
@@ -26,6 +23,7 @@
  * r.c2=(u*s).c2
  * r.c3=(u*s).c3
  */
+#pragma omp declare target
 void fsu3matxsu3vec(su3_vec_field *restrict res , const su3_mat_field *restrict u, const su3_vec_field *restrict v, const size_t begin, const size_t end)
 {
     #pragma omp simd
@@ -51,6 +49,7 @@ void fsu3matxsu3vec(su3_vec_field *restrict res , const su3_mat_field *restrict 
                        u->c3.c3re[i] * v->c3im[i] + u->c3.c3im[i] * v->c3re[i];
     }
 }
+#pragma omp end declare target
 
 /* SU(3) matrix-matrix field multiplication SoA
  *
@@ -143,6 +142,7 @@ void fsu3matxsu3mat(su3_mat_field *restrict res, const su3_mat_field *restrict u
     }
 }
 
+#pragma omp declare target
 void fsu3mattrace(complexv *res, const su3_mat_field *ufield, const size_t begin, const size_t end)
 {
     for (size_t i = begin; i < end; i++)
@@ -151,5 +151,6 @@ void fsu3mattrace(complexv *res, const su3_mat_field *ufield, const size_t begin
         res->im[i] = ufield->c1.c1im[i] + ufield->c2.c2im[i] + ufield->c3.c3im[i];
     }
 }
+#pragma omp end declare target
 
 #endif // UFLDS_C

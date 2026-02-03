@@ -106,4 +106,44 @@ void su3_mat_field_free(su3_mat_field *m)
     su3_vec_field_free(&m->c1);
 }
 
+#pragma omp declare target
+void su3_vec_field_map_pointers(su3_vec_field *v)
+{
+    size_t volume = v->volume;
+    v->c1re = v->base + 0*volume;
+    v->c1im = v->base + 1*volume;
+    v->c2re = v->base + 2*volume;
+    v->c2im = v->base + 3*volume;
+    v->c3re = v->base + 4*volume;
+    v->c3im = v->base + 5*volume;
+}
+#pragma omp end declare target
+
+#pragma omp declare target
+void su3_mat_field_map_pointers(su3_mat_field *m)
+{
+    size_t volume = m->c1.volume;
+    m->c1.c1re = m->c1.base + 0*volume;
+    m->c1.c1im = m->c1.base + 1*volume;
+    m->c1.c2re = m->c1.base + 2*volume;
+    m->c1.c2im = m->c1.base + 3*volume;
+    m->c1.c3re = m->c1.base + 4*volume;
+    m->c1.c3im = m->c1.base + 5*volume;
+
+    m->c2.c1re = m->c2.base + 0*volume;
+    m->c2.c1im = m->c2.base + 1*volume;
+    m->c2.c2re = m->c2.base + 2*volume;
+    m->c2.c2im = m->c2.base + 3*volume;
+    m->c2.c3re = m->c2.base + 4*volume;
+    m->c2.c3im = m->c2.base + 5*volume;
+
+    m->c3.c1re = m->c3.base + 0*volume;
+    m->c3.c1im = m->c3.base + 1*volume;
+    m->c3.c2re = m->c3.base + 2*volume;
+    m->c3.c2im = m->c3.base + 3*volume;
+    m->c3.c3re = m->c3.base + 4*volume;
+    m->c3.c3im = m->c3.base + 5*volume;
+}
+#pragma omp end declare target
+
 #endif // SU3V_C
