@@ -64,6 +64,8 @@ target_compile_options(su3lib PRIVATE
     -Wextra
     -Wpedantic
     -O3
+    -fstrict-aliasing
+    -Rpass-analysis=loop-vectorize
 )
 
 

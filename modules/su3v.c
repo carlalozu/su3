@@ -43,15 +43,18 @@ void unit_su3mat_field(su3_mat_field *su3mf)
 
 void complexv_init(complexv *x, size_t volume)
 {
-    x->volume = volume;
-    x->base = (double*)malloc((size_t)2 * volume * sizeof(double));
+    size_t size = 2 * volume * sizeof(double);
+    // Round up to nearest 8
+    size_t padded_volume = (volume + 7) & ~7; 
+    x->volume = padded_volume;
+    x->base = (double*)aligned_alloc(ALIGN, size);
     if (!x->base) {
         x->volume = 0;
         fprintf(stderr, "Erorr allocating complexv");
         abort();
     }
-    x->re = x->base + 0*volume;
-    x->im = x->base + 1*volume;
+    x->re = x->base + 0*padded_volume;
+    x->im = x->base + 1*padded_volume;
 }
 
 void complexv_free(complexv *x)
@@ -64,21 +67,23 @@ void complexv_free(complexv *x)
 
 void su3_vec_field_init(su3_vec_field *v, size_t volume)
 {
-    v->volume = volume;
-
-    v->base = (double*)malloc((size_t)6 * volume * sizeof(double));
+    // Round up to nearest 8
+    size_t padded_volume = (volume + 7) & ~7; 
+    v->volume = padded_volume;
+    size_t size = 6 * padded_volume * sizeof(double);
+    v->base = (double*)aligned_alloc(ALIGN, size);
     if (!v->base) {
         v->volume = 0;
         fprintf(stderr, "Erorr allocating su3_vec_field");
         abort();
     }
 
-    v->c1re = v->base + 0*volume;
-    v->c1im = v->base + 1*volume;
-    v->c2re = v->base + 2*volume;
-    v->c2im = v->base + 3*volume;
-    v->c3re = v->base + 4*volume;
-    v->c3im = v->base + 5*volume;
+    v->c1re = v->base + 0*padded_volume;
+    v->c1im = v->base + 1*padded_volume;
+    v->c2re = v->base + 2*padded_volume;
+    v->c2im = v->base + 3*padded_volume;
+    v->c3re = v->base + 4*padded_volume;
+    v->c3im = v->base + 5*padded_volume;
 }
 
 void su3_vec_field_free(su3_vec_field *v)
