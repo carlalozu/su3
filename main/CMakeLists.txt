@@ -1,20 +1,11 @@
 
-function(configure_exec target)
-    target_include_directories(${target} PRIVATE
-        ${PROJECT_SOURCE_DIR}/include
-    )
-    target_link_libraries(${target} PRIVATE su3lib)
-    target_compile_options(${target} PRIVATE ${CMAKE_C_FLAGS})
-endfunction()
+macro(add_su3_executable name source)
+    add_executable(${name} ${source})
+    target_link_libraries(${name} PRIVATE su3lib)
+endmacro()
 
-add_executable(su3_alg su3_alg.c)
-configure_exec(su3_alg)
-
-add_executable(su3_fields su3_fields.c)
-configure_exec(su3_fields)
-
-add_executable(su3_fieldsv su3_fieldsv.c)
-configure_exec(su3_fieldsv)
-
-add_executable(time time.c)
-configure_exec(time)
+add_su3_executable(su3_alg su3_alg.c)
+add_su3_executable(su3_fields su3_fields.c)
+add_su3_executable(su3_fieldsv su3_fieldsv.c)
+add_su3_executable(time time.c)
+ 

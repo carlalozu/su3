@@ -24,7 +24,7 @@
 #define L3_TRD 3
 
 #define VOLUME (L0*L1*L2*L3)
-#define ALIGN 9
+#define ALIGN 64
 #define CACHELINE 8
 
 #endif

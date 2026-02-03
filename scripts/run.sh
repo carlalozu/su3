@@ -1,13 +1,21 @@
+export HOME="/scratch/calopez"
+export LLVM_HOME=$HOME/clang+llvm-18.1.8-x86_64-linux-gnu-ubuntu-18.04
+export PATH=$LLVM_HOME/bin:$PATH
+export LD_LIBRARY_PATH=$LLVM_HOME/lib:$LD_LIBRARY_PATH
+export GCC="$(which clang)"
+
 repetitions=500
 idx=103
-avx=ON
+avx=OFF
 
-file_name=output/d_output_openmp_avx_$avx.txt
+cd ..
+
+file_name=output/output_openmp_clang_avx_$avx.txt
 > $file_name
 
 rm -rf build
 cmake -S . -B build \
-  -DCMAKE_C_COMPILER=/usr/bin/gcc \
+  -DCMAKE_C_COMPILER=$GCC \
   -DCMAKE_BUILD_TYPE=Debug -DENABLE_OPENMP=OFF -DENABLE_AVX=$avx
 cmake --build build -- -j8
 
@@ -17,7 +25,7 @@ echo "" >> $file_name
 
 rm -rf build
 cmake -S . -B build \
-  -DCMAKE_C_COMPILER=/usr/bin/gcc \
+  -DCMAKE_C_COMPILER=$GCC \
   -DCMAKE_BUILD_TYPE=Debug -DENABLE_OPENMP=ON -DENABLE_AVX=$avx
 cmake --build build -- -j8
 
