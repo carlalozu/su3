@@ -14,9 +14,9 @@ typedef struct
 } complexv;
 
 /* SU3 vector
-* Each component is a pointer to an array of doubles
-* Real and imaginary parts are stored separately
-*/
+ * Each component is a pointer to an array of doubles
+ * Real and imaginary parts are stored separately
+ */
 typedef struct
 {
     size_t volume;
@@ -26,10 +26,10 @@ typedef struct
     double *c3re, *c3im;
 } su3_vec_field;
 
-/* SU3 matrix 
-* Each element is a su3_vec_vdble
-* Represents a column of the SU3 matrix
-*/
+/* SU3 matrix
+ * Each element is a su3_vec_vdble
+ * Represents a column of the SU3 matrix
+ */
 typedef struct
 {
     su3_vec_field c1, c2, c3;
