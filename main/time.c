@@ -196,10 +196,4 @@ int main(int argc, char *argv[])
     printf("res_soa[%i] (re[%i], im[%i]) = (%f, %f) \n", idx, idx, idx, res_soa.re[idx], res_soa.im[idx]);
     printf("res_aosoa[%i] (re[%i], im[%i]) = (%f, %f) \n", idx, idx, idx, res_aosoa[idx_a].re[idx_b], res_aosoa[idx_a].im[idx_b]);
 
-    su3_mat_field_free(&u_fieldv);
-    su3_mat_field_free(&v_fieldv);
-    su3_mat_field_free(&w_fieldv);
-    su3_mat_field_free(&temp_fieldv);
-    su3_mat_field_free(&res_fieldv);
-    complexv_free(&res_soa);
 }
