@@ -9,7 +9,7 @@ idx=103
 avx=OFF
 
 cd ..
-file_name=output/output_openmp_clang_avx$avx.txt
+file_name=output/offloaf_dynamic_out_avx_$avx.txt
 > $file_name
 
 rm -rf build
