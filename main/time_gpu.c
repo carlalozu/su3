@@ -40,6 +40,9 @@ int main(int argc, char *argv[])
     prof_section init_AoSoA = {.name = "AoSoA init"};
     prof_section comp_AoSoA = {.name = "AoSoA compute"};
 
+    int n_blocks = (VOLUME + CACHELINE - 1)/CACHELINE;
+    printf("n_blocks: %d\n", n_blocks);
+
     // AoS
     su3_mat u_field[VOLUME];
     su3_mat v_field[VOLUME];
@@ -56,11 +59,10 @@ int main(int argc, char *argv[])
     }
     prof_end(&init_AoS);
     
-    #pragma omp target teams \
+    #pragma omp target teams num_teams(n_blocks)\
         map(to : v_field[0 : VOLUME], u_field[0 : VOLUME], w_field[0: VOLUME]) \
         map(from : res_aos[0 : VOLUME])
     {
-        is_gpu();
         su3_mat temp_field;
         su3_mat res_field;
         for (int r = 0; r < reps; r++)
@@ -107,13 +109,6 @@ int main(int argc, char *argv[])
 
     #pragma omp target teams
     {
-        su3_mat_field_map_pointers(u_fieldv);
-        su3_mat_field_map_pointers(v_fieldv);
-        su3_mat_field_map_pointers(w_fieldv);
-        su3_mat_field_map_pointers(temp_fieldv);
-        su3_mat_field_map_pointers(res_fieldv);
-        complex_field_map_pointers(res_soa);
-
         for (int r = 0; r < reps; r++)
         {   
             prof_begin(&comp_SoA);
@@ -131,12 +126,22 @@ int main(int argc, char *argv[])
 
 
     // AoSoA
-    int n_blocks = VOLUME/CACHELINE;
-    su3_mat_field u_fieldva[n_blocks];
-    su3_mat_field v_fieldva[n_blocks];
-    su3_mat_field w_fieldva[n_blocks];
-    complexv res_aosoa[n_blocks];
+    su3_mat_field *u_fieldva;
+    su3_mat_field *v_fieldva;
+    su3_mat_field *w_fieldva;
+    complexv *res_aosoa;
+    su3_mat_field *temp_fieldva;
+    su3_mat_field *res_fieldva;
 
+    u_fieldva = malloc(n_blocks * sizeof(su3_mat_field));
+    v_fieldva = malloc(n_blocks * sizeof(su3_mat_field));
+    w_fieldva = malloc(n_blocks * sizeof(su3_mat_field));
+    res_aosoa = malloc(n_blocks * sizeof(complexv));
+    temp_fieldva = malloc(sizeof(su3_mat_field));
+    res_fieldva = malloc(sizeof(su3_mat_field));
+
+    su3_mat_field_init(temp_fieldva, CACHELINE);
+    su3_mat_field_init(res_fieldva, CACHELINE);
     for (size_t i = 0; i < n_blocks; i++)
     {
         su3_mat_field_init(&u_fieldva[i], CACHELINE);
@@ -145,44 +150,42 @@ int main(int argc, char *argv[])
         complexv_init(&res_aosoa[i], CACHELINE);
     }
 
-    #pragma omp parallel
+    prof_begin(&init_AoSoA);
+    #pragma omp parallel for
+    for (size_t i = 0; i < n_blocks; i++)
     {
-        su3_mat_field temp_fieldva;
-        su3_mat_field res_fieldva;
+        unit_su3mat_field(&u_fieldva[i]);
+        unit_su3mat_field(&v_fieldva[i]);
+        unit_su3mat_field(&w_fieldva[i]);
+    }
+    prof_end(&init_AoSoA);
 
-        su3_mat_field_init(&temp_fieldva, CACHELINE);
-        su3_mat_field_init(&res_fieldva, CACHELINE);
+    enter_su3_mat_field(temp_fieldva);
+    enter_su3_mat_field(res_fieldva);
+    enter_su3_mat_field_array(u_fieldva, n_blocks);
+    enter_su3_mat_field_array(v_fieldva, n_blocks);
+    enter_su3_mat_field_array(w_fieldva, n_blocks);
+    enter_complex_field_array(res_aosoa, n_blocks);
 
-        #pragma omp single
-        prof_begin(&init_AoSoA);
-        #pragma omp for schedule(static)
-        for (size_t i = 0; i < n_blocks; i++)
-        {
-            unit_su3mat_field(&u_fieldva[i]);
-            unit_su3mat_field(&v_fieldva[i]);
-            unit_su3mat_field(&w_fieldva[i]);
-        }
-        #pragma omp single
-        prof_end(&init_AoSoA);
-
+    #pragma omp target teams firstprivate(temp_fieldva, res_fieldva) num_teams(n_blocks)
+    {
         for (int r = 0; r < reps; r++)
         {
-            #pragma omp single
             prof_begin(&comp_AoSoA);
-            #pragma omp for schedule(static)
+            #pragma omp distribute parallel for collapse(2)
             for (size_t b = 0; b < n_blocks; b++)
             {
                 for (size_t i=0; i<CACHELINE; i++)
-                    fsu3matxsu3mat(&temp_fieldva, &u_fieldva[b], &v_fieldva[b], i);
-                for (size_t i=0; i<CACHELINE; i++)
-                    fsu3matxsu3mat(&res_fieldva, &temp_fieldva, &w_fieldva[b], i);
-                for (size_t i=0; i<CACHELINE; i++)
-                    fsu3mattrace(&res_aosoa[b], &res_fieldva, i);
+                {
+                    fsu3matxsu3mat(temp_fieldva, &u_fieldva[b], &v_fieldva[b], i);
+                    fsu3matxsu3mat(res_fieldva, temp_fieldva, &w_fieldva[b], i);
+                    fsu3mattrace(&res_aosoa[b], res_fieldva, i);
+                }
             }
-            #pragma omp single
             prof_end(&comp_AoSoA);
         }
     }
+    update_host_complex_field_array(res_aosoa, n_blocks);
 
     printf("\n Init \n");
     prof_report(&init_AoS);
