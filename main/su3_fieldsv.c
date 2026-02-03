@@ -3,6 +3,7 @@
 #include "su3v.h"
 #include "global.h"
 #include "ufields.h"
+#include "utils.h"
 
 int main(int argc, char *argv[])
 {
@@ -41,14 +42,9 @@ int main(int argc, char *argv[])
     printf("m_field[%i]->c3.c1im[%i] = %f\n", idx, idx, m_field->c3.c1im[idx]);
 
     // move data to the gpu, move struct pointer and data inside
-    #pragma omp target enter data map(to : v_field[0], v_field->base[0:6*v_field->volume])
-    
-    #pragma omp target enter data map(to : resv_field[0], resv_field->base[0:6*resv_field->volume])
-    
-    #pragma omp target enter data map(to: m_field[0]) \
-    map(to: m_field->c1.base[0 : 6*m_field->c1.volume]) \
-    map(to: m_field->c2.base[0 : 6*m_field->c2.volume]) \
-    map(to: m_field->c3.base[0 : 6*m_field->c3.volume])
+    enter_su3_vec_field(v_field);
+    enter_su3_vec_field(resv_field);    
+    enter_su3_mat_field(m_field);
     
     #pragma omp target
     {
