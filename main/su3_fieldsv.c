@@ -4,6 +4,7 @@
 #include "global.h"
 #include "ufields.h"
 #include "utils.h"
+#include "profiler.h"
 
 int main(int argc, char *argv[])
 {
@@ -20,6 +21,7 @@ int main(int argc, char *argv[])
 
     printf("Testing ufields structures\n");
     printf("Volume: %d\n", VOLUME);
+    prof_section comp_SoA = {.name = "SoA compute"};
 
     su3_vec_field *v_field = (su3_vec_field*)malloc(sizeof(su3_vec_field));
     su3_mat_field *m_field = (su3_mat_field*)malloc(sizeof(su3_mat_field));
@@ -55,8 +57,19 @@ int main(int argc, char *argv[])
             su3_vec_field_map_pointers(resv_field);
             su3_mat_field_map_pointers(m_field);
         }
+    }
+
+    #pragma omp target teams
+    {
+        is_gpu();
+        prof_begin(&comp_SoA);
         // matrix-vector field multiplication
-        fsu3matxsu3vec(resv_field, m_field, v_field, 0, VOLUME);
+        // #pragma omp distribute parallel for
+        // for (size_t v=0; v<VOLUME; v+=CACHELINE)
+        // {
+            fsu3matxsu3vec(resv_field, m_field, v_field, 0, VOLUME);
+        // }
+        prof_end(&comp_SoA);
     }
     #pragma omp target update from(resv_field->base[0 : 6*resv_field->volume])
 
@@ -67,5 +80,8 @@ int main(int argc, char *argv[])
     fsu3matxsu3mat(resm_field, u_field, m_field, 0, VOLUME);
     printf("resm_field[%i]->c1.c1re[%i] = %f\n", idx, idx, resm_field->c1.c1re[idx]);
     printf("resm_field[%i]->c3.c3im[%i] = %f\n", idx, idx, resm_field->c3.c3im[idx]);
+
+    prof_report(&comp_SoA);
+
     return 0;
 }
