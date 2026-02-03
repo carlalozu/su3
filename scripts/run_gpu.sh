@@ -9,12 +9,11 @@ idx=103
 avx=OFF
 
 cd ..
-export OMP_NUM_THREADS=1
 
 rm -rf build
 cmake -S . -B build \
   -DCMAKE_C_COMPILER=$GCC \
-  -DCMAKE_BUILD_TYPE=Debug -DENABLE_OPENMP=ON -DENABLE_AVX=$avx -DENABLE_GPU_OFFLOAD=OFF
+  -DCMAKE_BUILD_TYPE=Debug -DENABLE_OPENMP=ON -DENABLE_AVX=$avx -DENABLE_GPU_OFFLOAD=ON
 cmake --build build -- -j8
 
-./build/main/su3_fieldsv $repetitions $idx
+./build/main/time_gpu $repetitions $idx

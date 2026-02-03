@@ -117,12 +117,13 @@ int main(int argc, char *argv[])
         for (int r = 0; r < reps; r++)
         {   
             prof_begin(&comp_SoA);
+            #pragma omp distribute parallel for
             for (size_t i=0; i<VOLUME; i++)
+            {
                 fsu3matxsu3mat(temp_fieldv, u_fieldv, v_fieldv, i);
-            for (size_t i=0; i<VOLUME; i++)
                 fsu3matxsu3mat(res_fieldv, temp_fieldv, w_fieldv, i);
-            for (size_t i=0; i<VOLUME; i++)
-                fsu3mattrace(res_soa, v_fieldv, i);
+                fsu3mattrace(res_soa, res_fieldv, i);
+            }
             prof_end(&comp_SoA);
         }
     }
@@ -169,14 +170,14 @@ int main(int argc, char *argv[])
             #pragma omp single
             prof_begin(&comp_AoSoA);
             #pragma omp for schedule(static)
-            for (size_t i = 0; i < n_blocks; i++)
+            for (size_t b = 0; b < n_blocks; b++)
             {
                 for (size_t i=0; i<CACHELINE; i++)
-                    fsu3matxsu3mat(&temp_fieldva, &u_fieldva[i], &v_fieldva[i], i);
+                    fsu3matxsu3mat(&temp_fieldva, &u_fieldva[b], &v_fieldva[b], i);
                 for (size_t i=0; i<CACHELINE; i++)
-                    fsu3matxsu3mat(&res_fieldva, &temp_fieldva, &w_fieldva[i], i);
+                    fsu3matxsu3mat(&res_fieldva, &temp_fieldva, &w_fieldva[b], i);
                 for (size_t i=0; i<CACHELINE; i++)
-                    fsu3mattrace(&res_aosoa[i], &res_fieldva, i);
+                    fsu3mattrace(&res_aosoa[b], &res_fieldva, i);
             }
             #pragma omp single
             prof_end(&comp_AoSoA);
