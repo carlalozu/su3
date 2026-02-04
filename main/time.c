@@ -18,6 +18,8 @@ int main(int argc, char *argv[])
     printf("Number of threads: %d\n", n_threads);
     printf("Number of size per thread: %d\n", VOLUME/n_threads);
     omp_set_dynamic(0); 
+#else
+    printf("OpenMP is not enabled\n");
 #endif
 
     // read reps from command line
@@ -34,6 +36,7 @@ int main(int argc, char *argv[])
 
     printf("Timing SoA vs AoS structures\n");
     printf("Volume: %d\n", VOLUME);
+    printf("Cacheline: %d\n", CACHELINE);
 
     prof_section init_AoS = {.name = "AoS init"};
     prof_section comp_AoS = {.name = "AoS compute"};
