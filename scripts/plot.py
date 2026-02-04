@@ -10,9 +10,10 @@ from collections import defaultdict, OrderedDict
 import matplotlib.pyplot as plt
 
 
-THREADS_RE = re.compile(r"Running with\s+(\d+)\s+threads", re.IGNORECASE)
+THREADS_RE = re.compile(r"Number of threads:\s*(\d+)", re.IGNORECASE)
 NO_OMP_RE = re.compile(r"OpenMP is not enabled", re.IGNORECASE)
 VOLUME_RE = re.compile(r"Volume:\s*(\d+)", re.IGNORECASE)
+CACHELINE_RE = re.compile(r"Cacheline:\s*(\d+)", re.IGNORECASE)
 AVX_RE    = re.compile(r"AVX vectorization is\s+(ON|OFF)", re.IGNORECASE)
 
 # Matches lines like:
@@ -49,6 +50,10 @@ def parse(text: str):
         if mV:
             volume = int(mV.group(1))
         
+        mC = CACHELINE_RE.search(line)
+        if mC:
+            cache = int(mC.group(1))
+        
         mA = AVX_RE.search(line)
         if mA:
             avx_on = (mA.group(1).upper() == "ON")
@@ -74,9 +79,9 @@ def parse(text: str):
 
     # Convert to normal dict and sort threads (baseline 0 first, then ascending)
     threads_sorted = sorted(data.keys(), key=lambda t: (t != 0, t))
-    return OrderedDict((t, data[t]) for t in threads_sorted), volume, avx_on
+    return OrderedDict((t, data[t]) for t in threads_sorted), volume, cache, avx_on
 
-def plot_phase(data, phase: str, volume: int, avx_on:bool):
+def plot_phase(text, data, phase: str, volume: int, cache:int, avx_on:bool):
     markers = ["o", "*", "v"]
     threads = list(data.keys())[1:]
     layouts = ["AoS", "SoA", "AoSoA"]
@@ -103,17 +108,17 @@ def plot_phase(data, phase: str, volume: int, avx_on:bool):
     plt.ylim([10e-4, 10e-1])
     plt.yscale('log')
     plt.ylabel("Total time (s)")
-    plt.title(f"Compute total time vs threads (volume {volume}, avx {avx_on})")
+    plt.title(f"Compute total time vs threads (volume {volume}, cache {cache}, avx {avx_on})")
     plt.grid(True, linestyle="--", linewidth=0.5)
     plt.legend()
 
     plt.tight_layout()
-    plt.savefig(f"plot_{phase}_avx{avx_on}_log.pdf", dpi=200)
+    plt.savefig(f"{text}.pdf", dpi=200)
 
 def main():
     path = sys.argv[1] if len(sys.argv) > 1 else None
-    text = read_text(path)
-    data, volume, avx_on = parse(text)
+    text = read_text(f'{path}.txt')
+    data, volume, cache, avx_on = parse(text)
 
     if not data:
         print("No timing data found. Did you paste the output correctly?", file=sys.stderr)
@@ -123,7 +128,7 @@ def main():
     print("Parsed thread blocks:", ", ".join("NoOMP" if t == 0 else str(t) for t in data.keys()))
 
     # Plot compute + init + speedup
-    plot_phase(data, "compute", volume, avx_on)
+    plot_phase(path, data, "compute", volume, cache, avx_on)
 
 if __name__ == "__main__":
     main()
