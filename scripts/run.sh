@@ -6,10 +6,11 @@ export GCC="$(which clang)"
 
 repetitions=500
 idx=103
-avx=OFF
+avx=ON
 
 cd ..
-file_name=output/offloaf_dynamic_out_avx_$avx.txt
+file=output/offloaf_dynamic_out_avx_$avx
+file_name=$file.txt
 > $file_name
 
 rm -rf build
@@ -36,3 +37,6 @@ do
     ./build/main/time $repetitions $idx >> $file_name
     echo "" >> $file_name
 done
+
+echo "Plotting $file"
+python scripts/plot.py $file

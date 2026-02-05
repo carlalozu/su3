@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     printf("Volume: %d\n", VOLUME);
     printf("Local volume: %i\n", CACHELINE);
 
-    int n_blocks = (VOLUME + CACHELINE - 1) / CACHELINE;
+    size_t n_blocks = (VOLUME + CACHELINE - 1) / CACHELINE;
     int n_rem = n_blocks * CACHELINE - VOLUME;
     printf("Number of blocks in the array: %i\n", n_blocks);
     printf("Extra elements: %i\n ", n_rem);

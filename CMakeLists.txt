@@ -18,15 +18,15 @@ add_library(su3lib
 
 target_include_directories(su3lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-target_compile_options(su3lib PRIVATE
+target_compile_options(su3lib PUBLIC
     -Wall
     -Wextra
     -Wpedantic
     -O2
     -fstrict-aliasing
-    -Rpass-analysis=loop-vectorize
-    -Rpass=loop-vectorize
-    -Rpass-missed=loop-vectorize
+    # -Rpass-analysis=loop-vectorize
+    # -Rpass=loop-vectorize
+    # -Rpass-missed=loop-vectorize
     -march=native
 )
 
@@ -61,7 +61,7 @@ if(ENABLE_AVX)
     message(STATUS "Vectorization enabled")
 else()
     if(NOT ENABLE_GPU_OFFLOAD)
-        target_compile_options(su3lib PRIVATE -fno-tree-vectorize -fno-tree-slp-vectorize)
+        target_compile_options(su3lib PUBLIC -fno-tree-vectorize -fno-tree-slp-vectorize)
         message(STATUS "CPU Vectorization disabled")
     endif()
 endif()

@@ -2,8 +2,6 @@
 macro(add_su3_executable name source)
     add_executable(${name} ${source})
     target_link_libraries(${name} PRIVATE su3lib)
-    target_compile_options(${name} PRIVATE
-    -Rpass=loop-vectorize -Rpass-missed=loop-vectorize)
 endmacro()
 
 add_su3_executable(su3_alg su3_alg.c)
