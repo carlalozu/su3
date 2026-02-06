@@ -46,7 +46,8 @@ int main(int argc, char *argv[])
     su3_mat u_field[VOLUME];
     su3_mat v_field[VOLUME];
     su3_mat w_field[VOLUME];
-    complex res_aos[VOLUME];
+    su3_mat x_field[VOLUME];
+    double res_aos[VOLUME];
 
     // SoA
     su3_mat_field u_fieldv;
@@ -93,6 +94,7 @@ int main(int argc, char *argv[])
                 unit_su3mat(&u_field[i]);
                 unit_su3mat(&v_field[i]);
                 unit_su3mat(&w_field[i]);
+                unit_su3mat(&x_field[i]);
             }
             #pragma omp single
             prof_end(&init_AoS);
@@ -103,8 +105,8 @@ int main(int argc, char *argv[])
             for (size_t i = 0; i < VOLUME; i++)
             {
                 su3matxsu3mat(&temp_field, &u_field[i], &v_field[i]);
-                su3matxsu3mat(&res_field, &temp_field, &w_field[i]);
-                res_aos[i] = su3_trace(&res_field);
+                su3matdagxsu3matdag(&res_field, &w_field[i], &x_field[i]);
+                res_aos[i] = su3matxsu3mat_retrace(&temp_field, &res_field);
             }
             #pragma omp single
             prof_end(&comp_AoS);
@@ -206,7 +208,7 @@ int main(int argc, char *argv[])
 
     int idx_a = idx/CACHELINE;
     int idx_b = idx%CACHELINE;
-    printf("res_aos[%i] (re[%i], im[%i]) = (%f, %f) \n", idx, idx, idx, res_aos[idx].re, res_aos[idx].im);
+    printf("res_aos[%i] = %f \n", idx, res_aos[idx]);
     printf("res_soa[%i] (re[%i], im[%i]) = (%f, %f) \n", idx, idx, idx, res_soa.re[idx], res_soa.im[idx]);
     printf("res_aosoa[%i] (re[%i], im[%i]) = (%f, %f) \n", idx, idx, idx, res_aosoa[idx_a].re[idx_b], res_aosoa[idx_a].im[idx_b]);
 

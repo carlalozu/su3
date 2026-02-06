@@ -198,6 +198,48 @@ void su3matxsu3mat(su3_mat *res, const su3_mat *u, const su3_mat *v)
                   u->c33.re * v->c33.im + u->c33.im * v->c33.re;
 }
 
+/*
+ * Computes w=u^dag*v^dag assuming that w is different from u and v.
+ */
+void su3matdagxsu3matdag(su3_mat *w, const su3_mat *u, const su3_mat *v)
+{
+
+    su3_vec psi, chi;
+
+    psi.c1.re = (*v).c11.re;
+    psi.c1.im = -(*v).c11.im;
+    psi.c2.re = (*v).c12.re;
+    psi.c2.im = -(*v).c12.im;
+    psi.c3.re = (*v).c13.re;
+    psi.c3.im = -(*v).c13.im;
+    su3matdagxsu3vec(&chi, u, &psi);
+    (*w).c11 = chi.c1;
+    (*w).c21 = chi.c2;
+    (*w).c31 = chi.c3;
+
+    psi.c1.re = (*v).c21.re;
+    psi.c1.im = -(*v).c21.im;
+    psi.c2.re = (*v).c22.re;
+    psi.c2.im = -(*v).c22.im;
+    psi.c3.re = (*v).c23.re;
+    psi.c3.im = -(*v).c23.im;
+    su3matdagxsu3vec(&chi, u, &psi);
+    (*w).c12 = chi.c1;
+    (*w).c22 = chi.c2;
+    (*w).c32 = chi.c3;
+
+    psi.c1.re = (*v).c31.re;
+    psi.c1.im = -(*v).c31.im;
+    psi.c2.re = (*v).c32.re;
+    psi.c2.im = -(*v).c32.im;
+    psi.c3.re = (*v).c33.re;
+    psi.c3.im = -(*v).c33.im;
+    su3matdagxsu3vec(&chi, u, &psi);
+    (*w).c13 = chi.c1;
+    (*w).c23 = chi.c2;
+    (*w).c33 = chi.c3;
+}
+
 /* SU(3) trace
  *
  * tr = trace(u)
@@ -216,7 +258,6 @@ complex su3mat_trace(const su3_mat *u)
  */
 double su3matxsu3mat_retrace(const su3_mat *u, const su3_mat *v)
 {
-    double tr;
     double tr_1;
     double tr_2;
     double tr_3;

@@ -51,11 +51,9 @@ int main(int argc, char *argv[])
     
     prof_begin(&comp_SoA);
     #pragma omp target teams distribute parallel for
-    {
         // matrix-vector field multiplication
         for (size_t i = 0; i < VOLUME; i++)
             fsu3matxsu3vec(resv_field, m_field, v_field, i);
-    }
     prof_end(&comp_SoA);
 
     #pragma omp target update from(resv_field->base[0 : 6*resv_field->volume])
