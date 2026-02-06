@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 
     size_t n_blocks = (VOLUME + CACHELINE - 1) / CACHELINE;
     int n_rem = n_blocks * CACHELINE - VOLUME;
-    printf("Number of blocks in the array: %i\n", n_blocks);
+    printf("Number of blocks in the array: %li\n", n_blocks);
     printf("Extra elements: %i\n ", n_rem);
 
     su3_vec_field *v_field;
