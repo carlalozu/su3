@@ -53,30 +53,34 @@ int main(int argc, char *argv[])
     su3_mat_field u_fieldv;
     su3_mat_field v_fieldv;
     su3_mat_field w_fieldv;
+    su3_mat_field x_fieldv;
     su3_mat_field temp_fieldv;
     su3_mat_field res_fieldv;
-    complexv res_soa;
+    doublev res_soa;
 
     su3_mat_field_init(&u_fieldv, VOLUME);
     su3_mat_field_init(&v_fieldv, VOLUME);
     su3_mat_field_init(&w_fieldv, VOLUME);
+    su3_mat_field_init(&x_fieldv, VOLUME);
     su3_mat_field_init(&temp_fieldv, VOLUME);
     su3_mat_field_init(&res_fieldv, VOLUME);
-    complexv_init(&res_soa, VOLUME);
+    doublev_init(&res_soa, VOLUME);
 
     // AoSoA
     int n_blocks = VOLUME/CACHELINE;
     su3_mat_field u_fieldva[n_blocks];
     su3_mat_field v_fieldva[n_blocks];
     su3_mat_field w_fieldva[n_blocks];
-    complexv res_aosoa[n_blocks];
+    su3_mat_field x_fieldva[n_blocks];
+    doublev res_aosoa[n_blocks];
 
     for (size_t i = 0; i < n_blocks; i++)
     {
         su3_mat_field_init(&u_fieldva[i], CACHELINE);
         su3_mat_field_init(&v_fieldva[i], CACHELINE);
         su3_mat_field_init(&w_fieldva[i], CACHELINE);
-        complexv_init(&res_aosoa[i], CACHELINE);
+        su3_mat_field_init(&x_fieldva[i], CACHELINE);
+        doublev_init(&res_aosoa[i], CACHELINE);
     }
 
     // AoS
@@ -134,6 +138,7 @@ int main(int argc, char *argv[])
             unit_su3mat_field(&u_fieldv);
             unit_su3mat_field(&v_fieldv);
             unit_su3mat_field(&w_fieldv);
+            unit_su3mat_field(&x_fieldv);
             prof_end(&init_SoA);
             }
 
@@ -142,12 +147,12 @@ int main(int argc, char *argv[])
             #pragma clang loop vectorize(enable)
             for (size_t i=begin; i<end; i++)
                 fsu3matxsu3mat(&temp_fieldv, &u_fieldv, &v_fieldv, i);
+            // #pragma clang loop vectorize(enable)
+            for (size_t i=begin; i<end; i++)
+                fsu3matdagxsu3matdag(&res_fieldv, &x_fieldv, &w_fieldv, i);
             #pragma clang loop vectorize(enable)
             for (size_t i=begin; i<end; i++)
-                fsu3matxsu3mat(&res_fieldv, &temp_fieldv, &w_fieldv, i);
-            #pragma clang loop vectorize(enable)
-            for (size_t i=begin; i<end; i++)
-                fsu3mattrace(&res_soa, &res_fieldv, i);
+                fsu3matxsu3mat_retrace(&res_soa, &temp_fieldv, &res_fieldv, i);
             #pragma omp single
             prof_end(&comp_SoA);
         }
@@ -172,6 +177,7 @@ int main(int argc, char *argv[])
                 unit_su3mat_field(&u_fieldva[i]);
                 unit_su3mat_field(&v_fieldva[i]);
                 unit_su3mat_field(&w_fieldva[i]);
+                unit_su3mat_field(&x_fieldva[i]);
             }
             #pragma omp single
             prof_end(&init_AoSoA);
@@ -186,10 +192,10 @@ int main(int argc, char *argv[])
                     fsu3matxsu3mat(&temp_fieldva, &u_fieldva[b], &v_fieldva[b], i);
                 #pragma clang loop vectorize(enable)
                 for (size_t i=0; i<CACHELINE; i++)
-                    fsu3matxsu3mat(&res_fieldva, &temp_fieldva, &w_fieldva[b], i);
+                    fsu3matdagxsu3matdag(&res_fieldva, &x_fieldva[b], &w_fieldva[b], i);
                 #pragma clang loop vectorize(enable)
                 for (size_t i=0; i<CACHELINE; i++)
-                    fsu3mattrace(&res_aosoa[b], &res_fieldva, i);
+                    fsu3matxsu3mat_retrace(&res_aosoa[b], &temp_fieldva, &res_fieldva, i);
             }
             #pragma omp single
             prof_end(&comp_AoSoA);
@@ -209,7 +215,7 @@ int main(int argc, char *argv[])
     int idx_a = idx/CACHELINE;
     int idx_b = idx%CACHELINE;
     printf("res_aos[%i] = %f \n", idx, res_aos[idx]);
-    printf("res_soa[%i] (re[%i], im[%i]) = (%f, %f) \n", idx, idx, idx, res_soa.re[idx], res_soa.im[idx]);
-    printf("res_aosoa[%i] (re[%i], im[%i]) = (%f, %f) \n", idx, idx, idx, res_aosoa[idx_a].re[idx_b], res_aosoa[idx_a].im[idx_b]);
+    printf("res_soa[%i] = %f \n", idx, res_soa.base[idx]);
+    printf("res_aosoa[%i] = %f \n", idx, res_aosoa[idx_a].base[idx_b]);
 
 }
