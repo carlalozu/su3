@@ -45,6 +45,12 @@ void su3_vec_field_free(su3_vec_field *v);
 void su3_mat_field_init(su3_mat_field *m, size_t volume);
 void su3_mat_field_free(su3_mat_field *m);
 
+#pragma omp declare target
+void complex_field_map_pointers(complexv *v);
+void su3_vec_field_map_pointers(su3_vec_field *v);
+void su3_mat_field_map_pointers(su3_mat_field *m);
+#pragma omp end declare target
+
 void random_su3mat_field(su3_mat_field *su3_mat);
 void random_su3vec_field(su3_vec_field *su3_vec);
 void unit_su3mat_field(su3_mat_field *su3_mat);

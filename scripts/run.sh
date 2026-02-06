@@ -9,8 +9,8 @@ idx=103
 avx=ON
 
 cd ..
-
-file_name=output/main_avx_$avx.txt
+file=output/offloaf_dynamic_out_avx_$avx
+file_name=$file.txt
 > $file_name
 
 rm -rf build
@@ -37,3 +37,6 @@ do
     ./build/main/time $repetitions $idx >> $file_name
     echo "" >> $file_name
 done
+
+echo "Plotting $file"
+python scripts/plot.py $file

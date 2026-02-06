@@ -18,6 +18,17 @@ add_library(su3lib
 
 target_include_directories(su3lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+target_compile_options(su3lib PUBLIC
+    -Wall
+    -Wextra
+    -Wpedantic
+    -O2
+    -fstrict-aliasing
+    # -Rpass-analysis=loop-vectorize
+    # -Rpass=loop-vectorize
+    # -Rpass-missed=loop-vectorize
+    -march=native
+)
 
 option(ENABLE_OPENMP "Enable OpenMP parallelization" ON)
 if(ENABLE_OPENMP)
@@ -40,7 +51,6 @@ if(ENABLE_GPU_OFFLOAD)
     target_link_options(su3lib PUBLIC ${OMP_OFFLOAD_FLAGS})
 
     message(STATUS "GPU Offloading Enabled (SM_86)")
-    set(ENABLE_AVX OFF CACHE BOOL "" FORCE) # Force override if user set it
 else()
     message(STATUS "GPU Offloading NOT Enabled")
 endif()
@@ -48,24 +58,13 @@ endif()
 
 option(ENABLE_AVX "Enable AVX vectorization" OFF)
 if(ENABLE_AVX)
-    target_compile_options(su3lib PRIVATE -mavx512f -mavx512dq -mavx512bw -mavx512vl)
-    message(STATUS "AVX-512 enabled")
+    message(STATUS "Vectorization enabled")
 else()
-
     if(NOT ENABLE_GPU_OFFLOAD)
-        target_compile_options(su3lib PRIVATE -fno-tree-vectorize -fno-tree-slp-vectorize)
+        target_compile_options(su3lib PUBLIC -fno-tree-vectorize -fno-tree-slp-vectorize)
         message(STATUS "CPU Vectorization disabled")
     endif()
 endif()
-
-target_compile_options(su3lib PRIVATE
-    -Wall
-    -Wextra
-    -Wpedantic
-    -O3
-    -fstrict-aliasing
-    -Rpass-analysis=loop-vectorize
-)
 
 
 add_subdirectory(main)

@@ -13,7 +13,6 @@
 #define SU3PROD_C
 
 #include "su3.h"
-#include "su3v.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -103,38 +102,78 @@ void su3matxsu3vec(su3_vec *res, const su3_mat *u, const su3_vec *s)
  */
 void su3matxsu3mat(su3_mat *res, const su3_mat *u, const su3_mat *v)
 {
-    su3_vec psi, chi;
+    // --- Column 1 ---
+    res->c11.re = u->c11.re * v->c11.re - u->c11.im * v->c11.im +
+                  u->c12.re * v->c21.re - u->c12.im * v->c21.im +
+                  u->c13.re * v->c31.re - u->c13.im * v->c31.im;
+    res->c11.im = u->c11.re * v->c11.im + u->c11.im * v->c11.re +
+                  u->c12.re * v->c21.im + u->c12.im * v->c21.re +
+                  u->c13.re * v->c31.im + u->c13.im * v->c31.re;
 
-    psi.c1 = v->c11;
-    psi.c2 = v->c21;
-    psi.c3 = v->c31;
-    su3matxsu3vec(&chi, u, &psi);
-    res->c11 = chi.c1;
-    res->c21 = chi.c2;
-    res->c31 = chi.c3;
+    res->c21.re = u->c21.re * v->c11.re - u->c21.im * v->c11.im +
+                  u->c22.re * v->c21.re - u->c22.im * v->c21.im +
+                  u->c23.re * v->c31.re - u->c23.im * v->c31.im;
+    res->c21.im = u->c21.re * v->c11.im + u->c21.im * v->c11.re +
+                  u->c22.re * v->c21.im + u->c22.im * v->c21.re +
+                  u->c23.re * v->c31.im + u->c23.im * v->c31.re;
 
-    psi.c1 = v->c12;
-    psi.c2 = v->c22;
-    psi.c3 = v->c32;
-    su3matxsu3vec(&chi, u, &psi);
-    res->c12 = chi.c1;
-    res->c22 = chi.c2;
-    res->c32 = chi.c3;
+    res->c31.re = u->c31.re * v->c11.re - u->c31.im * v->c11.im +
+                  u->c32.re * v->c21.re - u->c32.im * v->c21.im +
+                  u->c33.re * v->c31.re - u->c33.im * v->c31.im;
+    res->c31.im = u->c31.re * v->c11.im + u->c31.im * v->c11.re +
+                  u->c32.re * v->c21.im + u->c32.im * v->c21.re +
+                  u->c33.re * v->c31.im + u->c33.im * v->c31.re;
 
-    psi.c1 = v->c13;
-    psi.c2 = v->c23;
-    psi.c3 = v->c33;
-    su3matxsu3vec(&chi, u, &psi);
-    res->c13 = chi.c1;
-    res->c23 = chi.c2;
-    res->c33 = chi.c3;
+    // --- Column 2 ---
+    res->c12.re = u->c11.re * v->c12.re - u->c11.im * v->c12.im +
+                  u->c12.re * v->c22.re - u->c12.im * v->c22.im +
+                  u->c13.re * v->c32.re - u->c13.im * v->c32.im;
+    res->c12.im = u->c11.re * v->c12.im + u->c11.im * v->c12.re +
+                  u->c12.re * v->c22.im + u->c12.im * v->c22.re +
+                  u->c13.re * v->c32.im + u->c13.im * v->c32.re;
+
+    res->c22.re = u->c21.re * v->c12.re - u->c21.im * v->c12.im +
+                  u->c22.re * v->c22.re - u->c22.im * v->c22.im +
+                  u->c23.re * v->c32.re - u->c23.im * v->c32.im;
+    res->c22.im = u->c21.re * v->c12.im + u->c21.im * v->c12.re +
+                  u->c22.re * v->c22.im + u->c22.im * v->c22.re +
+                  u->c23.re * v->c32.im + u->c23.im * v->c32.re;
+
+    res->c32.re = u->c31.re * v->c12.re - u->c31.im * v->c12.im +
+                  u->c32.re * v->c22.re - u->c32.im * v->c22.im +
+                  u->c33.re * v->c32.re - u->c33.im * v->c32.im;
+    res->c32.im = u->c31.re * v->c12.im + u->c31.im * v->c12.re +
+                  u->c32.re * v->c22.im + u->c32.im * v->c22.re +
+                  u->c33.re * v->c32.im + u->c33.im * v->c32.re;
+
+    // --- Column 3 ---
+    res->c13.re = u->c11.re * v->c13.re - u->c11.im * v->c13.im +
+                  u->c12.re * v->c23.re - u->c12.im * v->c23.im +
+                  u->c13.re * v->c33.re - u->c13.im * v->c33.im;
+    res->c13.im = u->c11.re * v->c13.im + u->c11.im * v->c13.re +
+                  u->c12.re * v->c23.im + u->c12.im * v->c23.re +
+                  u->c13.re * v->c33.im + u->c13.im * v->c33.re;
+
+    res->c23.re = u->c21.re * v->c13.re - u->c21.im * v->c13.im +
+                  u->c22.re * v->c23.re - u->c22.im * v->c23.im +
+                  u->c23.re * v->c33.re - u->c23.im * v->c33.im;
+    res->c23.im = u->c21.re * v->c13.im + u->c21.im * v->c13.re +
+                  u->c22.re * v->c23.im + u->c22.im * v->c23.re +
+                  u->c23.re * v->c33.im + u->c23.im * v->c33.re;
+
+    res->c33.re = u->c31.re * v->c13.re - u->c31.im * v->c13.im +
+                  u->c32.re * v->c23.re - u->c32.im * v->c23.im +
+                  u->c33.re * v->c33.re - u->c33.im * v->c33.im;
+    res->c33.im = u->c31.re * v->c13.im + u->c31.im * v->c13.re +
+                  u->c32.re * v->c23.im + u->c32.im * v->c23.re +
+                  u->c33.re * v->c33.im + u->c33.im * v->c33.re;
 }
 
 /* SU(3) trace
  *
  * tr = trace(u)
  */
-inline complex su3_trace(const su3_mat *u)
+complex su3_trace(const su3_mat *u)
 {
     complex tr;
     tr.re = u->c11.re + u->c22.re + u->c33.re;
