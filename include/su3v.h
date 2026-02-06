@@ -10,6 +10,12 @@ typedef struct
 {
     size_t volume;
     double *base;
+} doublev;
+
+typedef struct
+{
+    size_t volume;
+    double *base;
     double *re, *im;
 } complexv;
 
@@ -36,6 +42,7 @@ typedef struct
 
 } su3_mat_field;
 
+void doublev_init(doublev *x, size_t volume);
 void complexv_init(complexv *x, size_t volume);
 void complexv_free(complexv *x);
 
