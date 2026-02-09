@@ -61,6 +61,7 @@ dkms.conf
 *.png
 *-env/*
 *.pdf
+*.fig
 
 # build files
 build/*
