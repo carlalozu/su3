@@ -279,19 +279,19 @@ complex su3mat_trace(const su3_mat *u)
  */
 double su3matxsu3mat_retrace(const su3_mat *u, const su3_mat *v)
 {
-    double tr_1;
-    double tr_2;
-    double tr_3;
+    double tr_1 = 0.0;
+    double tr_2 = 0.0;
+    double tr_3 = 0.0;
 
-    tr_1 = (*u).c11.re * (*v).c11.re - (*u).c11.im * (*v).c11.im;
+    tr_1 += (*u).c11.re * (*v).c11.re - (*u).c11.im * (*v).c11.im;
     tr_1 += (*u).c12.re * (*v).c21.re - (*u).c12.im * (*v).c21.im;
     tr_1 += (*u).c13.re * (*v).c31.re - (*u).c13.im * (*v).c31.im;
 
-    tr_2 = (*u).c21.re * (*v).c12.re - (*u).c21.im * (*v).c12.im;
+    tr_2 += (*u).c21.re * (*v).c12.re - (*u).c21.im * (*v).c12.im;
     tr_2 += (*u).c22.re * (*v).c22.re - (*u).c22.im * (*v).c22.im;
     tr_2 += (*u).c23.re * (*v).c32.re - (*u).c23.im * (*v).c32.im;
 
-    tr_3 = (*u).c31.re * (*v).c13.re - (*u).c31.im * (*v).c13.im;
+    tr_3 += (*u).c31.re * (*v).c13.re - (*u).c31.im * (*v).c13.im;
     tr_3 += (*u).c32.re * (*v).c23.re - (*u).c32.im * (*v).c23.im;
     tr_3 += (*u).c33.re * (*v).c33.re - (*u).c33.im * (*v).c33.im;
 

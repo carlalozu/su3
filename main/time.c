@@ -84,24 +84,27 @@ int main(int argc, char *argv[])
     }
 
     // AoS
+    
     #pragma omp parallel
     {
         su3_mat temp_field;
         su3_mat res_field;
+    
+        #pragma omp single
+        prof_begin(&init_AoS);
+        #pragma omp for schedule(static)
+        for (size_t i = 0; i < VOLUME; i++)
+        {
+            unit_su3mat(&u_field[i]);
+            unit_su3mat(&v_field[i]);
+            unit_su3mat(&w_field[i]);
+            unit_su3mat(&x_field[i]);
+        }
+        #pragma omp single
+        prof_end(&init_AoS);
+
         for (int r = 0; r < reps; r++)
         {
-            #pragma omp single
-            prof_begin(&init_AoS);
-            #pragma omp for schedule(static)
-            for (size_t i = 0; i < VOLUME; i++)
-            {
-                unit_su3mat(&u_field[i]);
-                unit_su3mat(&v_field[i]);
-                unit_su3mat(&w_field[i]);
-                unit_su3mat(&x_field[i]);
-            }
-            #pragma omp single
-            prof_end(&init_AoS);
 
             #pragma omp single
             prof_begin(&comp_AoS);
@@ -129,25 +132,24 @@ int main(int argc, char *argv[])
         int begin = 0;
         int end = VOLUME;
         #endif
+        
+        #pragma omp single
+        {
+        prof_begin(&init_SoA);
+        unit_su3mat_field(&u_fieldv);
+        unit_su3mat_field(&v_fieldv);
+        unit_su3mat_field(&w_fieldv);
+        unit_su3mat_field(&x_fieldv);
+        prof_end(&init_SoA);
+        }
 
         for (int r = 0; r < reps; r++)
         {   
-            #pragma omp single
-            {
-            prof_begin(&init_SoA);
-            unit_su3mat_field(&u_fieldv);
-            unit_su3mat_field(&v_fieldv);
-            unit_su3mat_field(&w_fieldv);
-            unit_su3mat_field(&x_fieldv);
-            prof_end(&init_SoA);
-            }
-
-            #pragma omp single
             prof_begin(&comp_SoA);
             #pragma clang loop vectorize(enable)
             for (size_t i=begin; i<end; i++)
                 fsu3matxsu3mat(&temp_fieldv, &u_fieldv, &v_fieldv, i);
-            // #pragma clang loop vectorize(enable)
+            #pragma clang loop vectorize(enable)
             for (size_t i=begin; i<end; i++)
                 fsu3matdagxsu3matdag(&res_fieldv, &x_fieldv, &w_fieldv, i);
             #pragma clang loop vectorize(enable)
@@ -167,21 +169,21 @@ int main(int argc, char *argv[])
         su3_mat_field_init(&temp_fieldva, CACHELINE);
         su3_mat_field_init(&res_fieldva, CACHELINE);
 
+        #pragma omp single
+        prof_begin(&init_AoSoA);
+        #pragma omp for schedule(static)
+        for (size_t i = 0; i < n_blocks; i++)
+        {
+            unit_su3mat_field(&u_fieldva[i]);
+            unit_su3mat_field(&v_fieldva[i]);
+            unit_su3mat_field(&w_fieldva[i]);
+            unit_su3mat_field(&x_fieldva[i]);
+        }
+        #pragma omp single
+        prof_end(&init_AoSoA);
+
         for (int r = 0; r < reps; r++)
         {
-            #pragma omp single
-            prof_begin(&init_AoSoA);
-            #pragma omp for schedule(static)
-            for (size_t i = 0; i < n_blocks; i++)
-            {
-                unit_su3mat_field(&u_fieldva[i]);
-                unit_su3mat_field(&v_fieldva[i]);
-                unit_su3mat_field(&w_fieldva[i]);
-                unit_su3mat_field(&x_fieldva[i]);
-            }
-            #pragma omp single
-            prof_end(&init_AoSoA);
-
             #pragma omp single
             prof_begin(&comp_AoSoA);
             #pragma omp for schedule(static)
