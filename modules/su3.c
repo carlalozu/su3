@@ -19,27 +19,27 @@
 
 void unit_su3mat(su3_mat *su3)
 {
-    _Static_assert(sizeof(su3_mat) == 18 * sizeof(double),
+    _Static_assert(sizeof(su3_mat) == 18 * sizeof(float),
                    "su3 layout assumption broken");
-    double *d = (double *)su3;
+    float *d = (float *)su3;
     for (int i = 0; i < 18; i++)
         d[i] = 1.0;
 }
 
 void random_su3mat(su3_mat *su3)
 {
-    _Static_assert(sizeof(su3_mat) == 18 * sizeof(double),
+    _Static_assert(sizeof(su3_mat) == 18 * sizeof(float),
                    "su3 layout assumption broken");
-    double *d = (double *)su3;
+    float *d = (float *)su3;
     for (int i = 0; i < 18; i++)
-        d[i] = (double)rand() / RAND_MAX;
+        d[i] = (float)rand() / RAND_MAX;
 }
 
 void unit_su3vec(su3_vec *vec)
 {
-    _Static_assert(sizeof(su3_vec) == 6 * sizeof(double),
+    _Static_assert(sizeof(su3_vec) == 6 * sizeof(float),
                    "su3_vec layout assumption broken");
-    double *d = (double *)vec;
+    float *d = (float *)vec;
     for (int i = 0; i < 6; i++)
         d[i] = 1.0;
 }
@@ -277,11 +277,11 @@ complex su3mat_trace(const su3_mat *u)
  *
  * tr = retrace(uv)
  */
-double su3matxsu3mat_retrace(const su3_mat *u, const su3_mat *v)
+float su3matxsu3mat_retrace(const su3_mat *u, const su3_mat *v)
 {
-    double tr_1 = 0.0;
-    double tr_2 = 0.0;
-    double tr_3 = 0.0;
+    float tr_1 = 0.0;
+    float tr_2 = 0.0;
+    float tr_3 = 0.0;
 
     tr_1 += (*u).c11.re * (*v).c11.re - (*u).c11.im * (*v).c11.im;
     tr_1 += (*u).c12.re * (*v).c21.re - (*u).c12.im * (*v).c21.im;

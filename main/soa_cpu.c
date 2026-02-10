@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     su3_mat v_field[VOLUME];
     su3_mat w_field[VOLUME];
     su3_mat x_field[VOLUME];
-    double res_aos[VOLUME];
+    float res_aos[VOLUME];
 
     // AoS    
     #pragma omp parallel

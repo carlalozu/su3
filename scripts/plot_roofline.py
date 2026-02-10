@@ -43,13 +43,13 @@ for i in range(len(peak_performances_gpu)):
     plt.text(label_x, label_y, labels_gpu[i], color=line.get_color(), fontsize=10, ha="left", va="top")
 
 # add kenrel lines su3matmat
-plt.vlines(0.7397, 0.001, 10000, linestyles='dashed', colors="black", label="plaq_sum", alpha=0.5, zorder=-1)
+plt.vlines(0.7397*2, 0.001, 10000, linestyles='dashed', colors="black", label="plaq_sum", alpha=0.5, zorder=-1)
 # plt.vlines(0.3724, 0.001, 10000, linestyles=':', colors="black", label="plaq_sum", alpha=0.5)
 
 # add points
-aos_I = 0.7397 #flops/byte
+aos_I = 0.7397*2 #flops/byte
 aos_P = 432 #flops
-df_soa = pd.read_csv("../output/volume_saling_soa.csv")
+df_soa = pd.read_csv("../output/volume_float_soa.csv")
 compute = df_soa[df_soa["phase"] == "compute"]
 compute_gpu = df_soa[df_soa["phase"] == "compute_GPU"]
 
@@ -67,10 +67,10 @@ aos16["op_int"]= aos_I
 
 plt.scatter(aos1["op_int"], aos1["performance"], label="1 thread",  marker="o")
 plt.scatter(aos16["op_int"], aos16["performance"], label="8 threads", marker="*", color="red")
-plt.scatter(compute_gpu["op_int"], compute_gpu["performance"], label="GPU FP64", marker=">", color="brown")
+plt.scatter(compute_gpu["op_int"], compute_gpu["performance"], label="GPU FP32", marker=">", color="magenta")
 
 for x, y, v in zip(compute_gpu["op_int"], compute_gpu["performance"], compute_gpu["vol"]):
-    plt.text(x,y,str(v),fontsize=9,color="brown",ha="left",va="bottom")
+    plt.text(x,y,str(v),fontsize=9,color="magenta",ha="left",va="bottom")
 
 # Add labels and legend
 plt.xlabel('Operational Intensity (FLOPs/Byte)')
@@ -85,4 +85,4 @@ plt.legend()
 # Show plot
 plt.grid(True)
 plt.tight_layout()
-plt.savefig("roofline_aos.pdf")
+plt.savefig("roofline_aos_float.pdf")

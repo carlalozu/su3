@@ -6,11 +6,11 @@ export GCC="$(which clang)"
 
 cd ..
 
-file=output/volume_saling_soa.log
+file=output/volume_float_soa.log
 # > $file
 for t in 1 2 4 8 16
 do
-  export OMP_NUM_THREADS=1
+  export OMP_NUM_THREADS=$((t))
 
   perl -i -pe "s/#define L0 \\d+/#define L0 8/" include/global.h
 

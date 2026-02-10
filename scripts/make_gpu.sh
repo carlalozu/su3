@@ -7,8 +7,8 @@ export GCC="$(which clang)"
 cd ..
 
 export OMP_NUM_THREADS=1
-file=output/volume_saling_soa_gpu.log
-> $file
+file=output/volume_float_soa.log
+# > $file
 
 perl -i -pe "s/#define L0 \\d+/#define L0 8/" include/global.h
 

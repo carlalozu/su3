@@ -63,5 +63,7 @@ dkms.conf
 *.pdf
 *.fig
 
+# output
+output/*
 # build files
 build/*

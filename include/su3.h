@@ -17,7 +17,7 @@
 
 typedef struct
 {
-    double re, im;
+    float re, im;
 } complex;
 
 typedef struct
@@ -43,7 +43,7 @@ void vec_add(su3_vec *res, const su3_vec *u, const su3_vec *v);
 
 #pragma omp declare target
 complex su3mat_trace(const su3_mat *u);
-double su3matxsu3mat_retrace(const su3_mat *u, const su3_mat *v);
+float su3matxsu3mat_retrace(const su3_mat *u, const su3_mat *v);
 void su3matxsu3vec(su3_vec *res, const su3_mat *u, const su3_vec *v);
 void su3matdagxsu3vec(su3_vec*, const su3_mat*, const su3_vec*);
 void su3matxsu3vec(su3_vec *res, const su3_mat *u, const su3_vec *v);
