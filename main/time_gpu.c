@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     prof_section comp_AoSoA = {.name = "AoSoA compute"};
 
     size_t n_blocks = (VOLUME + CACHELINE - 1)/CACHELINE;
-    printf("n_blocks: %d\n", n_blocks);
+    printf("n_blocks: %zu\n", n_blocks);
 
     // AoS
     su3_mat u_field[VOLUME];
@@ -60,14 +60,11 @@ int main(int argc, char *argv[])
     }
     prof_end(&init_AoS);
     
+    prof_begin(&comp_AoS);
     #pragma omp target teams \
     map(to : v_field[0 : VOLUME], u_field[0 : VOLUME], w_field[0: VOLUME]) \
-    map(from : res_aos[0 : VOLUME])
+    map(from : res_aos[0 : VOLUME]) num_teams(n_blocks) 
     {
-        int th_id = omp_get_team_num();
-        int te_id = omp_get_thread_num();
-        if (te_id == 0 && th_id == 0)
-            prof_begin(&comp_AoS);
         su3_mat temp_field;
         su3_mat res_field;
         
@@ -76,18 +73,15 @@ int main(int argc, char *argv[])
             #pragma omp distribute parallel for
             for (size_t i = 0; i < VOLUME; i++)
             {
-                if (r==0 && i==0) is_gpu();
+                // if (r==0 && i==0) is_gpu();
                 su3matxsu3mat(&temp_field, &u_field[i], &v_field[i]);
-                su3matxsu3mat(&res_field, &temp_field, &w_field[i]);
-                res_aos[i] = su3_trace(&res_field);
+                su3matdagxsu3matdag(&res_field, &temp_field, &w_field[i]);
+                res_aos[i] = su3mat_trace(&res_field);
             }
         }
-        if (te_id == 0 && th_id == 0)
-        {
-            prof_end(&comp_AoS);
-            comp_AoS.count *= reps;
-        }
     }
+    prof_end(&comp_AoS);
+    comp_AoS.count *= reps;
 
     // SoA
     su3_mat_field *u_fieldv = (su3_mat_field*)malloc(sizeof(su3_mat_field));
@@ -117,28 +111,24 @@ int main(int argc, char *argv[])
     enter_su3_mat_field(res_fieldv);
     enter_complex_field(res_soa);
 
-    #pragma omp target teams
+    prof_begin(&comp_SoA);
+    #pragma omp target teams num_teams(n_blocks)
     {   
-        int th_id = omp_get_team_num();
-        int te_id = omp_get_thread_num();
-        if (te_id == 0 && th_id == 0)
-            prof_begin(&comp_SoA);
         for (int r = 0; r < reps; r++)
         {
             #pragma omp distribute parallel for
             for (size_t i=0; i<VOLUME; i++)
             {
-                if (r==0 && i==0) is_gpu();
+                // if (r==0 && i==0) is_gpu();
                 fsu3matxsu3mat(temp_fieldv, u_fieldv, v_fieldv, i);
-                fsu3matxsu3mat(res_fieldv, temp_fieldv, w_fieldv, i);
-                fsu3mattrace(res_soa, res_fieldv, i);
+                fsu3matdagxsu3matdag(res_fieldv, temp_fieldv, w_fieldv, i);
+                fsu3mat_trace(res_soa, res_fieldv, i);
             }
         }
-        if (te_id == 0 && th_id == 0){
-            prof_end(&comp_SoA);
-            comp_SoA.count *= reps;
-        }
     }
+    prof_end(&comp_SoA);
+    comp_SoA.count *= reps;
+
     #pragma omp target update from(res_soa->base[0 : 2*res_soa->volume])
 
 
@@ -184,31 +174,26 @@ int main(int argc, char *argv[])
     enter_su3_mat_field_array(w_fieldva, n_blocks);
     enter_complex_field_array(res_aosoa, n_blocks);
     
-    #pragma omp target teams firstprivate(temp_fieldva, res_fieldva)
+    prof_begin(&comp_AoSoA);
+    #pragma omp target teams firstprivate(temp_fieldva, res_fieldva) num_teams(n_blocks)
     {
-        int th_id = omp_get_team_num();
-        int te_id = omp_get_thread_num();
-        if (te_id == 0 && th_id == 0)
-            prof_begin(&comp_AoSoA);
         for (int r = 0; r < reps; r++)
         {
             #pragma omp distribute parallel for collapse(2)
             for (size_t b = 0; b < n_blocks; b++)
             {
-                if (r==0 & b==0) is_gpu();
+                // if (r==0 & b==0) is_gpu();
                 for (size_t i=0; i<CACHELINE; i++)
                 {
                     fsu3matxsu3mat(temp_fieldva, &u_fieldva[b], &v_fieldva[b], i);
-                    fsu3matxsu3mat(res_fieldva, temp_fieldva, &w_fieldva[b], i);
-                    fsu3mattrace(&res_aosoa[b], res_fieldva, i);
+                    fsu3matdagxsu3matdag(res_fieldva, temp_fieldva, &w_fieldva[b], i);
+                    fsu3mat_trace(&res_aosoa[b], res_fieldva, i);
                 }
             }
         }
-        if (te_id == 0 && th_id == 0){
-            prof_end(&comp_AoSoA);
-            comp_AoSoA.count *= reps;
-        }
     }
+    prof_end(&comp_AoSoA);
+    comp_AoSoA.count *= reps;
     update_host_complex_field_array(res_aosoa, n_blocks);
 
     printf("\n Init \n");

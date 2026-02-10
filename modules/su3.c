@@ -203,41 +203,62 @@ void su3matxsu3mat(su3_mat *res, const su3_mat *u, const su3_mat *v)
  */
 void su3matdagxsu3matdag(su3_mat *w, const su3_mat *u, const su3_mat *v)
 {
+    w->c11.re = u->c11.re * v->c11.re + u->c11.im * -v->c11.im +
+                u->c21.re * v->c12.re + u->c21.im * -v->c12.im +
+                u->c31.re * v->c13.re + u->c31.im * -v->c13.im;
+    w->c11.im = u->c11.re * -v->c11.im - u->c11.im * v->c11.re +
+                u->c21.re * -v->c12.im - u->c21.im * v->c12.re +
+                u->c31.re * -v->c13.im - u->c31.im * v->c13.re;
+    w->c21.re = u->c12.re * v->c11.re + u->c12.im * -v->c11.im +
+                u->c22.re * v->c12.re + u->c22.im * -v->c12.im +
+                u->c32.re * v->c13.re + u->c32.im * -v->c13.im;
+    w->c21.im = u->c12.re * -v->c11.im - u->c12.im * v->c11.re +
+                u->c22.re * -v->c12.im - u->c22.im * v->c12.re +
+                u->c32.re * -v->c13.im - u->c32.im * v->c13.re;
+    w->c31.re = u->c13.re * v->c11.re + u->c13.im * -v->c11.im +
+                u->c23.re * v->c12.re + u->c23.im * -v->c12.im +
+                u->c33.re * v->c13.re + u->c33.im * -v->c13.im;
+    w->c31.im = u->c13.re * -v->c11.im - u->c13.im * v->c11.re +
+                u->c23.re * -v->c12.im - u->c23.im * v->c12.re +
+                u->c33.re * -v->c13.im - u->c33.im * v->c13.re;
 
-    su3_vec psi, chi;
+    w->c12.re = u->c11.re * v->c21.re + u->c11.im * -v->c21.im +
+                u->c21.re * v->c22.re + u->c21.im * -v->c22.im +
+                u->c31.re * v->c23.re + u->c31.im * -v->c23.im;
+    w->c12.im = u->c11.re * -v->c21.im - u->c11.im * v->c21.re +
+                u->c21.re * -v->c22.im - u->c21.im * v->c22.re +
+                u->c31.re * -v->c23.im - u->c31.im * v->c23.re;
+    w->c22.re = u->c12.re * v->c21.re + u->c12.im * -v->c21.im +
+                u->c22.re * v->c22.re + u->c22.im * -v->c22.im +
+                u->c32.re * v->c23.re + u->c32.im * -v->c23.im;
+    w->c22.im = u->c12.re * -v->c21.im - u->c12.im * v->c21.re +
+                u->c22.re * -v->c22.im - u->c22.im * v->c22.re +
+                u->c32.re * -v->c23.im - u->c32.im * v->c23.re;
+    w->c32.re = u->c13.re * v->c21.re + u->c13.im * -v->c21.im +
+                u->c23.re * v->c22.re + u->c23.im * -v->c22.im +
+                u->c33.re * v->c23.re + u->c33.im * -v->c23.im;
+    w->c32.im = u->c13.re * -v->c21.im - u->c13.im * v->c21.re +
+                u->c23.re * -v->c22.im - u->c23.im * v->c22.re +
+                u->c33.re * -v->c23.im - u->c33.im * v->c23.re;
 
-    psi.c1.re = (*v).c11.re;
-    psi.c1.im = -(*v).c11.im;
-    psi.c2.re = (*v).c12.re;
-    psi.c2.im = -(*v).c12.im;
-    psi.c3.re = (*v).c13.re;
-    psi.c3.im = -(*v).c13.im;
-    su3matdagxsu3vec(&chi, u, &psi);
-    (*w).c11 = chi.c1;
-    (*w).c21 = chi.c2;
-    (*w).c31 = chi.c3;
-
-    psi.c1.re = (*v).c21.re;
-    psi.c1.im = -(*v).c21.im;
-    psi.c2.re = (*v).c22.re;
-    psi.c2.im = -(*v).c22.im;
-    psi.c3.re = (*v).c23.re;
-    psi.c3.im = -(*v).c23.im;
-    su3matdagxsu3vec(&chi, u, &psi);
-    (*w).c12 = chi.c1;
-    (*w).c22 = chi.c2;
-    (*w).c32 = chi.c3;
-
-    psi.c1.re = (*v).c31.re;
-    psi.c1.im = -(*v).c31.im;
-    psi.c2.re = (*v).c32.re;
-    psi.c2.im = -(*v).c32.im;
-    psi.c3.re = (*v).c33.re;
-    psi.c3.im = -(*v).c33.im;
-    su3matdagxsu3vec(&chi, u, &psi);
-    (*w).c13 = chi.c1;
-    (*w).c23 = chi.c2;
-    (*w).c33 = chi.c3;
+    w->c13.re = u->c11.re * v->c31.re + u->c11.im * -v->c31.im +
+                u->c21.re * v->c32.re + u->c21.im * -v->c32.im +
+                u->c31.re * v->c33.re + u->c31.im * -v->c33.im;
+    w->c13.im = u->c11.re * -v->c31.im - u->c11.im * v->c31.re +
+                u->c21.re * -v->c32.im - u->c21.im * v->c32.re +
+                u->c31.re * -v->c33.im - u->c31.im * v->c33.re;
+    w->c23.re = u->c12.re * v->c31.re + u->c12.im * -v->c31.im +
+                u->c22.re * v->c32.re + u->c22.im * -v->c32.im +
+                u->c32.re * v->c33.re + u->c32.im * -v->c33.im;
+    w->c23.im = u->c12.re * -v->c31.im - u->c12.im * v->c31.re +
+                u->c22.re * -v->c32.im - u->c22.im * v->c32.re +
+                u->c32.re * -v->c33.im - u->c32.im * v->c33.re;
+    w->c33.re = u->c13.re * v->c31.re + u->c13.im * -v->c31.im +
+                u->c23.re * v->c32.re + u->c23.im * -v->c32.im +
+                u->c33.re * v->c33.re + u->c33.im * -v->c33.im;
+    w->c33.im = u->c13.re * -v->c31.im - u->c13.im * v->c31.re +
+                u->c23.re * -v->c32.im - u->c23.im * v->c32.re +
+                u->c33.re * -v->c33.im - u->c33.im * v->c33.re;
 }
 
 /* SU(3) trace
