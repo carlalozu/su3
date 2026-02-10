@@ -35,12 +35,12 @@ int main(int argc, char *argv[])
     printf("Volume: %d\n", VOLUME);
     printf("Cacheline: %d\n", CACHELINE);
 
-    prof_section init_AoS = {.name = "AoS init"};
-    prof_section comp_AoS = {.name = "AoS compute"};
-    prof_section init_SoA = {.name = "SoA init"};
-    prof_section comp_SoA = {.name = "SoA compute"};
-    prof_section init_AoSoA = {.name = "AoSoA init"};
-    prof_section comp_AoSoA = {.name = "AoSoA compute"};
+    prof_section init_AoS = {.name = "AoS init", .threads=n_threads};
+    prof_section comp_AoS = {.name = "AoS compute", .threads=n_threads};
+    prof_section init_SoA = {.name = "SoA init", .threads=n_threads};
+    prof_section comp_SoA = {.name = "SoA compute", .threads=n_threads};
+    prof_section init_AoSoA = {.name = "AoSoA init", .threads=n_threads};
+    prof_section comp_AoSoA = {.name = "AoSoA compute", .threads=n_threads};
 
     // AoS
     su3_mat u_field[VOLUME];

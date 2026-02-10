@@ -34,12 +34,12 @@ int main(int argc, char *argv[])
     printf("Volume: %d\n", VOLUME);
     printf("Cacheline: %d\n", CACHELINE);
 
-    prof_section init_AoS = {.name = "AoS init"};
-    prof_section comp_AoS = {.name = "AoS compute"};
-    prof_section init_SoA = {.name = "SoA init"};
-    prof_section comp_SoA = {.name = "SoA compute"};
-    prof_section init_AoSoA = {.name = "AoSoA init"};
-    prof_section comp_AoSoA = {.name = "AoSoA compute"};
+    prof_section init_AoS = {.name = "AoS init GPU"};
+    prof_section comp_AoS = {.name = "AoS compute GPU"};
+    prof_section init_SoA = {.name = "SoA init GPU"};
+    prof_section comp_SoA = {.name = "SoA compute GPU"};
+    prof_section init_AoSoA = {.name = "AoSoA init GPU"};
+    prof_section comp_AoSoA = {.name = "AoSoA compute GPU"};
 
     size_t n_blocks = (VOLUME + CACHELINE - 1)/CACHELINE;
     printf("n_blocks: %zu\n", n_blocks);
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
     su3_mat_field *x_fieldv = (su3_mat_field*)malloc(sizeof(su3_mat_field));
     su3_mat_field *temp_fieldv = (su3_mat_field*)malloc(sizeof(su3_mat_field));
     su3_mat_field *res_fieldv = (su3_mat_field*)malloc(sizeof(su3_mat_field));
-    doublev *res_soa  = (complexv*)malloc(sizeof(doublev));
+    doublev *res_soa  = (doublev*)malloc(sizeof(doublev));
 
     su3_mat_field_init(u_fieldv, VOLUME);
     su3_mat_field_init(v_fieldv, VOLUME);
