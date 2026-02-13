@@ -2,4 +2,4 @@
 file="offloaf_dynamic_out_avx_ON"
 python plot.py ../output/$file
 
-# python parse.py < aos.log | python analysis.py
+# python parse.py < ../output/volume_float_soa.log > ../output/volume_float_soa.csv
