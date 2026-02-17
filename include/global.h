@@ -13,9 +13,9 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#define L0 48
+#define L0 8
 #define L1 8
-#define L2 4
+#define L2 8
 #define L3 8
 
 #define L0_TRD 3

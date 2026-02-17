@@ -96,6 +96,35 @@ void su3matxsu3vec(su3_vec *res, const su3_mat *u, const su3_vec *s)
 }
 
 /*
+ * SU(3) matrix u^dagger times SU(3) vector s
+ *
+ * r.c1=(u^dagger*s).c1
+ * r.c2=(u^dagger*s).c2
+ * r.c3=(u^dagger*s).c3
+ */
+void su3matdagxsu3vec(su3_vec *r, const su3_mat *u, const su3_vec *s)
+{
+    (*r).c1.re = (*u).c11.re * (*s).c1.re + (*u).c11.im * (*s).c1.im +
+                 (*u).c21.re * (*s).c2.re + (*u).c21.im * (*s).c2.im +
+                 (*u).c31.re * (*s).c3.re + (*u).c31.im * (*s).c3.im;
+    (*r).c1.im = (*u).c11.re * (*s).c1.im - (*u).c11.im * (*s).c1.re +
+                 (*u).c21.re * (*s).c2.im - (*u).c21.im * (*s).c2.re +
+                 (*u).c31.re * (*s).c3.im - (*u).c31.im * (*s).c3.re;
+    (*r).c2.re = (*u).c12.re * (*s).c1.re + (*u).c12.im * (*s).c1.im +
+                 (*u).c22.re * (*s).c2.re + (*u).c22.im * (*s).c2.im +
+                 (*u).c32.re * (*s).c3.re + (*u).c32.im * (*s).c3.im;
+    (*r).c2.im = (*u).c12.re * (*s).c1.im - (*u).c12.im * (*s).c1.re +
+                 (*u).c22.re * (*s).c2.im - (*u).c22.im * (*s).c2.re +
+                 (*u).c32.re * (*s).c3.im - (*u).c32.im * (*s).c3.re;
+    (*r).c3.re = (*u).c13.re * (*s).c1.re + (*u).c13.im * (*s).c1.im +
+                 (*u).c23.re * (*s).c2.re + (*u).c23.im * (*s).c2.im +
+                 (*u).c33.re * (*s).c3.re + (*u).c33.im * (*s).c3.im;
+    (*r).c3.im = (*u).c13.re * (*s).c1.im - (*u).c13.im * (*s).c1.re +
+                 (*u).c23.re * (*s).c2.im - (*u).c23.im * (*s).c2.re +
+                 (*u).c33.re * (*s).c3.im - (*u).c33.im * (*s).c3.re;
+}
+
+/*
  * SU(3) matrix multiplication
  *
  * res = u * v
@@ -169,15 +198,104 @@ void su3matxsu3mat(su3_mat *res, const su3_mat *u, const su3_mat *v)
                   u->c33.re * v->c33.im + u->c33.im * v->c33.re;
 }
 
+/*
+ * Computes w=u^dag*v^dag assuming that w is different from u and v.
+ */
+void su3matdagxsu3matdag(su3_mat *w, const su3_mat *u, const su3_mat *v)
+{
+    w->c11.re = u->c11.re * v->c11.re + u->c11.im * -v->c11.im +
+                u->c21.re * v->c12.re + u->c21.im * -v->c12.im +
+                u->c31.re * v->c13.re + u->c31.im * -v->c13.im;
+    w->c11.im = u->c11.re * -v->c11.im - u->c11.im * v->c11.re +
+                u->c21.re * -v->c12.im - u->c21.im * v->c12.re +
+                u->c31.re * -v->c13.im - u->c31.im * v->c13.re;
+    w->c21.re = u->c12.re * v->c11.re + u->c12.im * -v->c11.im +
+                u->c22.re * v->c12.re + u->c22.im * -v->c12.im +
+                u->c32.re * v->c13.re + u->c32.im * -v->c13.im;
+    w->c21.im = u->c12.re * -v->c11.im - u->c12.im * v->c11.re +
+                u->c22.re * -v->c12.im - u->c22.im * v->c12.re +
+                u->c32.re * -v->c13.im - u->c32.im * v->c13.re;
+    w->c31.re = u->c13.re * v->c11.re + u->c13.im * -v->c11.im +
+                u->c23.re * v->c12.re + u->c23.im * -v->c12.im +
+                u->c33.re * v->c13.re + u->c33.im * -v->c13.im;
+    w->c31.im = u->c13.re * -v->c11.im - u->c13.im * v->c11.re +
+                u->c23.re * -v->c12.im - u->c23.im * v->c12.re +
+                u->c33.re * -v->c13.im - u->c33.im * v->c13.re;
+
+    w->c12.re = u->c11.re * v->c21.re + u->c11.im * -v->c21.im +
+                u->c21.re * v->c22.re + u->c21.im * -v->c22.im +
+                u->c31.re * v->c23.re + u->c31.im * -v->c23.im;
+    w->c12.im = u->c11.re * -v->c21.im - u->c11.im * v->c21.re +
+                u->c21.re * -v->c22.im - u->c21.im * v->c22.re +
+                u->c31.re * -v->c23.im - u->c31.im * v->c23.re;
+    w->c22.re = u->c12.re * v->c21.re + u->c12.im * -v->c21.im +
+                u->c22.re * v->c22.re + u->c22.im * -v->c22.im +
+                u->c32.re * v->c23.re + u->c32.im * -v->c23.im;
+    w->c22.im = u->c12.re * -v->c21.im - u->c12.im * v->c21.re +
+                u->c22.re * -v->c22.im - u->c22.im * v->c22.re +
+                u->c32.re * -v->c23.im - u->c32.im * v->c23.re;
+    w->c32.re = u->c13.re * v->c21.re + u->c13.im * -v->c21.im +
+                u->c23.re * v->c22.re + u->c23.im * -v->c22.im +
+                u->c33.re * v->c23.re + u->c33.im * -v->c23.im;
+    w->c32.im = u->c13.re * -v->c21.im - u->c13.im * v->c21.re +
+                u->c23.re * -v->c22.im - u->c23.im * v->c22.re +
+                u->c33.re * -v->c23.im - u->c33.im * v->c23.re;
+
+    w->c13.re = u->c11.re * v->c31.re + u->c11.im * -v->c31.im +
+                u->c21.re * v->c32.re + u->c21.im * -v->c32.im +
+                u->c31.re * v->c33.re + u->c31.im * -v->c33.im;
+    w->c13.im = u->c11.re * -v->c31.im - u->c11.im * v->c31.re +
+                u->c21.re * -v->c32.im - u->c21.im * v->c32.re +
+                u->c31.re * -v->c33.im - u->c31.im * v->c33.re;
+    w->c23.re = u->c12.re * v->c31.re + u->c12.im * -v->c31.im +
+                u->c22.re * v->c32.re + u->c22.im * -v->c32.im +
+                u->c32.re * v->c33.re + u->c32.im * -v->c33.im;
+    w->c23.im = u->c12.re * -v->c31.im - u->c12.im * v->c31.re +
+                u->c22.re * -v->c32.im - u->c22.im * v->c32.re +
+                u->c32.re * -v->c33.im - u->c32.im * v->c33.re;
+    w->c33.re = u->c13.re * v->c31.re + u->c13.im * -v->c31.im +
+                u->c23.re * v->c32.re + u->c23.im * -v->c32.im +
+                u->c33.re * v->c33.re + u->c33.im * -v->c33.im;
+    w->c33.im = u->c13.re * -v->c31.im - u->c13.im * v->c31.re +
+                u->c23.re * -v->c32.im - u->c23.im * v->c32.re +
+                u->c33.re * -v->c33.im - u->c33.im * v->c33.re;
+}
+
 /* SU(3) trace
  *
  * tr = trace(u)
  */
-complex su3_trace(const su3_mat *u)
+complex su3mat_trace(const su3_mat *u)
 {
     complex tr;
     tr.re = u->c11.re + u->c22.re + u->c33.re;
     tr.im = u->c11.im + u->c22.im + u->c33.im;
     return tr;
 }
+
+/* SU(3)xSU(3) real trace
+ *
+ * tr = retrace(uv)
+ */
+double su3matxsu3mat_retrace(const su3_mat *u, const su3_mat *v)
+{
+    double tr_1 = 0.0;
+    double tr_2 = 0.0;
+    double tr_3 = 0.0;
+
+    tr_1 += (*u).c11.re * (*v).c11.re - (*u).c11.im * (*v).c11.im;
+    tr_1 += (*u).c12.re * (*v).c21.re - (*u).c12.im * (*v).c21.im;
+    tr_1 += (*u).c13.re * (*v).c31.re - (*u).c13.im * (*v).c31.im;
+
+    tr_2 += (*u).c21.re * (*v).c12.re - (*u).c21.im * (*v).c12.im;
+    tr_2 += (*u).c22.re * (*v).c22.re - (*u).c22.im * (*v).c22.im;
+    tr_2 += (*u).c23.re * (*v).c32.re - (*u).c23.im * (*v).c32.im;
+
+    tr_3 += (*u).c31.re * (*v).c13.re - (*u).c31.im * (*v).c13.im;
+    tr_3 += (*u).c32.re * (*v).c23.re - (*u).c32.im * (*v).c23.im;
+    tr_3 += (*u).c33.re * (*v).c33.re - (*u).c33.im * (*v).c33.im;
+
+    return tr_1 + tr_2 + tr_3;
+}
+
 #endif // SU3PROD_C

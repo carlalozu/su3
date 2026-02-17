@@ -19,4 +19,7 @@ cmake -S . -B build \
   -DCMAKE_BUILD_TYPE=Debug -DENABLE_OPENMP=ON -DENABLE_AVX=$avx -DENABLE_GPU_OFFLOAD=ON
 cmake --build build -- -j8
 
-nsys profile --stats=true ./build/main/time_gpu $repetitions $idx
+# nsys profile --stats=true 
+./build/main/time_gpu $repetitions $idx
+
+python parse.py < ../output/volume_saling_soa_gpu.log > ../output/volume_saling_soa_gpu.csv

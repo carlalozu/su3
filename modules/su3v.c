@@ -41,6 +41,20 @@ void unit_su3mat_field(su3_mat_field *su3mf)
     unit_su3vec_field(&su3mf->c3);
 }
 
+void doublev_init(doublev *x, size_t volume)
+{
+    // Round up to nearest 8
+    size_t padded_volume = (volume + 7) & ~7; 
+    size_t size = padded_volume * sizeof(double);
+    x->volume = padded_volume;
+    x->base = (double*)aligned_alloc(ALIGN, size);
+    if (!x->base) {
+        x->volume = 0;
+        fprintf(stderr, "Erorr allocating complexv");
+        abort();
+    }
+}
+
 void complexv_init(complexv *x, size_t volume)
 {
     size_t size = 2 * volume * sizeof(double);

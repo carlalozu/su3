@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     printf("w[%i]->c13 = (%f, %f)\n", idx, w_field[idx].c13.re, w_field[idx].c13.im);
 
     // take trace of w_field[idx]
-    complex tr = su3_trace(&w_field[idx]);
+    complex tr = su3mat_trace(&w_field[idx]);
     printf("Trace of w[%i]: (%f, %f)\n", idx, tr.re, tr.im);
     return 0;
 }
