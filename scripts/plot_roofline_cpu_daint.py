@@ -1,0 +1,60 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+import pandas as pd
+
+# Create the log-log roofline plot
+plt.figure(figsize=(5, 3))
+plt.style.use("seaborn-v0_8-whitegrid")
+
+threads = [1,4,16,32,64,72]
+perf_1core = 24.8 # in GFlops/s
+memb_1core = 28 # in GB/s
+peak_performances_cpu = [perf_1core*t for t in threads]  # in GFlops/s
+memory_bandwidths_cpu = [memb_1core*t if memb_1core*t<480 else 480 for t in threads]  # in GB/s
+markers = Line2D.filled_markers
+
+for i, t in enumerate(threads):
+    x = np.linspace(0.001,  2**10, 100000)
+    y = np.minimum(x * memory_bandwidths_cpu[i], peak_performances_cpu[i])
+    line, = plt.plot(x, y, alpha=0.7)
+
+    #  add label
+    ridge_x = peak_performances_cpu[i] / memory_bandwidths_cpu[i]
+    label_x = 90
+    label_y = peak_performances_cpu[i]*0.5
+    plt.text(label_x, label_y, f"CPU {t} cores", color=line.get_color(), fontsize=10, ha="left", va="bottom")
+
+
+# add points
+aos_I = 0.7397 #flops/byte
+aos_P = 432 #flops
+
+# add kenrel lines su3matmat
+plt.vlines(aos_I, 0.001, 1e5, linestyles='dashed', colors="black", label="plaq_sum", alpha=0.7, zorder=-1)
+
+df_soa = pd.read_csv("../output/volume_daint_cpu.csv")
+df_soa["performance"]= aos_P*df_soa["vol"]/df_soa["avg_s"]*1e-9
+df_soa["op_int"]= aos_I
+
+compute = df_soa[df_soa["phase"] == "compute"]
+for i, t in enumerate(threads):
+    aost = compute[compute["threads"] == t]
+    plt.scatter(aost["op_int"]+0.005*t, aost["performance"], label=f"{t} threads", marker=markers[-i], zorder=4)
+    aost["vol per thread"] = aost["vol"]/aost["threads"]
+    print(aost.head(10))
+
+# Add labels and legend
+plt.xlabel('Operational Intensity (FLOPs/Byte)')
+plt.ylabel('Performance (GFLOPs/s)')
+plt.ylim([1e-1, 1e4])
+plt.xlim([1e-2, 1e3])
+plt.xscale('log')
+plt.yscale('log')
+plt.legend()
+
+# Show plot
+plt.grid(True)
+plt.tight_layout()
+plt.savefig("../output/roofline_cpu_daint.pdf")
+
