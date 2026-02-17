@@ -221,6 +221,6 @@ int main(int argc, char *argv[])
     int idx_a = idx/CACHELINE;
     int idx_b = idx%CACHELINE;
     printf("res_aos[%i] = %f \n", idx, res_aos[idx]);
-    printf("res_soa[%i] = %f \n", idx, &res_soa->base[idx]);
+    printf("res_soa[%i] = %f \n", idx, res_soa->base[idx]);
     printf("res_aosoa[%i] = %f \n", idx, res_aosoa[idx_a].base[idx_b]);
 }

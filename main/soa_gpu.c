@@ -34,15 +34,19 @@ int main(int argc, char *argv[])
     
     prof_section init_AoS = {.name = "AoS init_GPU", .threads = n_blocks};
     prof_section comp_AoS = {.name = "AoS compute_GPU", .threads = n_blocks};
+    
     // AoS
-    su3_mat u_field[VOLUME];
-    su3_mat v_field[VOLUME];
-    su3_mat w_field[VOLUME];
-    su3_mat x_field[VOLUME];
-    float res_aos[VOLUME];
+    su3_mat *u_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
+    su3_mat *v_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
+    su3_mat *w_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
+    su3_mat *x_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
+    float *res_aos = (float *)malloc(VOLUME * sizeof(float));
+
+    #pragma omp target enter data map(to : v_field[0:VOLUME], u_field[0:VOLUME], w_field[0:VOLUME], x_field[0:VOLUME])
+    #pragma omp target enter data map(alloc : res_aos[0:VOLUME])
 
     prof_begin(&init_AoS);
-    #pragma omp parallel for schedule(static)
+    #pragma omp target teams distribute parallel for
     for (size_t i = 0; i < VOLUME; i++)
     {
         unit_su3mat(&u_field[i]);
@@ -51,8 +55,6 @@ int main(int argc, char *argv[])
         unit_su3mat(&x_field[i]);
     }
     prof_end(&init_AoS);
-    #pragma omp target enter data map(to : v_field[0 : VOLUME], u_field[0 : VOLUME], w_field[0: VOLUME])
-    #pragma omp target enter data map(to : res_aos[0 : VOLUME])
     
     prof_begin(&comp_AoS);
     #pragma omp target teams num_teams(n_blocks) 
@@ -67,7 +69,7 @@ int main(int argc, char *argv[])
             {
                 // if (r==0 && i==0) is_gpu();
                 su3matxsu3mat(&temp_field, &u_field[i], &v_field[i]);
-                su3matdagxsu3matdag(&res_field, &w_field, &x_field[i]);
+                su3matdagxsu3matdag(&res_field, &w_field[i], &x_field[i]);
                 res_aos[i] = su3matxsu3mat_retrace(&temp_field, &res_field);
             }
         }
@@ -75,8 +77,11 @@ int main(int argc, char *argv[])
     prof_end(&comp_AoS);
     comp_AoS.count *= reps;
     
-    #pragma omp target update from(res_aos[0 : VOLUME])
+    #pragma omp target update from(res_aos[0:VOLUME])
+    printf("res_aos[%i] = %f \n", idx, res_aos[idx]);
 
     prof_report(&init_AoS);
     prof_report(&comp_AoS);
+
+    #pragma omp target exit data map(release: u_field[0:VOLUME], v_field[0:VOLUME], w_field[0:VOLUME], x_field[0:VOLUME], res_aos[0:VOLUME])
 }

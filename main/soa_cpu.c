@@ -30,12 +30,12 @@ int main(int argc, char *argv[])
     prof_section init_AoS = {.name = "AoS init", .threads=n_threads};
     prof_section comp_AoS = {.name = "AoS compute", .threads=n_threads};
 
-    // AoS
-    su3_mat u_field[VOLUME];
-    su3_mat v_field[VOLUME];
-    su3_mat w_field[VOLUME];
-    su3_mat x_field[VOLUME];
-    float res_aos[VOLUME];
+    su3_mat *u_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
+    su3_mat *v_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
+    su3_mat *w_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
+    su3_mat *x_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
+    float *res_aos = (float *)malloc(VOLUME * sizeof(float));
+
 
     // AoS    
     #pragma omp parallel
