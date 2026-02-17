@@ -8,13 +8,14 @@
 
 cd $SCRATCH/su3
 
-file=output/volume_saling_soa.log
-> $file
+export GOMP_CPU_AFFINITY=0-71
+file=output/volume_daint_cpu.log
+# > $file
 
 perl -i -pe "s/#define CACHELINE \\d+/#define CACHELINE 8/" include/global.h
 grep "#define CACHELINE" include/global.h
 
-for i in 1 2
+for i in 128 256
 do
   NEW_VAL=$((4 * i))
   echo $NEW_VAL
@@ -27,9 +28,11 @@ do
     -DCMAKE_BUILD_TYPE=Debug -DENABLE_OPENMP=ON -DENABLE_AVX=ON
   cmake --build build -- -j8
 
-  t=2
-  export OMP_NUM_THREADS=$t
-  echo OMP_NUM_THREADS=$OMP_NUM_THREADS
-  ./build/main/soa_cpu 500 100 >> $file
+  for t in 1 4 8 16 32 64 72
+  do
+    export OMP_NUM_THREADS=$((t))
+    echo OMP_NUM_THREADS=$OMP_NUM_THREADS
+    ./build/main/soa_cpu 500 100 >> $file
+  done
 
 done
