@@ -20,9 +20,9 @@ for i in [0,3,4]:
 
     #  add label
     ridge_x = peak_performances_cpu[i] / memory_bandwidths_cpu[i]
-    label_x = 90
+    label_x = 50
     label_y = peak_performances_cpu[i] * 2
-    plt.text(label_x, label_y, labels_cpu[i], color=line.get_color(), fontsize=10, ha="left", va="top")
+    plt.text(label_x, label_y, labels_cpu[i], color=line.get_color(), fontsize=9, ha="left", va="top")
 
 
 
@@ -40,7 +40,7 @@ for i in range(2):
     ridge_x = peak_performances_gpu[i] / memory_bandwidths_gpu[i]
     label_x = 50
     label_y = peak_performances_gpu[i] * 0.9
-    plt.text(label_x, label_y, labels_gpu[i], color=line.get_color(), fontsize=9.5, ha="left", va="top")
+    plt.text(label_x, label_y, labels_gpu[i], color=line.get_color(), fontsize=9, ha="left", va="top")
 
 # add points
 aos_I = 0.7397 #flops/byte
@@ -57,7 +57,6 @@ compute = df_soa[df_soa["phase"] == "compute"]
 compute_gpu = df_soa[df_soa["phase"] == "compute_GPU"]
 
 aos1 = compute[compute["threads"] == 1]
-aos4 = compute[compute["threads"] == 4]
 aos8 = compute[compute["threads"] == 8]
 aos16 = compute[compute["threads"] == 16]
 
@@ -65,7 +64,6 @@ plt.scatter(compute_gpu["op_int"]+0.2, compute_gpu["performance"], label="GPU FP
 
 plt.scatter(aos16["op_int"] + 0.2, aos16["performance"], label="16 threads", marker="*", color="tab:purple", zorder=4)
 plt.scatter(aos8["op_int"], aos8["performance"], label="8 threads", marker="^", color="tab:red", zorder=4)
-plt.scatter(aos4["op_int"], aos4["performance"], label="4 threads", marker="+", color="tab:green", zorder=4)
 plt.scatter(aos1["op_int"] - 0.1, aos1["performance"], marker="o", label="1 thread", color="tab:blue", zorder=4)
 
 for x, y, v in zip(aos16["op_int"], aos16["performance"], aos16["vol"]):

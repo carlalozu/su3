@@ -6,6 +6,7 @@ export GCC="$(which clang)"
 
 cd ..
 
+export CUDA_VISIBLE_DEVICES=6
 export OMP_NUM_THREADS=1
 file=output/volume_geno_gpu.log
 > $file
