@@ -10,7 +10,8 @@ export OMP_NUM_THREADS=1
 file=output/volume_geno_gpu.log
 > $file
 
-perl -i -pe "s/#define L0 \\d+/#define L0 8/" include/global.h
+perl -i -pe "s/#define CACHELINE \\d+/#define CACHELINE 128/" include/global.h
+grep "#define CACHELINE" include/global.h
 
 for i in 8 16 32 64
 do
@@ -28,3 +29,5 @@ do
   ./build/main/soa_gpu 500 100 >> $file
 
   done
+
+python parse.py < ../output/volume_geno_gpu.log > ../output/volume_geno_gpu.csv

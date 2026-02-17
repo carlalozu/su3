@@ -32,8 +32,8 @@ int main(int argc, char *argv[])
     
     size_t n_blocks = (VOLUME + CACHELINE - 1)/CACHELINE;
     
-    prof_section init_AoS = {.name = "AoS init GPU", .threads = n_blocks};
-    prof_section comp_AoS = {.name = "AoS compute GPU", .threads = n_blocks};
+    prof_section init_AoS = {.name = "AoS init_GPU", .threads = n_blocks};
+    prof_section comp_AoS = {.name = "AoS compute_GPU", .threads = n_blocks};
     
     // AoS
     su3_mat *u_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
