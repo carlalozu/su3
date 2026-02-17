@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     su3_mat *v_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
     su3_mat *w_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
     su3_mat *x_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
-    double *res_aos = (su3_mat *)malloc(VOLUME * sizeof(double));
+    double *res_aos = (double *)malloc(VOLUME * sizeof(double));
 
 
     // AoS    
