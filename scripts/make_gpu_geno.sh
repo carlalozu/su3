@@ -6,7 +6,7 @@ export GCC="$(which clang)"
 
 cd ..
 
-export CUDA_VISIBLE_DEVICES=6
+export CUDA_VISIBLE_DEVICES=0
 export OMP_NUM_THREADS=1
 file=output/volume_geno_gpu.log
 > $file
@@ -14,7 +14,7 @@ file=output/volume_geno_gpu.log
 perl -i -pe "s/#define CACHELINE \\d+/#define CACHELINE 128/" include/global.h
 grep "#define CACHELINE" include/global.h
 
-for i in 8 16 32 64
+for i in 8 16 32 64 128 256
 do
   NEW_VAL=$((4 * i))
   echo $NEW_VAL
@@ -31,4 +31,4 @@ do
 
   done
 
-python parse.py < ../output/volume_geno_gpu.log > ../output/volume_geno_gpu.csv
+# python parse.py < ../output/volume_geno_gpu_float.log > ../output/volume_geno_gpu_float.csv

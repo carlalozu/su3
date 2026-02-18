@@ -1,29 +1,41 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from matplotlib.lines import Line2D
+
 
 # Create the log-log roofline plot
 plt.figure(figsize=(5, 3))
 plt.style.use("seaborn-v0_8-whitegrid")
 
+# add points
+aos_I = 0.7397*2 #flops/byte
+aos_P = 432 #flops
 
-# Plot roofline CPU
-labels_cpu = ["CPU 1 core", "CPU 2 cores", "CPU 4 cores", "CPU 8 cores", "CPU 16 cores"]
-colors_cpu = ["tab:blue", "tab:orange", "tab:green", "tab:red", "tab:purple"]
-peak_performances_cpu = np.array([12, 12*2, 12*4, 12*8, 12*16])  # in GFlops/s
-memory_bandwidths_cpu = np.array([30, 30*2, 30*4, 30*8, 460.8])  # in GB/s
+# parameters
+threads = [1,8,16]
+input_file = "../output/volume_geno_cpu_float.csv"
+plot_file = "../output/roofline_gpu_geno_float.pdf"
+precision = "float"
 
-for i in [0,3,4]:
+perf_1core = 12 # in GFlops/s
+memb_1core = 30 # in GB/s
+socket_bw = 460.8 # in GB/s
+
+peak_performances_cpu = [perf_1core*t for t in threads]
+memory_bandwidths_cpu = [memb_1core*t if memb_1core*t<socket_bw else socket_bw for t in threads]
+
+markers = Line2D.filled_markers
+
+for i, t in enumerate(threads):
     x = np.linspace(0.001,  2**10, 100000)
     y = np.minimum(x * memory_bandwidths_cpu[i], peak_performances_cpu[i])
-    line, = plt.plot(x, y, alpha=0.7, color=colors_cpu[i])
+    line, = plt.plot(x, y, alpha=0.7)
 
     #  add label
     ridge_x = peak_performances_cpu[i] / memory_bandwidths_cpu[i]
-    label_x = 50
-    label_y = peak_performances_cpu[i] * 2
-    plt.text(label_x, label_y, labels_cpu[i], color=line.get_color(), fontsize=9, ha="left", va="top")
-
+    label_y = peak_performances_cpu[i]*0.5
+    plt.text(90, label_y, f"CPU {t} cores", color=line.get_color(), fontsize=9, ha="left", va="bottom")
 
 
 # Plot roofline GPU
@@ -38,36 +50,34 @@ for i in range(2):
 
     #  add label
     ridge_x = peak_performances_gpu[i] / memory_bandwidths_gpu[i]
-    label_x = 50
     label_y = peak_performances_gpu[i] * 0.9
-    plt.text(label_x, label_y, labels_gpu[i], color=line.get_color(), fontsize=9, ha="left", va="top")
+    plt.text(90, label_y, labels_gpu[i], color=line.get_color(), fontsize=9, ha="left", va="top")
 
-# add points
-aos_I = 0.7397 #flops/byte
-aos_P = 432 #flops
 
 # add kenrel lines su3matmat
 plt.vlines(aos_I, 0.001, 1e5, linestyles='dashed', colors="black", label="plaq_sum", alpha=0.7, zorder=-1)
 
-df_soa = pd.read_csv("../output/volume_geno_cpu.csv")
+df_soa = pd.read_csv(input_file)
 df_soa["performance"]= aos_P*df_soa["vol"]/df_soa["avg_s"]*1e-9
 df_soa["op_int"]= aos_I
 
-compute = df_soa[df_soa["phase"] == "compute"]
 compute_gpu = df_soa[df_soa["phase"] == "compute_GPU"]
+plt.scatter(compute_gpu["op_int"]+0.2, compute_gpu["performance"], label="GPU FP32", marker=">", color="tab:brown", zorder=4)
+# plt.scatter(compute_gpu["op_int"]+0.2, compute_gpu["performance"], label="GPU FP64", marker=">", color="tab:pink", zorder=4)
 
-aos1 = compute[compute["threads"] == 1]
-aos8 = compute[compute["threads"] == 8]
-aos16 = compute[compute["threads"] == 16]
 
-plt.scatter(compute_gpu["op_int"]+0.2, compute_gpu["performance"], label="GPU FP64", marker=">", color="tab:pink", zorder=4)
+compute = df_soa[df_soa["phase"] == "compute"]
+for i, t in enumerate(threads):
+    aost = compute[compute["threads"] == t]
+    plt.scatter(
+        aost["op_int"]+0.005*t, aost["performance"], 
+        label=f"{t} threads", marker=markers[i]
+    )
+    aost["vol per thread"] = aost["vol"]/aost["threads"]
+    # print(aost.head(10))
 
-plt.scatter(aos16["op_int"] + 0.2, aos16["performance"], label="16 threads", marker="*", color="tab:purple", zorder=4)
-plt.scatter(aos8["op_int"], aos8["performance"], label="8 threads", marker="^", color="tab:red", zorder=4)
-plt.scatter(aos1["op_int"] - 0.1, aos1["performance"], marker="o", label="1 thread", color="tab:blue", zorder=4)
-
-for x, y, v in zip(aos16["op_int"], aos16["performance"], aos16["vol"]):
-    plt.text(x+0.25,y,str(v),fontsize=9,color="tab:purple",ha="left",va="center")
+# for x, y, v in zip(compute_gpu["op_int"], compute_gpu["performance"], compute_gpu["vol"]):
+#     plt.text(x,y,str(v),fontsize=9,color="tab:brown",ha="left",va="center")
 
 # Add labels and legend
 plt.xlabel('Operational Intensity (FLOPs/Byte)')
@@ -76,9 +86,9 @@ plt.ylim([1e0, 1e5])
 plt.xlim([1e-2, 1e3])
 plt.xscale('log')
 plt.yscale('log')
-plt.legend()
+plt.legend(fontsize=9)
 
 # Show plot
 plt.grid(True)
 plt.tight_layout()
-plt.savefig("../output/roofline_gpu_geno.pdf")
+plt.savefig(plot_file)

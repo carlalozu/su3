@@ -7,13 +7,13 @@ cd $SCRATCH/su3
 
 export GOMP_CPU_AFFINITY=0-16
 
-file=output/volume_geno_cpu.log
-# > $file
+file=output/volume_geno_cpu_float.log
+> $file
 
 perl -i -pe "s/#define CACHELINE \\d+/#define CACHELINE 8/" include/global.h
 grep "#define CACHELINE" include/global.h
 
-for i in 8 16 32 64
+for i in 8 16 32 64 128 256
 do
   NEW_VAL=$((4 * i))
   echo $NEW_VAL
@@ -34,3 +34,5 @@ do
   done
 
 done
+
+# python parse.py < ../output/volume_geno_cpu_float.log > ../output/volume_geno_cpu_float.csv

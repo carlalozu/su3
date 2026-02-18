@@ -75,6 +75,6 @@ int main(int argc, char *argv[])
 
     prof_report(&init_AoS);
     prof_report(&comp_AoS);
-    // printf("res_aos[%i] = %f \n", idx, res_aos[idx]);
+    printf("res_aos[%i] = %f \n", idx, res_aos[idx]);
 
 }

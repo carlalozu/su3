@@ -1,17 +1,29 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 import pandas as pd
 
 # Create the log-log roofline plot
 plt.figure(figsize=(5, 3))
 plt.style.use("seaborn-v0_8-whitegrid")
 
-labels_cpu = ["CPU 1 core", "CPU 2 cores", "CPU 4 cores", "CPU 8 cores", "CPU 16 cores"]
-colors_cpu = ["tab:blue", "tab:orange", "tab:green", "tab:red", "tab:purple"]
-peak_performances_cpu = np.array([12, 12*2, 12*4, 12*8, 12*16])  # in GFlops/s
-memory_bandwidths_cpu = np.array([30, 30*2, 30*4, 30*8, 460.8])  # in GB/s
+# parameters
+threads = [1,2,4,8,16]
+input_file = "../output/volume_geno_cpu_float.csv"
+plot_file = "../output/roofline_cpu_geno_float.pdf"
+precision = "float"
 
-for i in range(len(peak_performances_cpu)):
+perf_1core = 12 # in GFlops/s
+memb_1core = 30 # in GB/s
+socket_bw = 460.8 # in GB/s
+
+peak_performances_cpu = [perf_1core*t for t in threads]
+memory_bandwidths_cpu = [memb_1core*t if memb_1core*t<socket_bw else socket_bw for t in threads]
+
+markers = Line2D.filled_markers
+colors_cpu = ["tab:blue", "tab:orange", "tab:green", "tab:red", "tab:purple"]
+
+for i, t in enumerate(threads):
     x = np.linspace(0.001,  2**10, 100000)
     y = np.minimum(x * memory_bandwidths_cpu[i], peak_performances_cpu[i])
     line, = plt.plot(x, y, alpha=0.7, color=colors_cpu[i])
@@ -20,35 +32,37 @@ for i in range(len(peak_performances_cpu)):
     ridge_x = peak_performances_cpu[i] / memory_bandwidths_cpu[i]
     label_x = 90
     label_y = peak_performances_cpu[i]*0.5
-    plt.text(label_x, label_y, labels_cpu[i], color=line.get_color(), fontsize=10, ha="left", va="bottom")
+    plt.text(label_x, label_y, f"CPU {t} cores", color=line.get_color(), fontsize=10, ha="left", va="bottom")
 
 
 # add points
-aos_I = 0.7397 #flops/byte
+aos_I = {
+    "double": 0.7397,
+    "float": 0.7397*2,
+} #flops/byte
 aos_P = 432 #flops
 
 # add kenrel lines su3matmat
-plt.vlines(aos_I, 0.001, 1e5, linestyles='dashed', colors="black", label="plaq_sum", alpha=0.7, zorder=-1)
+plt.vlines(aos_I[precision], 0.001, 1e5, linestyles='dashed', colors="black", label="plaq_sum", alpha=0.7, zorder=-1)
 
-df_soa = pd.read_csv("../output/volume_geno_cpu.csv")
+df_soa = pd.read_csv(input_file)
+df_soa["performance"]= aos_P*df_soa["vol"]/df_soa["avg_s"]*1e-9
+df_soa["op_int"]= aos_I[precision]
+
 compute = df_soa[df_soa["phase"] == "compute"]
 
-compute["performance"]= aos_P*compute["vol"]/compute["avg_s"]*1e-9
-compute["op_int"]= aos_I
 
-aos1 = compute[compute["threads"] == 1]
-aos2 = compute[compute["threads"] == 2]
-aos4 = compute[compute["threads"] == 4]
-aos8 = compute[compute["threads"] == 8]
+compute = df_soa[df_soa["phase"] == "compute"]
+for i, t in enumerate(threads):
+    aost = compute[compute["threads"] == t]
+    plt.scatter(
+        aost["op_int"]+0.005*t, aost["performance"], 
+        label=f"{t} threads", marker=markers[i]
+    )
+    aost["vol per thread"] = aost["vol"]/aost["threads"]
+    print(aost.head(10))
+
 aos16 = compute[compute["threads"] == 16]
-
-
-plt.scatter(aos1["op_int"], aos1["performance"], label="1 thread", marker="o", color="tab:blue", zorder=4)
-plt.scatter(aos2["op_int"], aos2["performance"], label="2 threads", marker=">", color="tab:orange", zorder=4)
-plt.scatter(aos4["op_int"], aos4["performance"], label="4 threads", marker="*", color="tab:green", zorder=4)
-plt.scatter(aos8["op_int"], aos8["performance"], label="8 threads", marker="^", color="tab:red", zorder=4)
-plt.scatter(aos16["op_int"], aos16["performance"], label="16 threads", marker="+", color="tab:purple", zorder=4)
-
 for x, y, v in zip(aos16["op_int"], aos16["performance"], aos16["vol"]):
     plt.text(x+0.25,y,str(v),fontsize=9,color="tab:purple",ha="left",va="center")
 
@@ -64,4 +78,4 @@ plt.legend()
 # Show plot
 plt.grid(True)
 plt.tight_layout()
-plt.savefig("../output/roofline_cpu_geno.pdf")
+plt.savefig(plot_file)
