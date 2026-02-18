@@ -16,7 +16,7 @@ file=output/volume_daint_gpu.log
 perl -i -pe "s/#define CACHELINE \\d+/#define CACHELINE 128/" include/global.h
 grep "#define CACHELINE" include/global.h
 
-for i in 16 32 64 128 256
+for i in 32 64 128 256 512
 do
   NEW_VAL=$((4 * i))
   echo $NEW_VAL
@@ -25,7 +25,7 @@ do
 
   rm -rf build
   cmake -S . -B build \
-    -DCMAKE_C_COMPILER=$GCC \
+    -DCMAKE_C_COMPILER=$CC \
     -DCMAKE_BUILD_TYPE=Debug -DENABLE_OPENMP=ON -DENABLE_AVX=ON -DENABLE_GPU_OFFLOAD=ON
   cmake --build build -- -j8
 

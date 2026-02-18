@@ -15,7 +15,7 @@ file=output/volume_daint_cpu.log
 perl -i -pe "s/#define CACHELINE \\d+/#define CACHELINE 8/" include/global.h
 grep "#define CACHELINE" include/global.h
 
-for i in 16 32 64 128 256
+for i in 32 64 128 256 512
 do
   NEW_VAL=$((4 * i))
   echo $NEW_VAL
