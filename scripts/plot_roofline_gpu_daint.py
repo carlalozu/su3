@@ -8,9 +8,15 @@ from matplotlib.lines import Line2D
 plt.figure(figsize=(5, 3))
 plt.style.use("seaborn-v0_8-whitegrid")
 
+# plaq_sum_kernel
+aos_I = 0.7397 #flops/byte
+aos_P = 432 #flops
+
+input_file = "../output/volume_daint_cpu.csv"
+plot_file = "../output/roofline_daint_gpu.pdf"
 
 # Plot roofline CPU
-threads = [1,4,16,32,64,72]
+threads = [1,16,32,72]
 perf_1core = 24.8 # in GFlops/s
 memb_1core = 28 # in GB/s
 peak_performances_cpu = [perf_1core*t for t in threads]  # in GFlops/s
@@ -47,14 +53,11 @@ for i in range(2, 4):
     label_y = peak_performances_gpu[i] * 0.9
     plt.text(label_x, label_y, labels_gpu[i], color=line.get_color(), fontsize=9, ha="left", va="top")
 
-# add points
-aos_I = 0.7397 #flops/byte
-aos_P = 432 #flops
 
 # add kenrel lines su3matmat
 plt.vlines(aos_I, 0.001, 1e5, linestyles='dashed', colors="black", label="plaq_sum", alpha=0.7, zorder=-1)
 
-df_soa = pd.read_csv("../output/volume_daint_cpu.csv")
+df_soa = pd.read_csv(input_file)
 df_soa["performance"]= aos_P*df_soa["vol"]/df_soa["avg_s"]*1e-9
 df_soa["op_int"]= aos_I
 
@@ -66,7 +69,8 @@ for i, t in enumerate(threads):
     # print(aost.head(10))
 
 compute_gpu = df_soa[df_soa["phase"] == "compute_GPU"]
-plt.scatter(compute_gpu["op_int"], compute_gpu["performance"], label=f"GPU FP64", marker=markers[-i], color="tab:pink")
+plt.scatter(compute_gpu["op_int"], compute_gpu["performance"], label=f"GPU FP64", marker=markers[-i-1], color="tab:pink")
+# plt.scatter(compute_gpu["op_int"], compute_gpu["performance"], label="GPU FP32", marker=markers[-i-1], color="tab:grey", zorder=4)
 
 
 # Add labels and legend
@@ -76,9 +80,9 @@ plt.ylim([1e0, 1e5])
 plt.xlim([1e-2, 1e3])
 plt.xscale('log')
 plt.yscale('log')
-plt.legend()
+plt.legend(fontsize=9)
 
 # Show plot
 plt.grid(True)
 plt.tight_layout()
-plt.savefig("../output/roofline_gpu_daint.pdf")
+plt.savefig(plot_file)

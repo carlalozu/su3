@@ -7,6 +7,12 @@ import pandas as pd
 plt.figure(figsize=(5, 3))
 plt.style.use("seaborn-v0_8-whitegrid")
 
+aos_I = 0.7397*2 #flops/byte
+aos_P = 432 #flops
+
+input_file = "../output/volume_daint_cpu_float.csv"
+plot_file = "../output/roofline_daint_cpu_float.pdf"
+
 threads = [1,4,16,32,64,72]
 perf_1core = 24.8 # in GFlops/s
 memb_1core = 28 # in GB/s
@@ -26,14 +32,10 @@ for i, t in enumerate(threads):
     plt.text(label_x, label_y, f"CPU {t} cores", color=line.get_color(), fontsize=10, ha="left", va="bottom")
 
 
-# add points
-aos_I = 0.7397 #flops/byte
-aos_P = 432 #flops
-
 # add kenrel lines su3matmat
 plt.vlines(aos_I, 0.001, 1e5, linestyles='dashed', colors="black", label="plaq_sum", alpha=0.7, zorder=-1)
 
-df_soa = pd.read_csv("../output/volume_daint_cpu.csv")
+df_soa = pd.read_csv(input_file)
 df_soa["performance"]= aos_P*df_soa["vol"]/df_soa["avg_s"]*1e-9
 df_soa["op_int"]= aos_I
 
@@ -42,7 +44,10 @@ for i, t in enumerate(threads):
     aost = compute[compute["threads"] == t]
     plt.scatter(aost["op_int"]+0.005*t, aost["performance"], label=f"{t} threads", marker=markers[-i], zorder=4)
     aost["vol per thread"] = aost["vol"]/aost["threads"]
-    print(aost.head(10))
+    # print(aost.head(10))
+
+for x, y, v in zip(aost["op_int"], aost["performance"], aost["vol"]):
+    plt.text(x+0.5,y,str(v),fontsize=9,color="tab:brown",ha="left",va="center")
 
 # Add labels and legend
 plt.xlabel('Operational Intensity (FLOPs/Byte)')
@@ -51,10 +56,10 @@ plt.ylim([1e-1, 1e4])
 plt.xlim([1e-2, 1e3])
 plt.xscale('log')
 plt.yscale('log')
-plt.legend()
+plt.legend(fontsize=9)
 
 # Show plot
 plt.grid(True)
 plt.tight_layout()
-plt.savefig("../output/roofline_cpu_daint.pdf")
+plt.savefig(plot_file)
 
