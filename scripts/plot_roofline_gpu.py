@@ -23,7 +23,7 @@ plot_file = f"../output/volume_{computer}_gpu.pdf"
 
 if computer=="geno":
     threads = [1,2,4,8,16]
-    perf_1core = 12*2   # in GFlops/s, AVX on
+    perf_1core = 12     # in GFlops/s
     memb_1core = 30     # in GB/s
     socket_bw = 460.8   # in GB/s
 
@@ -32,7 +32,7 @@ if computer=="geno":
     memory_bandwidths_gpu = [288, 288]        # in GB/s
 elif computer=="daint":
     threads = [1,4,8,16,32,64]
-    perf_1core = 24.8*2 # in GFlops/s, AVX on
+    perf_1core = 24.8   # in GFlops/s
     memb_1core = 28     # in GB/s
     socket_bw = 480     # in GB/s
 

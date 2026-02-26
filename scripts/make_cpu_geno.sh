@@ -29,7 +29,7 @@ do
   rm -rf build
   cmake -S . -B build \
     -DCMAKE_C_COMPILER=$CC \
-    -DCMAKE_BUILD_TYPE=Debug -DENABLE_OPENMP=ON -DENABLE_AVX=ON
+    -DCMAKE_BUILD_TYPE=Debug -DENABLE_OPENMP=ON -DENABLE_AVX=OFF
   cmake --build build -- -j8
 
   for t in 1 2 4 8 16
