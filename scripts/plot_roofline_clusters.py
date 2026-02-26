@@ -43,7 +43,7 @@ aos_I = 0.7397 #flops/byte
 aos_P = 432 #flops
 
 # add kenrel lines su3matmat
-plt.vlines(aos_I, 0.001, 1e5, linestyles='dashed', colors="black", label="plaq_sum", alpha=0.7, zorder=-1)
+plt.vlines(aos_I, 0.001, 1e5, linestyles='dashed', colors="black", label="plaq_dble", alpha=0.7, zorder=-1)
 
 # Add labels and legend
 plt.xlabel('Operational Intensity (FLOPs/Byte)')
