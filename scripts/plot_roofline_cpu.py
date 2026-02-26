@@ -9,7 +9,7 @@ plt.figure(figsize=(5, 3))
 plt.style.use("seaborn-v0_8-whitegrid")
 
 # Kernel parameters, plaqsum
-aos_I = 0.7397  # flops/byte
+aos_I = 0.7397*2  # flops/byte
 aos_P = 432     # flops
 
 computer = sys.argv[1] if len(sys.argv) > 1 else "geno"
