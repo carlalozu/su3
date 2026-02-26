@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     su3_mat v_field[VOLUME];
     su3_mat w_field[VOLUME];
     su3_mat x_field[VOLUME];
-    double res_aos[VOLUME];
+    float res_aos[VOLUME];
 
     prof_begin(&init_AoS);
     #pragma omp parallel for schedule(static)
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
     su3_mat_field *x_fieldv = (su3_mat_field*)malloc(sizeof(su3_mat_field));
     su3_mat_field *temp_fieldv = (su3_mat_field*)malloc(sizeof(su3_mat_field));
     su3_mat_field *res_fieldv = (su3_mat_field*)malloc(sizeof(su3_mat_field));
-    doublev *res_soa  = (doublev*)malloc(sizeof(doublev));
+    floatv *res_soa  = (floatv*)malloc(sizeof(floatv));
 
     su3_mat_field_init(u_fieldv, VOLUME);
     su3_mat_field_init(v_fieldv, VOLUME);
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
     su3_mat_field_init(x_fieldv, VOLUME);
     su3_mat_field_init(temp_fieldv, VOLUME);
     su3_mat_field_init(res_fieldv, VOLUME);
-    doublev_init(res_soa, VOLUME);
+    floatv_init(res_soa, VOLUME);
 
     prof_begin(&init_SoA);
     unit_su3mat_field(u_fieldv);
@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
     enter_su3_mat_field(x_fieldv);
     enter_su3_mat_field(temp_fieldv);
     enter_su3_mat_field(res_fieldv);
-    enter_double_field(res_soa);
+    enter_float_field(res_soa);
 
     prof_begin(&comp_SoA);
     #pragma omp target teams num_teams(n_blocks)
@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
     su3_mat_field *v_fieldva;
     su3_mat_field *w_fieldva;
     su3_mat_field *x_fieldva;
-    doublev *res_aosoa;
+    floatv *res_aosoa;
 
     su3_mat_field *temp_fieldva;
     su3_mat_field *res_fieldva;
@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
     v_fieldva = malloc(n_blocks * sizeof(su3_mat_field));
     w_fieldva = malloc(n_blocks * sizeof(su3_mat_field));
     x_fieldva = malloc(n_blocks * sizeof(su3_mat_field));
-    res_aosoa = malloc(n_blocks * sizeof(doublev));
+    res_aosoa = malloc(n_blocks * sizeof(floatv));
     temp_fieldva = malloc(sizeof(su3_mat_field));
     res_fieldva = malloc(sizeof(su3_mat_field));
 
@@ -164,7 +164,7 @@ int main(int argc, char *argv[])
         su3_mat_field_init(&v_fieldva[i], CACHELINE);
         su3_mat_field_init(&w_fieldva[i], CACHELINE);
         su3_mat_field_init(&x_fieldva[i], CACHELINE);
-        doublev_init(&res_aosoa[i], CACHELINE);
+        floatv_init(&res_aosoa[i], CACHELINE);
     }
 
     prof_begin(&init_AoSoA);
@@ -184,7 +184,7 @@ int main(int argc, char *argv[])
     enter_su3_mat_field_array(v_fieldva, n_blocks);
     enter_su3_mat_field_array(w_fieldva, n_blocks);
     enter_su3_mat_field_array(x_fieldva, n_blocks);
-    enter_double_field_array(res_aosoa, n_blocks);
+    enter_float_field_array(res_aosoa, n_blocks);
     
     prof_begin(&comp_AoSoA);
     #pragma omp target teams firstprivate(temp_fieldva, res_fieldva) num_teams(n_blocks)
@@ -206,7 +206,7 @@ int main(int argc, char *argv[])
     }
     prof_end(&comp_AoSoA);
     comp_AoSoA.count *= reps;
-    update_host_double_field_array(res_aosoa, n_blocks);
+    update_host_float_field_array(res_aosoa, n_blocks);
 
     printf("\n Init \n");
     prof_report(&init_AoS);

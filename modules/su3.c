@@ -19,10 +19,10 @@
 #include <stdint.h>
 
 #pragma omp declare target
-double local_rand(uint64_t *state) {
+float local_rand(uint64_t *state) {
     // Standard LCG parameters (e.g., MMIX by Knuth)
     *state = 6364136223846793005ULL * (*state) + 1ULL;
-    return (double)(*state >> 33) / 2147483647.0;
+    return (float)(*state >> 33) / 2147483647.0;
 }
 #pragma omp end declare target
 

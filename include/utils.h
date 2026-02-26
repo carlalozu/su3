@@ -59,7 +59,7 @@ void enter_complex_field(complexv* c_field){
 
 }
 
-void enter_double_field(doublev* d_field){
+void enter_float_field(floatv* d_field){
     #pragma omp target enter data \
     map(to : d_field[0], d_field->base[0:d_field->volume])
 }
@@ -107,7 +107,7 @@ void update_host_complex_field_array(complexv* c_field, int n_blocks) {
     }
 }
 
-void enter_double_field_array(doublev* d_field, int n_blocks) {
+void enter_float_field_array(floatv* d_field, int n_blocks) {
     #pragma omp target enter data map(to: d_field[0:n_blocks])
 
     for (int i = 0; i < n_blocks; i++) {
@@ -117,7 +117,7 @@ void enter_double_field_array(doublev* d_field, int n_blocks) {
 }
 
 
-void update_host_double_field_array(doublev* d_field, int n_blocks) {
+void update_host_float_field_array(floatv* d_field, int n_blocks) {
     for (int i = 0; i < n_blocks; i++) {
         // pull data from device to host for each block's data buffer
         #pragma omp target update from(d_field[i].base[0:d_field[i].volume])

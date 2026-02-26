@@ -9,27 +9,27 @@
 typedef struct
 {
     size_t volume;
-    double *base;
-} doublev;
+    float *base;
+} floatv;
 
 typedef struct
 {
     size_t volume;
-    double *base;
-    double *re, *im;
+    float *base;
+    float *re, *im;
 } complexv;
 
 /* SU3 vector
- * Each component is a pointer to an array of doubles
+ * Each component is a pointer to an array of floats
  * Real and imaginary parts are stored separately
  */
 typedef struct
 {
     size_t volume;
-    double *base;
-    double *c1re, *c1im;
-    double *c2re, *c2im;
-    double *c3re, *c3im;
+    float *base;
+    float *c1re, *c1im;
+    float *c2re, *c2im;
+    float *c3re, *c3im;
 } su3_vec_field;
 
 /* SU3 matrix
@@ -42,7 +42,7 @@ typedef struct
 
 } su3_mat_field;
 
-void doublev_init(doublev *x, size_t volume);
+void floatv_init(floatv *x, size_t volume);
 void complexv_init(complexv *x, size_t volume);
 void complexv_free(complexv *x);
 

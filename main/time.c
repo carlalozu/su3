@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     su3_mat v_field[VOLUME];
     su3_mat w_field[VOLUME];
     su3_mat x_field[VOLUME];
-    double res_aos[VOLUME];
+    float res_aos[VOLUME];
 
     // SoA
     su3_mat_field u_fieldv;
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     su3_mat_field x_fieldv;
     su3_mat_field temp_fieldv;
     su3_mat_field res_fieldv;
-    doublev res_soa;
+    floatv res_soa;
 
     su3_mat_field_init(&u_fieldv, VOLUME);
     su3_mat_field_init(&v_fieldv, VOLUME);
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     su3_mat_field_init(&x_fieldv, VOLUME);
     su3_mat_field_init(&temp_fieldv, VOLUME);
     su3_mat_field_init(&res_fieldv, VOLUME);
-    doublev_init(&res_soa, VOLUME);
+    floatv_init(&res_soa, VOLUME);
 
     // AoSoA
     int n_blocks = VOLUME/CACHELINE;
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
     su3_mat_field v_fieldva[n_blocks];
     su3_mat_field w_fieldva[n_blocks];
     su3_mat_field x_fieldva[n_blocks];
-    doublev res_aosoa[n_blocks];
+    floatv res_aosoa[n_blocks];
 
     for (size_t i = 0; i < n_blocks; i++)
     {
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
         su3_mat_field_init(&v_fieldva[i], CACHELINE);
         su3_mat_field_init(&w_fieldva[i], CACHELINE);
         su3_mat_field_init(&x_fieldva[i], CACHELINE);
-        doublev_init(&res_aosoa[i], CACHELINE);
+        floatv_init(&res_aosoa[i], CACHELINE);
     }
 
     // AoS

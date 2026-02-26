@@ -12,16 +12,16 @@
 void random_su3vec_field(su3_vec_field *su3vf)
 {
     size_t n = 6 * su3vf->volume;
-    double *d = su3vf->base;
+    float *d = su3vf->base;
 
     for (size_t i = 0; i < n; i++)
-        d[i] = (double)rand() / (double)RAND_MAX;
+        d[i] = (float)rand() / (float)RAND_MAX;
 }
 
 void unit_su3vec_field(su3_vec_field *su3vf)
 {
     size_t n = 6 * su3vf->volume;
-    double *d = su3vf->base;
+    float *d = su3vf->base;
 
     for (size_t i = 0; i < n; i++)
         d[i] = 1.0;
@@ -41,13 +41,13 @@ void unit_su3mat_field(su3_mat_field *su3mf)
     unit_su3vec_field(&su3mf->c3);
 }
 
-void doublev_init(doublev *x, size_t volume)
+void floatv_init(floatv *x, size_t volume)
 {
     // Round up to nearest 8
     size_t padded_volume = (volume + 7) & ~7; 
-    size_t size = padded_volume * sizeof(double);
+    size_t size = padded_volume * sizeof(float);
     x->volume = padded_volume;
-    x->base = (double*)aligned_alloc(ALIGN, size);
+    x->base = (float*)aligned_alloc(ALIGN, size);
     if (!x->base) {
         x->volume = 0;
         fprintf(stderr, "Erorr allocating complexv");
@@ -57,11 +57,11 @@ void doublev_init(doublev *x, size_t volume)
 
 void complexv_init(complexv *x, size_t volume)
 {
-    size_t size = 2 * volume * sizeof(double);
+    size_t size = 2 * volume * sizeof(float);
     // Round up to nearest 8
     size_t padded_volume = (volume + 7) & ~7; 
     x->volume = padded_volume;
-    x->base = (double*)aligned_alloc(ALIGN, size);
+    x->base = (float*)aligned_alloc(ALIGN, size);
     if (!x->base) {
         x->volume = 0;
         fprintf(stderr, "Erorr allocating complexv");
@@ -84,8 +84,8 @@ void su3_vec_field_init(su3_vec_field *v, size_t volume)
     // Round up to nearest 8
     size_t padded_volume = (volume + 7) & ~7; 
     v->volume = padded_volume;
-    size_t size = 6 * padded_volume * sizeof(double);
-    v->base = (double*)aligned_alloc(ALIGN, size);
+    size_t size = 6 * padded_volume * sizeof(float);
+    v->base = (float*)aligned_alloc(ALIGN, size);
     if (!v->base) {
         v->volume = 0;
         fprintf(stderr, "Erorr allocating su3_vec_field");

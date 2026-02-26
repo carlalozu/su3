@@ -51,17 +51,6 @@ int main(int argc, char *argv[])
     {
         su3_mat temp_field;
         su3_mat res_field;
-        
-        prof_begin(&init_AoS);
-        #pragma omp distribute parallel for
-        for (size_t i = 0; i < VOLUME; i++)
-        {
-            random_su3mat(&u_field[i]);
-            random_su3mat(&v_field[i]);
-            random_su3mat(&w_field[i]);
-            random_su3mat(&x_field[i]);
-        }
-        prof_end(&init_AoS);
 
         for (int r = 0; r < reps; r++)
         {

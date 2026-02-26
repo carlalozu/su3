@@ -1,7 +1,7 @@
-# export LLVM_HOME=$SCRATCH/clang+llvm-18.1.8-x86_64-linux-gnu-ubuntu-18.04
-# export PATH=$LLVM_HOME/bin:$PATH
-# export LD_LIBRARY_PATH=$LLVM_HOME/lib:$LD_LIBRARY_PATH
-# export GCC="$(which clang)"
+export LLVM_HOME=$SCRATCH/clang+llvm-18.1.8-x86_64-linux-gnu-ubuntu-18.04
+export PATH=$LLVM_HOME/bin:$PATH
+export LD_LIBRARY_PATH=$LLVM_HOME/lib:$LD_LIBRARY_PATH
+export CC="$(which clang)"
 
 cd ..
 
