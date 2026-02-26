@@ -26,8 +26,9 @@ int main(int argc, char *argv[])
 
     for (size_t i = 0; i < VOLUME; i++)
     {
-        random_su3mat(&u_field[i]);
-        random_su3mat(&v_field[i]);
+        uint64_t thread_state = 12345ULL + i;
+        random_su3mat(&u_field[i], &thread_state);
+        random_su3mat(&v_field[i], &thread_state);
     }
     printf("u[%i]->c22 = (%f, %f)\n", idx, u_field[idx].c22.re, u_field[idx].c22.im);
     printf("u[%i]->c31 = (%f, %f)\n", idx, u_field[idx].c31.re, u_field[idx].c31.im);

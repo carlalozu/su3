@@ -47,17 +47,18 @@ int main(int argc, char *argv[])
         {
 
             #pragma omp single
+            prof_begin(&init_AoS);
+            #pragma omp for schedule(static)
+            for (size_t i = 0; i < VOLUME; i++)
             {
-                prof_begin(&init_AoS);
-                for (size_t i = 0; i < VOLUME; i++)
-                {
-                    random_su3mat(&u_field[i]);
-                    random_su3mat(&v_field[i]);
-                    random_su3mat(&w_field[i]);
-                    random_su3mat(&x_field[i]);
-                }
-                prof_end(&init_AoS);
+                uint64_t thread_state = 12345ULL + i;
+                random_su3mat(&u_field[i], &thread_state);
+                random_su3mat(&v_field[i], &thread_state);
+                random_su3mat(&w_field[i], &thread_state);
+                random_su3mat(&x_field[i], &thread_state);
             }
+            #pragma omp single
+            prof_end(&init_AoS);
 
             #pragma omp single
             prof_begin(&comp_AoS);
@@ -75,6 +76,6 @@ int main(int argc, char *argv[])
 
     prof_report(&init_AoS);
     prof_report(&comp_AoS);
-    // printf("res_aos[%i] = %f \n", idx, res_aos[idx]);
+    printf("res_aos[%i] = %f \n", idx, res_aos[idx]);
 
 }

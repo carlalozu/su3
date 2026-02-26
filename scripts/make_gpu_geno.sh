@@ -14,7 +14,7 @@ export CUDA_VISIBLE_DEVICES=0
 export OMP_NUM_THREADS=1
 
 file=volume_geno_gpu
-> $file
+> $file.log
 
 perl -i -pe "s/#define CACHELINE \\d+/#define CACHELINE 128/" include/global.h
 grep "#define CACHELINE" include/global.h
@@ -35,8 +35,10 @@ do
     -DCMAKE_BUILD_TYPE=Debug -DENABLE_OPENMP=ON -DENABLE_AVX=ON -DENABLE_GPU_OFFLOAD=ON
   cmake --build build -- -j8
 
-  ./build/main/soa_gpu 500 100 >> $file
+  ./build/main/soa_gpu 500 100 >> $file.log
 
-  done
+done
 
-python parse.py < $ROOT/output/$file.log > $ROOT/output/$file.csv
+mv $file.log $ROOT/output/$file.log
+
+python $DIR/parse.py < $ROOT/output/$file.log > $ROOT/output/$file.csv

@@ -11,7 +11,7 @@ cd $ROOT
 export GOMP_CPU_AFFINITY=0-16
 
 file=volume_geno_cpu
-> $file
+> $file.log
 
 perl -i -pe "s/#define CACHELINE \\d+/#define CACHELINE 8/" include/global.h
 grep "#define CACHELINE" include/global.h
@@ -36,9 +36,11 @@ do
   do
     export OMP_NUM_THREADS=$((t))
     echo OMP_NUM_THREADS=$OMP_NUM_THREADS
-    ./build/main/soa_cpu 500 100 >> $ROOT/output/$file.log
+    ./build/main/soa_cpu 500 100 >> $file.log
   done
 
 done
+
+mv $file.log $ROOT/output/$file.log
 
 python parse.py < $ROOT/output/$file.log > $ROOT/output/$file.csv

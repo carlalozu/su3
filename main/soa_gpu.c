@@ -45,16 +45,6 @@ int main(int argc, char *argv[])
     #pragma omp target enter data map(to : v_field[0:VOLUME], u_field[0:VOLUME], w_field[0:VOLUME], x_field[0:VOLUME])
     #pragma omp target enter data map(alloc : res_aos[0:VOLUME])
 
-    prof_begin(&init_AoS);
-    #pragma omp target teams distribute parallel for
-    for (size_t i = 0; i < VOLUME; i++)
-    {
-        unit_su3mat(&u_field[i]);
-        unit_su3mat(&v_field[i]);
-        unit_su3mat(&w_field[i]);
-        unit_su3mat(&x_field[i]);
-    }
-    prof_end(&init_AoS);
     
     prof_begin(&comp_AoS);
     #pragma omp target teams num_teams(n_blocks) 
@@ -64,6 +54,18 @@ int main(int argc, char *argv[])
         
         for (int r = 0; r < reps; r++)
         {
+            prof_begin(&init_AoS);
+            #pragma omp distribute parallel for
+            for (size_t i = 0; i < VOLUME; i++)
+            {
+                uint64_t thread_state = 12345ULL + i;
+                random_su3mat(&u_field[i], &thread_state);
+                random_su3mat(&v_field[i], &thread_state);
+                random_su3mat(&w_field[i], &thread_state);
+                random_su3mat(&x_field[i], &thread_state);
+            }
+            prof_end(&init_AoS);
+
             #pragma omp distribute parallel for
             for (size_t i = 0; i < VOLUME; i++)
             {

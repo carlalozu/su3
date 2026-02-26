@@ -14,6 +14,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 typedef struct
 {
@@ -33,7 +34,7 @@ typedef struct
 // SU3 initialization
 #pragma omp declare target
 void unit_su3mat(su3_mat *su3_mat);
-void random_su3mat(su3_mat *su3_mat);
+void random_su3mat(su3_mat *su3_mat, uint64_t *state);
 void unit_su3vec(su3_vec *su3_vec);
 #pragma omp end declare target
 

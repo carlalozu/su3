@@ -17,9 +17,9 @@ aos_P = 432     #flops
 computer = sys.argv[1] if len(sys.argv) > 1 else "geno"
 
 
-input_file_gpu = f"../output/time_gpu_{computer}.csv"
-input_file_cpu = f"../output/time_threads_{computer}.csv"
-plot_file = f"../output/time_gpu_{computer}.pdf"
+input_file_gpu = f"../output/volume_{computer}_gpu.csv"
+input_file_cpu = f"../output/volume_{computer}_cpu.csv"
+plot_file = f"../output/volume_{computer}_gpu.pdf"
 
 if computer=="geno":
     threads = [1,2,4,8,16]
@@ -72,7 +72,7 @@ for i, t in enumerate(threads):
 df_gpu = pd.read_csv(input_file_gpu)
 df_gpu["op_int"]= aos_I
 df_gpu["performance"]= aos_P*df_gpu["vol"]/df_gpu["avg_s"]*1e-9
-compute_gpu = df_gpu[df_gpu["phase"] == "compute"]
+compute_gpu = df_gpu[df_gpu["phase"] == "compute_GPU"]
 
 colors_gpu = ["tab:pink", "tab:grey"]
 for i in range(2):
