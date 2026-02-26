@@ -14,14 +14,9 @@
 #define GLOBAL_H
 
 #define L0 128
-#define L1 4
-#define L2 4
-#define L3 4
-
-#define L0_TRD 3
-#define L1_TRD 3
-#define L2_TRD 3
-#define L3_TRD 3
+#define L1 8
+#define L2 8
+#define L3 8
 
 #define VOLUME (L0*L1*L2*L3)
 #define ALIGN 64

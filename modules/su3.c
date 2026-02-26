@@ -16,6 +16,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdint.h>
+
+#pragma omp declare target
+double local_rand(uint64_t *state) {
+    // Standard LCG parameters (e.g., MMIX by Knuth)
+    *state = 6364136223846793005ULL * (*state) + 1ULL;
+    return (double)(*state >> 33) / 2147483647.0;
+}
+#pragma omp end declare target
 
 void unit_su3mat(su3_mat *su3)
 {
@@ -26,13 +35,13 @@ void unit_su3mat(su3_mat *su3)
         d[i] = 1.0;
 }
 
-void random_su3mat(su3_mat *su3)
+void random_su3mat(su3_mat *su3, uint64_t *state)
 {
     _Static_assert(sizeof(su3_mat) == 18 * sizeof(float),
                    "su3 layout assumption broken");
     float *d = (float *)su3;
     for (int i = 0; i < 18; i++)
-        d[i] = (float)rand() / RAND_MAX;
+        d[i] = local_rand(state);
 }
 
 void unit_su3vec(su3_vec *vec)

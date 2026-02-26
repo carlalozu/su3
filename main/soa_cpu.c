@@ -42,8 +42,7 @@ int main(int argc, char *argv[])
     {
         su3_mat temp_field;
         su3_mat res_field;
-    
-        
+            
         for (int r = 0; r < reps; r++)
         {
             #pragma omp single
@@ -55,6 +54,20 @@ int main(int argc, char *argv[])
                 random_su3mat(&v_field[i]);
                 random_su3mat(&w_field[i]);
                 random_su3mat(&x_field[i]);
+            }
+            #pragma omp single
+            prof_end(&init_AoS);
+
+            #pragma omp single
+            prof_begin(&init_AoS);
+            #pragma omp for schedule(static)
+            for (size_t i = 0; i < VOLUME; i++)
+            {
+                uint64_t thread_state = 12345ULL + i;
+                random_su3mat(&u_field[i], &thread_state);
+                random_su3mat(&v_field[i], &thread_state);
+                random_su3mat(&w_field[i], &thread_state);
+                random_su3mat(&x_field[i], &thread_state);
             }
             #pragma omp single
             prof_end(&init_AoS);
