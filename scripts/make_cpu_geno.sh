@@ -10,7 +10,7 @@ cd $ROOT
 
 export GOMP_CPU_AFFINITY=0-16
 
-file=volume_geno_cpu
+file=volume_geno_cpu_float
 > $file.log
 
 perl -i -pe "s/#define CACHELINE \\d+/#define CACHELINE 8/" include/global.h
@@ -43,4 +43,4 @@ done
 
 mv $file.log $ROOT/output/$file.log
 
-python parse.py < $ROOT/output/$file.log > $ROOT/output/$file.csv
+python $DIR/parse.py < $ROOT/output/$file.log > $ROOT/output/$file.csv

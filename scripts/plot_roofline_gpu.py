@@ -11,15 +11,15 @@ plt.style.use("seaborn-v0_8-whitegrid")
 markers = Line2D.filled_markers
 
 # Kernel parameters, plaqsum
-aos_I = 0.7397  #flops/byte
+aos_I = 0.7397*2  #flops/byte
 aos_P = 432     #flops
 
 computer = sys.argv[1] if len(sys.argv) > 1 else "geno"
 
 
-input_file_gpu = f"../output/volume_{computer}_gpu.csv"
-input_file_cpu = f"../output/volume_{computer}_cpu.csv"
-plot_file = f"../output/volume_{computer}_gpu.pdf"
+input_file_gpu = f"../output/volume_{computer}_gpu_float.csv"
+input_file_cpu = f"../output/volume_{computer}_cpu_float.csv"
+plot_file = f"../output/volume_{computer}_gpu_float.pdf"
 
 if computer=="geno":
     threads = [1,2,4,8,16]
@@ -84,7 +84,7 @@ for i in range(2):
     ridge_x = peak_performances_gpu[i] / memory_bandwidths_gpu[i]
     label_y = peak_performances_gpu[i] * 0.9
     plt.text(90, label_y, labels_gpu[i], color=line.get_color(), fontsize=9, ha="left", va="top")
-plt.scatter(compute_gpu["op_int"]+0.5, compute_gpu["performance"], color=colors_gpu[0], label=labels_gpu[0], marker=markers[marker_count], zorder=marker_count)
+plt.scatter(compute_gpu["op_int"]+0.5, compute_gpu["performance"], color=colors_gpu[1], label=labels_gpu[1], marker=markers[marker_count], zorder=marker_count)
 
 
 # Problem size label
