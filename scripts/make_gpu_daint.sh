@@ -6,31 +6,40 @@
 #SBATCH --environment=cpe-cray-24.07
 #SBATCH --exclusive
 
-cd $SCRATCH/su3
+ROOT=$SCRATCH/su3
+DIR=$ROOT/scripts
+
+cd $ROOT
 
 export CUDA_VISIBLE_DEVICES=0
 export OMP_NUM_THREADS=1
-file=output/volume_daint_gpu.log
-> $file
+
+file=volume_daint_gpu
+> $file.log
 
 perl -i -pe "s/#define CACHELINE \\d+/#define CACHELINE 128/" include/global.h
 grep "#define CACHELINE" include/global.h
 
-for i in 8 16 32 64
+perl -i -pe "s/#define L1 \\d+/#define L1 8/" $ROOT/include/global.h
+perl -i -pe "s/#define L2 \\d+/#define L2 8/" $ROOT/include/global.h
+perl -i -pe "s/#define L3 \\d+/#define L3 8/" $ROOT/include/global.h
+
+for i in 8 16 32 64 128
 do
-  NEW_VAL=$((4 * i))
-  echo $NEW_VAL
-  perl -i -pe "s/#define L0 \\d+/#define L0 $NEW_VAL/" include/global.h
-  grep "#define L0" include/global.h
+  base_t1=$((4 * i))
+  echo $base_t1
+  perl -i -pe "s/#define L0 \\d+/#define L0 $base_t1/" $ROOT/include/global.h
 
   rm -rf build
   cmake -S . -B build \
-    -DCMAKE_C_COMPILER=$GCC \
+    -DCMAKE_C_COMPILER=$CC \
     -DCMAKE_BUILD_TYPE=Debug -DENABLE_OPENMP=ON -DENABLE_AVX=ON -DENABLE_GPU_OFFLOAD=ON
   cmake --build build -- -j8
 
-  ./build/main/soa_gpu 500 100 >> $file
+  ./build/main/soa_gpu 500 100 >> $file.log
 
-  done
+done
 
-# python parse.py < ../output/volume_geno_gpu.log > ../output/volume_geno_gpu.csv
+mv $file.log $ROOT/output/$file.log
+
+python $DIR/parse.py < $ROOT/output/$file.log > $ROOT/output/$file.csv
