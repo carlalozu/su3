@@ -42,22 +42,22 @@ int main(int argc, char *argv[])
     {
         su3_mat temp_field;
         su3_mat res_field;
-    
-        #pragma omp single
-        prof_begin(&init_AoS);
-        #pragma omp for schedule(static)
-        for (size_t i = 0; i < VOLUME; i++)
-        {
-            unit_su3mat(&u_field[i]);
-            unit_su3mat(&v_field[i]);
-            unit_su3mat(&w_field[i]);
-            unit_su3mat(&x_field[i]);
-        }
-        #pragma omp single
-        prof_end(&init_AoS);
-
+            
         for (int r = 0; r < reps; r++)
         {
+
+            #pragma omp single
+            {
+                prof_begin(&init_AoS);
+                for (size_t i = 0; i < VOLUME; i++)
+                {
+                    random_su3mat(&u_field[i]);
+                    random_su3mat(&v_field[i]);
+                    random_su3mat(&w_field[i]);
+                    random_su3mat(&x_field[i]);
+                }
+                prof_end(&init_AoS);
+            }
 
             #pragma omp single
             prof_begin(&comp_AoS);
