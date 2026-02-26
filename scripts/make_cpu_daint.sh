@@ -13,7 +13,7 @@ cd $ROOT
 
 export GOMP_CPU_AFFINITY=0-71
 
-file=volume_daint_cpu
+file=volume_daint_cpu_float
 > $file.log
 
 perl -i -pe "s/#define CACHELINE \\d+/#define CACHELINE 8/" include/global.h

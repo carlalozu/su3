@@ -14,7 +14,7 @@ cd $ROOT
 export CUDA_VISIBLE_DEVICES=0
 export OMP_NUM_THREADS=1
 
-file=volume_daint_gpu
+file=volume_daint_gpu_float
 > $file.log
 
 perl -i -pe "s/#define CACHELINE \\d+/#define CACHELINE 128/" include/global.h
