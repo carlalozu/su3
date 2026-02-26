@@ -22,4 +22,4 @@ cmake --build build -- -j8
 # nsys profile --stats=true 
 ./build/main/time_gpu $repetitions $idx
 
-python parse.py < ../output/volume_saling_soa_gpu.log > ../output/volume_saling_soa_gpu.csv
+python parse.py < ../output/volume_geno_gpu.log > ../output/volume_geno_gpu.csv
