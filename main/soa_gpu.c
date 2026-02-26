@@ -45,39 +45,33 @@ int main(int argc, char *argv[])
     #pragma omp target enter data map(to : v_field[0:VOLUME], u_field[0:VOLUME], w_field[0:VOLUME], x_field[0:VOLUME])
     #pragma omp target enter data map(alloc : res_aos[0:VOLUME])
 
+    su3_mat temp_field;
+    su3_mat res_field;
     
-    prof_begin(&comp_AoS);
-    #pragma omp target teams num_teams(n_blocks) 
+    for (int r = 0; r < reps; r++)
     {
-        su3_mat temp_field;
-        su3_mat res_field;
-        
-        for (int r = 0; r < reps; r++)
+        prof_begin(&init_AoS);
+        #pragma omp target teams distribute parallel for num_teams(n_blocks) 
+        for (size_t i = 0; i < VOLUME; i++)
         {
-            prof_begin(&init_AoS);
-            #pragma omp distribute parallel for
-            for (size_t i = 0; i < VOLUME; i++)
-            {
-                uint64_t thread_state = 12345ULL + i;
-                random_su3mat(&u_field[i], &thread_state);
-                random_su3mat(&v_field[i], &thread_state);
-                random_su3mat(&w_field[i], &thread_state);
-                random_su3mat(&x_field[i], &thread_state);
-            }
-            prof_end(&init_AoS);
-
-            #pragma omp distribute parallel for
-            for (size_t i = 0; i < VOLUME; i++)
-            {
-                // if (r==0 && i==0) is_gpu();
-                su3matxsu3mat(&temp_field, &u_field[i], &v_field[i]);
-                su3matdagxsu3matdag(&res_field, &w_field[i], &x_field[i]);
-                res_aos[i] = su3matxsu3mat_retrace(&temp_field, &res_field);
-            }
+            uint64_t thread_state = 12345ULL + i + r;
+            random_su3mat(&u_field[i], &thread_state);
+            random_su3mat(&v_field[i], &thread_state);
+            random_su3mat(&w_field[i], &thread_state);
+            random_su3mat(&x_field[i], &thread_state);
         }
+        prof_end(&init_AoS);
+        
+        prof_begin(&comp_AoS);
+        #pragma omp target teams distribute parallel for num_teams(n_blocks) 
+        for (size_t i = 0; i < VOLUME; i++)
+        {
+            su3matxsu3mat(&temp_field, &u_field[i], &v_field[i]);
+            su3matdagxsu3matdag(&res_field, &w_field[i], &x_field[i]);
+            res_aos[i] = su3matxsu3mat_retrace(&temp_field, &res_field);
+        }
+        prof_end(&comp_AoS);
     }
-    prof_end(&comp_AoS);
-    comp_AoS.count *= reps;
     
     #pragma omp target update from(res_aos[0:VOLUME])
     printf("res_aos[%i] = %f \n", idx, res_aos[idx]);
