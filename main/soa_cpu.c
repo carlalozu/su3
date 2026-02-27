@@ -42,7 +42,8 @@ int main(int argc, char *argv[])
     {
         su3_mat temp_field;
         su3_mat res_field;
-            
+        uint64_t thread_state = 12345ULL + omp_get_thread_num();
+
         for (int r = 0; r < reps; r++)
         {
             #pragma omp single
@@ -50,7 +51,6 @@ int main(int argc, char *argv[])
             #pragma omp for schedule(static)
             for (size_t i = 0; i < VOLUME; i++)
             {
-                uint64_t thread_state = 12345ULL + i;
                 random_su3mat(&u_field[i], &thread_state);
                 random_su3mat(&v_field[i], &thread_state);
                 random_su3mat(&w_field[i], &thread_state);
