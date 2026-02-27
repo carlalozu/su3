@@ -14,8 +14,8 @@ aos_P = 432     # flops
 
 computer = sys.argv[1] if len(sys.argv) > 1 else "geno"
 
-input_file = f"../output/volume_{computer}_cpu.csv"
-plot_file = f"../output/volume_{computer}_cpu.pdf"
+input_file = f"../output/volume_{computer}_cpu_float.csv"
+plot_file = f"../output/volume_{computer}_cpu_float.pdf"
 
 if computer=="geno":
     threads = [1,2,4,8,16]
