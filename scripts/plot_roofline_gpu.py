@@ -89,7 +89,7 @@ plt.scatter(compute_gpu["op_int"]+0.5, compute_gpu["performance"], color=colors_
 
 # Problem size label
 for x, y, v in zip(compute_gpu["op_int"], compute_gpu["performance"], compute_gpu["vol"]):
-    plt.text(x+0.8,y,str(v),fontsize=9,color=colors_gpu[0],ha="left",va="center")
+    plt.text(x+0.8,y,str(v),fontsize=9,color=colors_gpu[1],ha="left",va="center")
 
 
 # Add labels and legend
