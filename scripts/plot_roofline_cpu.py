@@ -56,7 +56,7 @@ df_soa = df[df["phase"] == "compute"]
 
 for i, t in enumerate(threads):
     aost = df_soa[df_soa["threads"] == t]
-    plt.scatter(aost["op_int"], aost["performance"], marker=markers[-i], zorder=4)
+    plt.scatter(aost["op_int"], aost["performance"], marker=markers[-i], zorder=4, label=f"{t} cores")
     # print(aost.head(10))
 
 for x, y, v in zip(aost["op_int"], aost["performance"], aost["vol"]):
