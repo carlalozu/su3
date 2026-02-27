@@ -52,7 +52,8 @@ int main(int argc, char *argv[])
     prof_end(&init_AoS);
 
     // geno 3145728 Byes L2 cache
-    size_t flush_size = 3145728 / sizeof(double);
+    // daint 62914560 Byes L2 cache
+    size_t flush_size = 62914560 * 2 / sizeof(double);
     double *flush_buf = malloc(flush_size * sizeof(double));
     #pragma omp target enter data map(alloc : flush_buf[0:flush_size])
 
@@ -95,10 +96,16 @@ int main(int argc, char *argv[])
         total_sum += res_aos[i]/reps;
     }
         
+    double total_sum_flush = 0.0;
+    for(size_t i = 0; i < flush_size; i++) {
+        total_sum_flush += flush_buf[i];
+    }
+
     prof_report(&init_AoS);
     prof_report(&comp_AoS);
-
+    
     printf("Average to prevent optimization: %f \n", total_sum/reps);
+    printf("Average to prevent optimization: %f \n", total_sum_flush/reps);
     
     #pragma omp target exit data map(release: u_field[0:VOLUME], v_field[0:VOLUME], w_field[0:VOLUME], x_field[0:VOLUME], res_aos[0:VOLUME])
     free(u_field); free(v_field); free(w_field); free(x_field); free(res_aos);

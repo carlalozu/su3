@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
     su3_mat *v_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
     su3_mat *w_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
     su3_mat *x_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
-    double *res_aos = (double *)malloc(VOLUME * sizeof(double));
+    float *res_aos = (float *)malloc(VOLUME * sizeof(float));
 
     prof_begin(&init_AoS);
     #pragma omp parallel for schedule(static)
@@ -42,8 +42,9 @@ int main(int argc, char *argv[])
     prof_end(&init_AoS);
 
 
-    // geno 64MiB L3 cache
-    size_t flush_size = 128 * 1024 * 1024 / sizeof(double);
+    // geno 64 MiB L3 cache
+    // daint 114 MiB L3 cache
+    size_t flush_size = 114 * 4 * 1024 * 1024 / sizeof(double);
     double *flush_buf = malloc(flush_size * sizeof(double));
     
     #pragma omp parallel for schedule(static)
@@ -89,10 +90,16 @@ int main(int argc, char *argv[])
         total_sum += res_aos[i];
     }
 
+    double total_sum_flush = 0.0;
+    for(size_t i = 0; i < flush_size; i++) {
+        total_sum_flush += flush_buf[i];
+    }
+
     prof_report(&init_AoS);
     prof_report(&comp_AoS);
     
     printf("Average to prevent optimization: %f \n", total_sum/reps);
+    printf("Average to prevent optimization: %f \n", total_sum_flush/reps);
 
     free(u_field); free(v_field); free(w_field); free(x_field); free(res_aos);
     return 0;
