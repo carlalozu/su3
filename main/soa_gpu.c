@@ -9,13 +9,6 @@
 
 int main(int argc, char *argv[])
 {
-#ifdef _OPENMP
-    // Make OpenMP behavior predictable for benchmarking:
-    int n_threads = omp_get_max_threads();
-    omp_set_dynamic(0); 
-#else
-    printf("OpenMP is not enabled\n");
-#endif
 
     // read reps from command line
     int reps = 100;
@@ -45,39 +38,69 @@ int main(int argc, char *argv[])
     #pragma omp target enter data map(to : v_field[0:VOLUME], u_field[0:VOLUME], w_field[0:VOLUME], x_field[0:VOLUME])
     #pragma omp target enter data map(alloc : res_aos[0:VOLUME])
 
-    su3_mat temp_field;
-    su3_mat res_field;
     
-    for (int r = 0; r < reps; r++)
+    prof_begin(&init_AoS);
+    #pragma omp target teams distribute parallel for num_teams(n_blocks) 
+    for (size_t i = 0; i < VOLUME; i++)
     {
-        prof_begin(&init_AoS);
+        uint64_t thread_state = 12345ULL + i;
+        random_su3mat(&u_field[i], &thread_state);
+        random_su3mat(&v_field[i], &thread_state);
+        random_su3mat(&w_field[i], &thread_state);
+        random_su3mat(&x_field[i], &thread_state);
+    }
+    prof_end(&init_AoS);
+
+    // geno 3145728 Byes L2 cache
+    size_t flush_size = 3145728 / sizeof(double);
+    double *flush_buf = malloc(flush_size * sizeof(double));
+    #pragma omp target enter data map(alloc : flush_buf[0:flush_size])
+
+
+    #pragma omp target teams distribute parallel for num_teams(n_blocks) 
+    for (size_t i = 0; i < VOLUME; i++)
+    {
+        su3_mat temp_field;
+        su3_mat res_field;
+        su3matxsu3mat(&temp_field, &u_field[i], &v_field[i]);
+        su3matdagxsu3matdag(&res_field, &w_field[i], &x_field[i]);
+        res_aos[i] = su3matxsu3mat_retrace(&temp_field, &res_field);
+    }
+
+
+    for (int r = 0; r < reps; r++)
+    {   
         #pragma omp target teams distribute parallel for num_teams(n_blocks) 
-        for (size_t i = 0; i < VOLUME; i++)
-        {
-            uint64_t thread_state = 12345ULL + i + r;
-            random_su3mat(&u_field[i], &thread_state);
-            random_su3mat(&v_field[i], &thread_state);
-            random_su3mat(&w_field[i], &thread_state);
-            random_su3mat(&x_field[i], &thread_state);
+        for (size_t j = 0; j < flush_size; j++) {
+            flush_buf[j] += 1.0; 
         }
-        prof_end(&init_AoS);
-        
+
         prof_begin(&comp_AoS);
         #pragma omp target teams distribute parallel for num_teams(n_blocks) 
         for (size_t i = 0; i < VOLUME; i++)
         {
+            su3_mat temp_field;
+            su3_mat res_field;
             su3matxsu3mat(&temp_field, &u_field[i], &v_field[i]);
             su3matdagxsu3matdag(&res_field, &w_field[i], &x_field[i]);
-            res_aos[i] = su3matxsu3mat_retrace(&temp_field, &res_field);
+            res_aos[i] += su3matxsu3mat_retrace(&temp_field, &res_field);
         }
         prof_end(&comp_AoS);
     }
     
     #pragma omp target update from(res_aos[0:VOLUME])
-    printf("res_aos[%i] = %f \n", idx, res_aos[idx]);
 
+    double total_sum = 0.0;
+    for(size_t i = 0; i < VOLUME; i++) {
+        total_sum += res_aos[i]/reps;
+    }
+        
     prof_report(&init_AoS);
     prof_report(&comp_AoS);
 
+    printf("Average to prevent optimization: %f \n", total_sum/reps);
+    
     #pragma omp target exit data map(release: u_field[0:VOLUME], v_field[0:VOLUME], w_field[0:VOLUME], x_field[0:VOLUME], res_aos[0:VOLUME])
+    free(u_field); free(v_field); free(w_field); free(x_field); free(res_aos);
+    return 0;
 }
