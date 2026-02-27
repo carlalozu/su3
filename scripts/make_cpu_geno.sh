@@ -43,4 +43,4 @@ done
 
 mv $file.log $ROOT/output/$file.log
 
-python parse.py < $ROOT/output/$file.log > $ROOT/output/$file.csv
+python $DIR/parse.py < $ROOT/output/$file.log > $ROOT/output/$file.csv
