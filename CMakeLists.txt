@@ -48,8 +48,8 @@ if(ENABLE_GPU_OFFLOAD)
         # GCC Specific Flags
         set(OMP_OFFLOAD_FLAGS
             -fopenmp
-            -foffload=nvptx-none="-misa=sm_90" # Replace sm_70 with your GPU arch
-            -fno-stack-protector
+            -foffload=nvptx-none="-misa=sm_90"
+            "-foffload=-L/scratch/calopez/nvptx-install/lib -B/scratch/calopez/nvptx-install/bin"
         )
     elseif(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "AppleClang")
         # Clang/LLVM Specific Flags (Your original setup)
@@ -63,8 +63,8 @@ if(ENABLE_GPU_OFFLOAD)
         set(OMP_OFFLOAD_FLAGS -fopenmp)
     endif()
 
-    target_compile_options(su3lib PUBLIC ${OMP_OFFLOAD_FLAGS})
-    target_link_options(su3lib PUBLIC ${OMP_OFFLOAD_FLAGS})
+    target_compile_options(su3lib PRIVATE ${OMP_OFFLOAD_FLAGS})
+    target_link_options(su3lib PRIVATE ${OMP_OFFLOAD_FLAGS})
 
     message(STATUS "GPU Offloading Enabled using ${CMAKE_C_COMPILER_ID}")
 else()
