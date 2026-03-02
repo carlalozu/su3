@@ -6,6 +6,7 @@
 #SBATCH --environment=cpe-cray-24.07
 #SBATCH --exclusive
 
+CC=$(which gcc)
 ROOT=$SCRATCH/su3
 DIR=$ROOT/scripts
 
@@ -13,6 +14,7 @@ cd $ROOT
 
 export CUDA_VISIBLE_DEVICES=0
 export OMP_NUM_THREADS=1
+export OMP_TARGET_OFFLOAD=MANDATORY
 
 file=volume_daint_gpu
 > $file.log

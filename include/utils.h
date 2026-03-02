@@ -51,8 +51,9 @@ void print_parallel_info()
 #endif
 
 void enter_complex_field(complexv* c_field){
-    #pragma omp target enter data \
-    map(to : c_field[0], c_field->base[0:2*c_field->volume])
+    size_t total_size = 2*c_field->volume;
+    double* base_ptr = c_field->base;
+    #pragma omp target enter data map(to : c_field[0], base_ptr[0:total_size])
 
     #pragma omp target
     complex_field_map_pointers(c_field);
@@ -60,13 +61,15 @@ void enter_complex_field(complexv* c_field){
 }
 
 void enter_double_field(doublev* d_field){
-    #pragma omp target enter data \
-    map(to : d_field[0], d_field->base[0:d_field->volume])
+    size_t total_size = d_field->volume;
+    double* base_ptr = d_field->base;
+    #pragma omp target enter data map(to : d_field[0], base_ptr[0:total_size])
 }
 
 void enter_su3_vec_field(su3_vec_field* v_field){
-    #pragma omp target enter data \
-    map(to : v_field[0], v_field->base[0:6*v_field->volume])
+    size_t total_size = 6*v_field->volume;
+    double* base_ptr = v_field->base;
+    #pragma omp target enter data map(to : v_field[0], base_ptr[0:total_size])
 
     #pragma omp target
     su3_vec_field_map_pointers(v_field);
@@ -74,10 +77,17 @@ void enter_su3_vec_field(su3_vec_field* v_field){
 }
 
 void enter_su3_mat_field(su3_mat_field* m_field){
+
+    size_t total_size = 6 * m_field->c1.volume;
+
+    double* base_ptr_c1 = m_field->c1.base;
+    double* base_ptr_c2 = m_field->c2.base;
+    double* base_ptr_c3 = m_field->c3.base;
+
     #pragma omp target enter data map(to: m_field[0]) \
-    map(to: m_field->c1.base[0 : 6*m_field->c1.volume]) \
-    map(to: m_field->c2.base[0 : 6*m_field->c2.volume]) \
-    map(to: m_field->c3.base[0 : 6*m_field->c3.volume])
+    map(to: base_ptr_c1[0 : total_size]) \
+    map(to: base_ptr_c2[0 : total_size]) \
+    map(to: base_ptr_c3[0 : total_size])
 
     #pragma omp target
     su3_mat_field_map_pointers(m_field);
@@ -88,7 +98,8 @@ void enter_complex_field_array(complexv* c_field, int n_blocks) {
 
     for (int i = 0; i < n_blocks; i++) {
         size_t total_size = 2 * c_field[i].volume;
-        #pragma omp target enter data map(to: c_field[i].base[0:total_size])
+        double* base_ptr = c_field[i].base;
+        #pragma omp target enter data map(to: base_ptr[0:total_size])
 
         #pragma omp target teams distribute parallel for
         for (int j = 0; j < 1; j++) { 
@@ -101,9 +112,9 @@ void enter_complex_field_array(complexv* c_field, int n_blocks) {
 void update_host_complex_field_array(complexv* c_field, int n_blocks) {
     for (int i = 0; i < n_blocks; i++) {
         size_t total_size = 2 * c_field[i].volume;
-        
+        double* base_ptr = c_field[i].base;
         // pull data from device to host for each block's data buffer
-        #pragma omp target update from(c_field[i].base[0:total_size])
+        #pragma omp target update from(base_ptr[0:total_size])
     }
 }
 
@@ -112,15 +123,18 @@ void enter_double_field_array(doublev* d_field, int n_blocks) {
 
     for (int i = 0; i < n_blocks; i++) {
         size_t total_size = d_field[i].volume;
-        #pragma omp target enter data map(to: d_field[i].base[0:total_size])
+        double* base_ptr = d_field[i].base;
+        #pragma omp target enter data map(to: base_ptr[0:total_size])
     }
 }
 
 
 void update_host_double_field_array(doublev* d_field, int n_blocks) {
     for (int i = 0; i < n_blocks; i++) {
+        size_t total_size = d_field[i].volume;
+        double* base_ptr = d_field[i].base;
         // pull data from device to host for each block's data buffer
-        #pragma omp target update from(d_field[i].base[0:d_field[i].volume])
+        #pragma omp target update from(base_ptr[0:total_size])
     }
 }
 
@@ -130,11 +144,11 @@ void enter_su3_vec_field_array(su3_vec_field* v_field, int n_blocks) {
 
     for (int i = 0; i < n_blocks; i++) {
         size_t total_size = 6 * v_field[i].volume;
-        
+        double* base_ptr = v_field[i].base;
         // 2. Map the data buffer for each struct
         // This also handles the "attachment" so v_field[i].base on the 
         // device points to the device-allocated buffer.
-        #pragma omp target enter data map(to: v_field[i].base[0:total_size])
+        #pragma omp target enter data map(to: base_ptr[0:total_size])
 
         // 3. Fix the internal pointers (c1re, c1im, etc.) on the device
         #pragma omp target teams distribute parallel for
@@ -148,9 +162,9 @@ void enter_su3_vec_field_array(su3_vec_field* v_field, int n_blocks) {
 void update_host_su3_vec_field_array(su3_vec_field* v_field, int n_blocks) {
     for (int i = 0; i < n_blocks; i++) {
         size_t total_size = 6 * v_field[i].volume;
-        
+        double* base_ptr = v_field[i].base;
         // pull data from device to host for each block's data buffer
-        #pragma omp target update from(v_field[i].base[0:total_size])
+        #pragma omp target update from(base_ptr[0:total_size])
     }
 }
 
@@ -161,10 +175,14 @@ void enter_su3_mat_field_array(su3_mat_field* m_field, int n_blocks) {
     for (int i = 0; i < n_blocks; i++) {
         size_t total_size = 6 * m_field[i].c1.volume;
 
+        double* base_ptr_c1 = m_field[i].c1.base;
+        double* base_ptr_c2 = m_field[i].c2.base;
+        double* base_ptr_c3 = m_field[i].c3.base;
+
         // map the data buffer for each struct
-        #pragma omp target enter data map(to: m_field[i].c1.base[0:total_size])
-        #pragma omp target enter data map(to: m_field[i].c2.base[0:total_size])
-        #pragma omp target enter data map(to: m_field[i].c3.base[0:total_size])
+        #pragma omp target enter data map(to: base_ptr_c1[0:total_size])
+        #pragma omp target enter data map(to: base_ptr_c2[0:total_size])
+        #pragma omp target enter data map(to: base_ptr_c3[0:total_size])
 
         // fix the internal pointers on the device
         #pragma omp target teams distribute parallel for
@@ -178,10 +196,14 @@ void update_host_su3_mat_field_array(su3_mat_field* m_field, int n_blocks) {
     for (int i = 0; i < n_blocks; i++) {
         size_t total_size = 6 * m_field[i].c1.volume;
         
+        double* base_ptr_c1 = m_field[i].c1.base;
+        double* base_ptr_c2 = m_field[i].c2.base;
+        double* base_ptr_c3 = m_field[i].c3.base;
+
         // pull data from device to host for each block's data buffer
-        #pragma omp target update from(m_field[i].c1.base[0:total_size])
-        #pragma omp target update from(m_field[i].c2.base[0:total_size])
-        #pragma omp target update from(m_field[i].c3.base[0:total_size])
+        #pragma omp target update from(base_ptr_c1[0:total_size])
+        #pragma omp target update from(base_ptr_c2[0:total_size])
+        #pragma omp target update from(base_ptr_c3[0:total_size])
     }
 }
 

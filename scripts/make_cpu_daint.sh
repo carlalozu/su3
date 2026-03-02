@@ -6,6 +6,7 @@
 #SBATCH --environment=cpe-cray-24.07
 #SBATCH --exclusive
 
+CC=$(which gcc)
 ROOT=$SCRATCH/su3
 DIR=$ROOT/scripts
 
@@ -32,7 +33,7 @@ do
   rm -rf build
   cmake -S . -B build \
     -DCMAKE_C_COMPILER=$CC \
-    -DCMAKE_BUILD_TYPE=Debug -DENABLE_OPENMP=ON -DENABLE_AVX=OFF
+    -DCMAKE_BUILD_TYPE=Debug -DENABLE_OPENMP=ON -DENABLE_AVX=OFF -DENABLE_GPU_OFFLOAD=ON
   cmake --build build -- -j8
 
   for t in 1 2 4 8 16 32 64
