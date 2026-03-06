@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
             {
                 // if (r==0 && i==0) is_gpu();
                 su3matxsu3mat(&temp_field, &u_field[i], &v_field[i]);
-                su3matdagxsu3matdag(&res_field, &w_field, &x_field[i]);
+                su3matdagxsu3matdag(&res_field, w_field, &x_field[i]);
                 res_aos[i] = su3matxsu3mat_retrace(&temp_field, &res_field);
             }
         }
