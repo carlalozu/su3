@@ -18,18 +18,6 @@ add_library(su3lib
 
 target_include_directories(su3lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-target_compile_options(su3lib PUBLIC
-    -Wall
-    -Wextra
-    -Wpedantic
-    -O2
-    -fstrict-aliasing
-    # -Rpass-analysis=loop-vectorize
-    # -Rpass=loop-vectorize
-    # -Rpass-missed=loop-vectorize
-    -march=native
-)
-
 option(ENABLE_OPENMP "Enable OpenMP parallelization" ON)
 if(ENABLE_OPENMP)
     find_package(OpenMP REQUIRED)
