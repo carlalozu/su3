@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     
     #pragma omp parallel for schedule(static)
     for (size_t j = 0; j < flush_size; j++) {
-        flush_buf[j] += (double)(j)/(double)(flush_size); 
+        flush_buf[j] += 1.0; 
     }
 
     // warm-up run
@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
     prof_report(&comp_AoS);
     
     printf("Average to prevent optimization: %f \n", total_sum/reps);
-    printf("Average to prevent optimization: %f \n", total_sum/total_sum_flush);
+    printf("Average to prevent optimization: %f \n", total_sum_flush/reps);
 
     free(u_field); free(v_field); free(w_field); free(x_field); free(res_aos);
     return 0;
