@@ -7,6 +7,16 @@
 #include "profiler.h"
 #include "utils.h"
 
+static size_t n_blocks;
+
+void flush_cache(size_t flush_size, double* flush_buf)
+{
+    #pragma omp target teams distribute parallel for num_teams(n_blocks) 
+    for (size_t j = 0; j < flush_size; j++) {
+        flush_buf[j] += 1.0; 
+    }
+}
+
 int main(int argc, char *argv[])
 {
 
@@ -23,7 +33,7 @@ int main(int argc, char *argv[])
     }
 
     
-    size_t n_blocks = (VOLUME + CACHELINE - 1)/CACHELINE;
+    n_blocks = (VOLUME + CACHELINE - 1)/CACHELINE;
     
     prof_section init_AoS = {.name = "AoS init_GPU", .threads = n_blocks};
     prof_section comp_AoS = {.name = "AoS compute_GPU", .threads = n_blocks};
@@ -56,7 +66,8 @@ int main(int argc, char *argv[])
     size_t flush_size = 62914560 * 2 / sizeof(double);
     double *flush_buf = malloc(flush_size * sizeof(double));
     #pragma omp target enter data map(alloc : flush_buf[0:flush_size])
-
+    
+    flush_cache(flush_size, flush_buf);
 
     #pragma omp target teams distribute parallel for num_teams(n_blocks) 
     for (size_t i = 0; i < VOLUME; i++)
@@ -71,10 +82,7 @@ int main(int argc, char *argv[])
 
     for (int r = 0; r < reps; r++)
     {   
-        #pragma omp target teams distribute parallel for num_teams(n_blocks) 
-        for (size_t j = 0; j < flush_size; j++) {
-            flush_buf[j] += 1.0; 
-        }
+        flush_cache(flush_size, flush_buf);
 
         prof_begin(&comp_AoS);
         #pragma omp target teams distribute parallel for num_teams(n_blocks) 

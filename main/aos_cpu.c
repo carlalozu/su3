@@ -6,6 +6,14 @@
 #include <time.h>
 #include "profiler.h"
 
+void flush_cache(size_t flush_size, double* flush_buf)
+{
+    #pragma omp parallel for schedule(static)
+    for (size_t j = 0; j < flush_size; j++) {
+        flush_buf[j] += 1.0; 
+    }
+}
+
 int main(int argc, char *argv[])
 {
 #ifdef _OPENMP
@@ -44,13 +52,10 @@ int main(int argc, char *argv[])
 
     // geno 64 MiB L3 cache
     // daint 114 MiB L3 cache
-    size_t flush_size = 114 * 4 * 1024 * 1024 / sizeof(double);
+    size_t flush_size = 64 * 4 * 1024 * 1024 / sizeof(double);
     double *flush_buf = malloc(flush_size * sizeof(double));
     
-    #pragma omp parallel for schedule(static)
-    for (size_t j = 0; j < flush_size; j++) {
-        flush_buf[j] += 1.0; 
-    }
+    flush_cache(flush_size, flush_buf);
 
     // warm-up run
     #pragma omp parallel for schedule(static)
@@ -66,10 +71,7 @@ int main(int argc, char *argv[])
 
     for (int r = 0; r < reps; r++) 
     {
-        #pragma omp parallel for schedule(static)
-        for (size_t j = 0; j < flush_size; j++) {
-            flush_buf[j] += 1.0; 
-        }
+        flush_cache(flush_size, flush_buf);
 
         prof_begin(&comp_AoS);
         #pragma omp parallel for schedule(static)
