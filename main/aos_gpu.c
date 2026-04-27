@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
     
     flush_cache(flush_size, flush_buf);
 
-    #pragma omp target teams distribute parallel for num_teams(n_blocks) 
+    #pragma omp target teams distribute parallel for
     for (size_t i = 0; i < VOLUME; i++)
     {
         su3_mat temp_field;
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
         flush_cache(flush_size, flush_buf);
 
         prof_begin(&comp_AoS);
-        #pragma omp target teams distribute parallel for num_teams(n_blocks) 
+        #pragma omp target teams distribute parallel for
         for (size_t i = 0; i < VOLUME; i++)
         {
             su3_mat temp_field;
