@@ -12,4 +12,9 @@ add_su3_executable(time time.c)
 add_su3_executable(time_gpu time_gpu.c)
 add_su3_executable(aos_gpu aos_gpu.c)
 add_su3_executable(aos_cpu aos_cpu.c)
- 
+
+if(ENABLE_CUDA)
+    add_executable(soa_gpu_cuda soa_gpu_cuda.cu)
+    target_link_libraries(soa_gpu_cuda PRIVATE su3cudakernel)
+    set_target_properties(soa_gpu_cuda PROPERTIES CUDA_ARCHITECTURES "90")
+endif()

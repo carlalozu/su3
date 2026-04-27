@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.18)
 
 project(su3_alg
     VERSION 1.0
@@ -54,5 +54,24 @@ else()
     endif()
 endif()
 
+
+option(ENABLE_CUDA "Enable native CUDA kernel" OFF)
+if(ENABLE_CUDA)
+    enable_language(CUDA CXX)
+
+    add_library(su3cudakernel STATIC
+        modules/su3v_cuda.cu
+    )
+    target_include_directories(su3cudakernel PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_link_libraries(su3cudakernel PUBLIC su3lib)
+    set_target_properties(su3cudakernel PROPERTIES
+        CUDA_ARCHITECTURES "90"
+        CUDA_SEPARABLE_COMPILATION ON
+    )
+
+    message(STATUS "CUDA kernel enabled (SM_90)")
+else()
+    message(STATUS "CUDA kernel NOT enabled")
+endif()
 
 add_subdirectory(main)
