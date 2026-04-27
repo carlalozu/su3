@@ -11,7 +11,7 @@ static size_t n_blocks;
 
 void flush_cache(size_t flush_size, double* flush_buf)
 {
-    #pragma omp target teams distribute parallel for num_teams(n_blocks) 
+    #pragma omp target teams distribute parallel for
     for (size_t j = 0; j < flush_size; j++) {
         flush_buf[j] += 1.0; 
     }
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 
     
     prof_begin(&init_AoS);
-    #pragma omp target teams distribute parallel for num_teams(n_blocks) 
+    #pragma omp target teams distribute parallel for
     for (size_t i = 0; i < VOLUME; i++)
     {
         uint64_t thread_state = 12345ULL + i;
