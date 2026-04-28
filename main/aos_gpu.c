@@ -6,6 +6,7 @@
 #include <time.h>
 #include "profiler.h"
 #include "utils.h"
+#include "su3v_openmp.h"
 
 static size_t n_blocks;
 

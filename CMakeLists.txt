@@ -10,12 +10,9 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
 add_library(su3lib
-    modules/ufields.c
     modules/su3.c
     modules/su3v.c
 )
-
-
 target_include_directories(su3lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 option(ENABLE_OPENMP "Enable OpenMP parallelization" ON)
@@ -30,6 +27,11 @@ option(ENABLE_GPU_OFFLOAD "Enable OpenMP GPU Offloading" OFF)
 if(ENABLE_GPU_OFFLOAD)
     target_compile_definitions(su3lib PUBLIC SU3_USE_GPU_OFFLOAD)
 
+    add_library(su3openmp STATIC
+        modules/su3v_openmp.c
+    )
+    target_include_directories(su3openmp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_link_libraries(su3openmp PUBLIC su3lib)
     set(OMP_OFFLOAD_FLAGS
         -fopenmp
         -fopenmp-targets=nvptx64-nvidia-cuda
@@ -37,8 +39,10 @@ if(ENABLE_GPU_OFFLOAD)
     )
     target_compile_options(su3lib PUBLIC ${OMP_OFFLOAD_FLAGS})
     target_link_options(su3lib PUBLIC ${OMP_OFFLOAD_FLAGS} -lmpi_gtl_cuda)
+    target_compile_options(su3openmp PUBLIC ${OMP_OFFLOAD_FLAGS})
+    target_link_options(su3openmp PUBLIC ${OMP_OFFLOAD_FLAGS} -lmpi_gtl_cuda)
 
-    message(STATUS "GPU Offloading Enabled (SM_86)")
+    message(STATUS "GPU Offloading Enabled")
 else()
     message(STATUS "GPU Offloading NOT Enabled")
 endif()
