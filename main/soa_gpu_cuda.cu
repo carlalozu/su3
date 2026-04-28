@@ -100,13 +100,13 @@ int main(int argc, char *argv[])
     // Memory: 4 input matrices * 18 complex doubles = 4*18*2*8 = 1152 B/site
     //         + 1 output double = 8 B/site → 1160 B/site
     double gflops   = (double)VOLUME * 432.0 / avg_s * 1e-9;
-    double gbytes   = (double)VOLUME * 1160.0 / avg_s * 1e-9;
+    double gbytes   = (double)VOLUME * 1160.0;
 
     printf("\nResults\n");
     printf("  total  = %.6f s  (%d reps)\n", total_ms * 1e-3, reps);
     printf("  avg    = %.6f s  (%.3f ms)\n", avg_s, avg_ms);
     printf("  GFLOP/s = %.2f\n", gflops);
-    printf("  GB/s    = %.2f\n", gbytes);
+    printf("  GB     = %.2f\n", gbytes);
 
     // -----------------------------------------------------------------------
     // Verify one element

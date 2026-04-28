@@ -29,11 +29,7 @@
 
 // SoA operations
 LQCD_OMP_BEGIN
-LQCD_DEVICE static inline void fsu3matxsu3vec(
-    su3_vec_dble *restrict res,
-    const su3_mat_field *restrict u,
-    const su3_vec_field *restrict v,
-    const size_t i)
+LQCD_DEVICE static inline void fsu3matxsu3vec(su3_vec_dble *res,const su3_mat_field *u,const su3_vec_field *v,const size_t i)
 {
     res->c1re = u->c1.c1re[i] * v->c1re[i] - u->c1.c1im[i] * v->c1im[i] +
                 u->c1.c2re[i] * v->c2re[i] - u->c1.c2im[i] * v->c2im[i] +
@@ -104,18 +100,8 @@ LQCD_DEVICE static inline double su3matdxsu3matd_retrace(const su3_mat_dble *u, 
 LQCD_OMP_END
 
 LQCD_OMP_BEGIN
-LQCD_DEVICE static inline void fsu3matxsu3mat(
-    su3_mat_dble *restrict res,
-    const su3_mat_field *restrict u,
-    const su3_mat_field *restrict v,
-    const size_t i)
+LQCD_DEVICE static inline void fsu3matxsu3mat(su3_mat_dble *res, const su3_mat_field *u, const su3_mat_field *v, const size_t i)
 {
-    // if (res == u || res == v || u == v)
-    // {
-    //     fprintf(stderr,
-    //             "Error in fsu3matxsu3mat: res aliases input field (res == u_field or res == v_field)\n");
-    //     abort();
-    // }
     res->c1.c1re = u->c1.c1re[i] * v->c1.c1re[i] - u->c1.c1im[i] * v->c1.c1im[i] +
                    u->c1.c2re[i] * v->c1.c2re[i] - u->c1.c2im[i] * v->c1.c2im[i] +
                    u->c1.c3re[i] * v->c1.c3re[i] - u->c1.c3im[i] * v->c1.c3im[i];
@@ -179,11 +165,7 @@ LQCD_OMP_END
  * Computes w=u^dag*v^dag assuming that w is different from u and v.
  */
 LQCD_OMP_BEGIN
-LQCD_DEVICE static inline void fsu3matdagxsu3matdag(
-    su3_mat_dble *restrict w,
-    const su3_mat_field *restrict u,
-    const su3_mat_field *restrict v,
-    const size_t i)
+LQCD_DEVICE static inline void fsu3matdagxsu3matdag(su3_mat_dble *w, const su3_mat_field *u, const su3_mat_field *v, const size_t i)
 {
     w->c1.c1re = u->c1.c1re[i] * v->c1.c1re[i] + u->c1.c1im[i] * -v->c1.c1im[i] +
                  u->c2.c1re[i] * v->c1.c2re[i] + u->c2.c1im[i] * -v->c1.c2im[i] +
