@@ -59,10 +59,10 @@ int main(int argc, char *argv[])
     #pragma omp target enter data map(alloc : flush_buf[0:flush_size])
 
     // AoS
-    su3_mat *u_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
-    su3_mat *v_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
-    su3_mat *w_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
-    su3_mat *x_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
+    su3_mat_c *u_field = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
+    su3_mat_c *v_field = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
+    su3_mat_c *w_field = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
+    su3_mat_c *x_field = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
     double *res_aos = (double *)malloc(VOLUME * sizeof(double));
 
     #pragma omp target enter data map(to : v_field[0:VOLUME], u_field[0:VOLUME], w_field[0:VOLUME], x_field[0:VOLUME])
@@ -87,8 +87,8 @@ int main(int argc, char *argv[])
         #pragma omp target teams distribute parallel for
         for (size_t i = 0; i < VOLUME; i++)
         {
-            su3_mat temp_field;
-            su3_mat res_field;
+            su3_mat_c temp_field;
+            su3_mat_c res_field;
             su3matxsu3mat(&temp_field, &u_field[i], &v_field[i]);
             su3matdagxsu3matdag(&res_field, &w_field[i], &x_field[i]);
             res_aos[i] = su3matxsu3mat_retrace(&temp_field, &res_field);

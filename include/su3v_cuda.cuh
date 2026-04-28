@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "su3.h"
 #include "su3v.h"
 
 #define CUDA_CHECK(call)                                                       \
@@ -15,25 +16,12 @@
         }                                                                      \
     } while (0)
 
-// Single-site SU(3) vector stored entirely in registers.
-// Mirrors su3_vec_field at one index i.
-typedef struct {
-    double c1re, c1im;
-    double c2re, c2im;
-    double c3re, c3im;
-} su3_vec_reg;
-
-// Single-site SU(3) matrix stored entirely in registers.
-// Mirrors su3_mat_field at one index i.
-typedef struct {
-    su3_vec_reg c1, c2, c3;
-} su3_mat_reg;
 
 // ---------------------------------------------------------------------------
 // res = u[i] * v[i]  (register output, SoA inputs)
 // ---------------------------------------------------------------------------
 __device__ static inline void fsu3matxsu3mat_reg(
-    su3_mat_reg *__restrict__ res,
+    su3_mat_dble *__restrict__ res,
     const su3_mat_field *__restrict__ u,
     const su3_mat_field *__restrict__ v,
     size_t i)
@@ -103,7 +91,7 @@ __device__ static inline void fsu3matxsu3mat_reg(
 // res = u†[i] * v†[i]  (register output, SoA inputs)
 // ---------------------------------------------------------------------------
 __device__ static inline void fsu3matdagxsu3matdag_reg(
-    su3_mat_reg *__restrict__ res,
+    su3_mat_dble *__restrict__ res,
     const su3_mat_field *__restrict__ u,
     const su3_mat_field *__restrict__ v,
     size_t i)
@@ -173,7 +161,7 @@ __device__ static inline void fsu3matdagxsu3matdag_reg(
 // Re Tr(u * v)  (both inputs in registers, scalar output)
 // ---------------------------------------------------------------------------
 __device__ static inline double fsu3matxsu3mat_retrace_reg(
-    const su3_mat_reg *u, const su3_mat_reg *v)
+    const su3_mat_dble *u, const su3_mat_dble *v)
 {
     double tr_1 = u->c1.c1re * v->c1.c1re - u->c1.c1im * v->c1.c1im
                 + u->c1.c2re * v->c2.c1re - u->c1.c2im * v->c2.c1im

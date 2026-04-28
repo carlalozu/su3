@@ -42,6 +42,10 @@ typedef struct
 
 } su3_mat_field;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void doublev_init(doublev *x, size_t volume);
 void complexv_init(complexv *x, size_t volume);
 void complexv_free(complexv *x);
@@ -61,5 +65,9 @@ void su3_mat_field_map_pointers(su3_mat_field *m);
 void random_su3mat_field(su3_mat_field *su3_mat);
 void random_su3vec_field(su3_vec_field *su3_vec);
 void unit_su3mat_field(su3_mat_field *su3_mat);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SU3V_H

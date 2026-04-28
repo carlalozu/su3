@@ -20,9 +20,9 @@ int main(int argc, char *argv[])
     printf("Testing ufields structures\n");
     printf("Volume: %d\n", VOLUME);
 
-    su3_mat u_field[VOLUME];
-    su3_mat v_field[VOLUME];
-    su3_mat w_field[VOLUME];
+    su3_mat_c u_field[VOLUME];
+    su3_mat_c v_field[VOLUME];
+    su3_mat_c w_field[VOLUME];
 
     for (size_t i = 0; i < VOLUME; i++)
     {

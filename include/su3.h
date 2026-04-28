@@ -24,32 +24,43 @@ typedef struct
 typedef struct
 {
     complex c1, c2, c3;
-} su3_vec;
+} su3_vec_c;
+
+typedef struct
+{
+    double c1re, c1im;
+    double c2re, c2im;
+    double c3re, c3im;
+} su3_vec_dble;
+
+typedef struct {
+    su3_vec_dble c1, c2, c3;
+} su3_mat_dble;
 
 typedef struct
 {
     complex c11, c12, c13, c21, c22, c23, c31, c32, c33;
-} su3_mat;
+} su3_mat_c;
 
 // SU3 initialization
 #pragma omp declare target
-void unit_su3mat(su3_mat *su3_mat);
-void random_su3mat(su3_mat *su3_mat, uint64_t *state);
-void unit_su3vec(su3_vec *su3_vec);
+void unit_su3mat(su3_mat_c *su3_mat);
+void random_su3mat(su3_mat_c *su3_mat, uint64_t *state);
+void unit_su3vec(su3_vec_c *su3_vec);
 #pragma omp end declare target
 
 // Algebra
 complex add(const complex a, const complex b);
-void vec_add(su3_vec *res, const su3_vec *u, const su3_vec *v);
+void vec_add(su3_vec_c *res, const su3_vec_c *u, const su3_vec_c *v);
 
 #pragma omp declare target
-complex su3mat_trace(const su3_mat *u);
-double su3matxsu3mat_retrace(const su3_mat *u, const su3_mat *v);
-void su3matxsu3vec(su3_vec *res, const su3_mat *u, const su3_vec *v);
-void su3matdagxsu3vec(su3_vec*, const su3_mat*, const su3_vec*);
-void su3matxsu3vec(su3_vec *res, const su3_mat *u, const su3_vec *v);
-void su3matxsu3mat(su3_mat *res, const su3_mat *u, const su3_mat *v);
-void su3matdagxsu3matdag(su3_mat *res, const su3_mat *u, const su3_mat *v);
+complex su3mat_trace(const su3_mat_c *u);
+double su3matxsu3mat_retrace(const su3_mat_c *u, const su3_mat_c *v);
+void su3matxsu3vec(su3_vec_c *res, const su3_mat_c *u, const su3_vec_c *v);
+void su3matdagxsu3vec(su3_vec_c*, const su3_mat_c*, const su3_vec_c*);
+void su3matxsu3vec(su3_vec_c *res, const su3_mat_c *u, const su3_vec_c *v);
+void su3matxsu3mat(su3_mat_c *res, const su3_mat_c *u, const su3_mat_c *v);
+void su3matdagxsu3matdag(su3_mat_c *res, const su3_mat_c *u, const su3_mat_c *v);
 #pragma omp end declare target
 
 #endif // SU3_H

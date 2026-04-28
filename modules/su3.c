@@ -26,28 +26,28 @@ double local_rand(uint64_t *state) {
 }
 #pragma omp end declare target
 
-void unit_su3mat(su3_mat *su3)
+void unit_su3mat(su3_mat_c *su3)
 {
-    _Static_assert(sizeof(su3_mat) == 18 * sizeof(double),
+    _Static_assert(sizeof(su3_mat_c) == 18 * sizeof(double),
                    "su3 layout assumption broken");
     double *d = (double *)su3;
     for (int i = 0; i < 18; i++)
         d[i] = 1.0;
 }
 
-void random_su3mat(su3_mat *su3, uint64_t *state)
+void random_su3mat(su3_mat_c *su3, uint64_t *state)
 {
-    _Static_assert(sizeof(su3_mat) == 18 * sizeof(double),
+    _Static_assert(sizeof(su3_mat_c) == 18 * sizeof(double),
                    "su3 layout assumption broken");
     double *d = (double *)su3;
     for (int i = 0; i < 18; i++)
         d[i] = local_rand(state);
 }
 
-void unit_su3vec(su3_vec *vec)
+void unit_su3vec(su3_vec_c *vec)
 {
-    _Static_assert(sizeof(su3_vec) == 6 * sizeof(double),
-                   "su3_vec layout assumption broken");
+    _Static_assert(sizeof(su3_vec_c) == 6 * sizeof(double),
+                   "su3_vec_c layout assumption broken");
     double *d = (double *)vec;
     for (int i = 0; i < 6; i++)
         d[i] = 1.0;
@@ -65,7 +65,7 @@ complex add(const complex a, const complex b)
  * r.c2=s1.c2+s2.c2
  * r.c3=s1.c3+s2.c3
  */
-void vec_add(su3_vec *res, const su3_vec *s1, const su3_vec *s2)
+void vec_add(su3_vec_c *res, const su3_vec_c *s1, const su3_vec_c *s2)
 {
     res->c1.re = s1->c1.re + s2->c1.re;
     res->c1.im = s1->c1.im + s2->c1.im;
@@ -82,7 +82,7 @@ void vec_add(su3_vec *res, const su3_vec *s1, const su3_vec *s2)
  * r.c2=(u*s).c2
  * r.c3=(u*s).c3
  */
-void su3matxsu3vec(su3_vec *res, const su3_mat *u, const su3_vec *s)
+void su3matxsu3vec(su3_vec_c *res, const su3_mat_c *u, const su3_vec_c *s)
 {
     res->c1.re = u->c11.re * s->c1.re - u->c11.im * s->c1.im +
                  u->c12.re * s->c2.re - u->c12.im * s->c2.im +
@@ -111,7 +111,7 @@ void su3matxsu3vec(su3_vec *res, const su3_mat *u, const su3_vec *s)
  * r.c2=(u^dagger*s).c2
  * r.c3=(u^dagger*s).c3
  */
-void su3matdagxsu3vec(su3_vec *r, const su3_mat *u, const su3_vec *s)
+void su3matdagxsu3vec(su3_vec_c *r, const su3_mat_c *u, const su3_vec_c *s)
 {
     (*r).c1.re = (*u).c11.re * (*s).c1.re + (*u).c11.im * (*s).c1.im +
                  (*u).c21.re * (*s).c2.re + (*u).c21.im * (*s).c2.im +
@@ -138,7 +138,7 @@ void su3matdagxsu3vec(su3_vec *r, const su3_mat *u, const su3_vec *s)
  *
  * res = u * v
  */
-void su3matxsu3mat(su3_mat *res, const su3_mat *u, const su3_mat *v)
+void su3matxsu3mat(su3_mat_c *res, const su3_mat_c *u, const su3_mat_c *v)
 {
     // --- Column 1 ---
     res->c11.re = u->c11.re * v->c11.re - u->c11.im * v->c11.im +
@@ -210,7 +210,7 @@ void su3matxsu3mat(su3_mat *res, const su3_mat *u, const su3_mat *v)
 /*
  * Computes w=u^dag*v^dag assuming that w is different from u and v.
  */
-void su3matdagxsu3matdag(su3_mat *w, const su3_mat *u, const su3_mat *v)
+void su3matdagxsu3matdag(su3_mat_c *w, const su3_mat_c *u, const su3_mat_c *v)
 {
     w->c11.re = u->c11.re * v->c11.re + u->c11.im * -v->c11.im +
                 u->c21.re * v->c12.re + u->c21.im * -v->c12.im +
@@ -274,7 +274,7 @@ void su3matdagxsu3matdag(su3_mat *w, const su3_mat *u, const su3_mat *v)
  *
  * tr = trace(u)
  */
-complex su3mat_trace(const su3_mat *u)
+complex su3mat_trace(const su3_mat_c *u)
 {
     complex tr;
     tr.re = u->c11.re + u->c22.re + u->c33.re;
@@ -286,7 +286,7 @@ complex su3mat_trace(const su3_mat *u)
  *
  * tr = retrace(uv)
  */
-double su3matxsu3mat_retrace(const su3_mat *u, const su3_mat *v)
+double su3matxsu3mat_retrace(const su3_mat_c *u, const su3_mat_c *v)
 {
     double tr_1 = 0.0;
     double tr_2 = 0.0;
