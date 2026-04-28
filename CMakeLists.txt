@@ -82,6 +82,10 @@ if(ENABLE_KOKKOS)
     option(Kokkos_ENABLE_CUDA   "Kokkos CUDA backend"   OFF)
     option(Kokkos_ENABLE_OPENMP "Kokkos OpenMP backend" OFF)
 
+    if(Kokkos_ENABLE_CUDA)
+        enable_language(CUDA)
+    endif()
+
     include(FetchContent)
     FetchContent_Declare(
         Kokkos
@@ -95,6 +99,11 @@ if(ENABLE_KOKKOS)
     )
     target_include_directories(su3kokkoskernel PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
     target_link_libraries(su3kokkoskernel PUBLIC su3lib Kokkos::kokkos)
+
+    if(Kokkos_ENABLE_CUDA)
+        set_source_files_properties(modules/su3v_kokkos.cpp PROPERTIES LANGUAGE CUDA)
+        set_target_properties(su3kokkoskernel PROPERTIES CUDA_ARCHITECTURES "90")
+    endif()
 
     message(STATUS "Kokkos kernel enabled")
 else()
