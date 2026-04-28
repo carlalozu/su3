@@ -31,7 +31,7 @@ void doublev_cuda_free(doublev *d);
 void doublev_cuda_download(doublev *h, const doublev *d);
 
 // Fused kernel launcher
-void launch_fsu3_combined(
+void launch_plaq_dble(
     doublev *d_res,
     const su3_mat_field *d_u, const su3_mat_field *d_v,
     const su3_mat_field *d_w, const su3_mat_field *d_x,

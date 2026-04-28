@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
     // Warm-up
     // -----------------------------------------------------------------------
     for (int r = 0; r < 3; r++) {
-        launch_fsu3_combined(&d_res, &d_u, &d_v, &d_w, &d_x, VOLUME, THREADS);
+        launch_plaq_dble(&d_res, &d_u, &d_v, &d_w, &d_x, VOLUME, THREADS);
     }
     CUDA_CHECK(cudaDeviceSynchronize());
 
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
         CUDA_CHECK(cudaDeviceSynchronize());
 
         CUDA_CHECK(cudaEventRecord(ev_start));
-        launch_fsu3_combined(&d_res, &d_u, &d_v, &d_w, &d_x, VOLUME, THREADS);
+        launch_plaq_dble(&d_res, &d_u, &d_v, &d_w, &d_x, VOLUME, THREADS);
         CUDA_CHECK(cudaEventRecord(ev_stop));
         CUDA_CHECK(cudaEventSynchronize(ev_stop));
 

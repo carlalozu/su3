@@ -18,10 +18,10 @@ void launch_flush_cache(double *d_buf, size_t n)
 }
 
 // ---------------------------------------------------------------------------
-// Fused kernel: temp = u*v, res = w†*x†, output = Re Tr(temp * res)
+// Plaquette action: temp = u*v, res = w†*x†, output = Re Tr(temp * res)
 // All intermediate matrices stay in registers.
 // ---------------------------------------------------------------------------
-__global__ void fsu3_combined_kernel(
+__global__ void plaq_dble(
     double         *__restrict__ res_base,
     su3_mat_field  u,
     su3_mat_field  v,
@@ -118,7 +118,7 @@ void doublev_cuda_download(doublev *h, const doublev *d)
 // ---------------------------------------------------------------------------
 // Kernel launcher
 // ---------------------------------------------------------------------------
-void launch_fsu3_combined(
+void launch_plaq_dble(
     doublev              *d_res,
     const su3_mat_field  *d_u,
     const su3_mat_field  *d_v,
@@ -128,7 +128,7 @@ void launch_fsu3_combined(
     int                   threads_per_block)
 {
     int blocks = (int)((volume + threads_per_block - 1) / threads_per_block);
-    fsu3_combined_kernel<<<blocks, threads_per_block>>>(
+    plaq_dble<<<blocks, threads_per_block>>>(
         d_res->base,
         *d_u, *d_v, *d_w, *d_x,
         volume);
