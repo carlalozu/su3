@@ -73,9 +73,9 @@ if(ENABLE_CUDA)
         CUDA_SEPARABLE_COMPILATION ON
     )
 
-    message(STATUS "CUDA kernel enabled (SM_90)")
+    message(STATUS "CUDA native kernel enabled (SM_90)")
 else()
-    message(STATUS "CUDA kernel NOT enabled")
+    message(STATUS "CUDA native kernel NOT enabled")
 endif()
 
 

@@ -21,22 +21,19 @@ int main(int argc, char *argv[])
     // -----------------------------------------------------------------------
     // Host fields
     // -----------------------------------------------------------------------
-    su3_mat_field *h_u = (su3_mat_field *)malloc(sizeof(su3_mat_field));
-    su3_mat_field *h_v = (su3_mat_field *)malloc(sizeof(su3_mat_field));
-    su3_mat_field *h_w = (su3_mat_field *)malloc(sizeof(su3_mat_field));
-    su3_mat_field *h_x = (su3_mat_field *)malloc(sizeof(su3_mat_field));
-    doublev       *h_res = (doublev *)malloc(sizeof(doublev));
+    su3_mat_field h_u, h_v, h_w, h_x;
+    doublev       h_res;
 
-    su3_mat_field_init(h_u, VOLUME);
-    su3_mat_field_init(h_v, VOLUME);
-    su3_mat_field_init(h_w, VOLUME);
-    su3_mat_field_init(h_x, VOLUME);
-    doublev_init(h_res, VOLUME);
+    su3_mat_field_init(&h_u, VOLUME);
+    su3_mat_field_init(&h_v, VOLUME);
+    su3_mat_field_init(&h_w, VOLUME);
+    su3_mat_field_init(&h_x, VOLUME);
+    doublev_init(&h_res, VOLUME);
 
-    random_su3mat_field(h_u);
-    random_su3mat_field(h_v);
-    random_su3mat_field(h_w);
-    random_su3mat_field(h_x);
+    random_su3mat_field(&h_u);
+    random_su3mat_field(&h_v);
+    random_su3mat_field(&h_w);
+    random_su3mat_field(&h_x);
 
     // -----------------------------------------------------------------------
     // Device fields
@@ -50,10 +47,10 @@ int main(int argc, char *argv[])
     su3_mat_field_cuda_alloc(&d_x, VOLUME);
     doublev_cuda_alloc(&d_res, VOLUME);
 
-    su3_mat_field_cuda_upload(&d_u, h_u);
-    su3_mat_field_cuda_upload(&d_v, h_v);
-    su3_mat_field_cuda_upload(&d_w, h_w);
-    su3_mat_field_cuda_upload(&d_x, h_x);
+    su3_mat_field_cuda_upload(&d_u, &h_u);
+    su3_mat_field_cuda_upload(&d_v, &h_v);
+    su3_mat_field_cuda_upload(&d_w, &h_w);
+    su3_mat_field_cuda_upload(&d_x, &h_x);
 
     // Flush buffer
     double *d_flush = nullptr;
@@ -111,9 +108,9 @@ int main(int argc, char *argv[])
     // -----------------------------------------------------------------------
     // Verify one element
     // -----------------------------------------------------------------------
-    doublev_cuda_download(h_res, &d_res);
+    doublev_cuda_download(&h_res, &d_res);
     if (idx >= 0 && (size_t)idx < (size_t)VOLUME)
-        printf("  res[%d] = %.10f\n", idx, h_res->base[idx]);
+        printf("  res[%d] = %.10f\n", idx, h_res.base[idx]);
 
     // -----------------------------------------------------------------------
     // Cleanup
@@ -128,12 +125,11 @@ int main(int argc, char *argv[])
     su3_mat_field_cuda_free(&d_x);
     doublev_cuda_free(&d_res);
 
-    su3_mat_field_free(h_u);
-    su3_mat_field_free(h_v);
-    su3_mat_field_free(h_w);
-    su3_mat_field_free(h_x);
-    free(h_res->base);
-    free(h_u); free(h_v); free(h_w); free(h_x); free(h_res);
+    su3_mat_field_free(&h_u);
+    su3_mat_field_free(&h_v);
+    su3_mat_field_free(&h_w);
+    su3_mat_field_free(&h_x);
+    free(h_res.base);
 
     return 0;
 }
