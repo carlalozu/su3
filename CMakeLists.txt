@@ -42,9 +42,9 @@ if(ENABLE_GPU_OFFLOAD)
     target_compile_options(su3openmp PUBLIC ${OMP_OFFLOAD_FLAGS})
     target_link_options(su3openmp PUBLIC ${OMP_OFFLOAD_FLAGS} -lmpi_gtl_cuda)
 
-    message(STATUS "GPU Offloading Enabled")
+    message(STATUS "GPU OpenMP Offloading Enabled (SM_90)")
 else()
-    message(STATUS "GPU Offloading NOT Enabled")
+    message(STATUS "GPU OpenMP Offloading NOT Enabled")
 endif()
 
 
@@ -54,7 +54,7 @@ if(ENABLE_AVX)
 else()
     if(NOT ENABLE_GPU_OFFLOAD)
         target_compile_options(su3lib PUBLIC -fno-tree-vectorize -fno-tree-slp-vectorize)
-        message(STATUS "CPU Vectorization disabled")
+        message(STATUS "CPU Vectorization NOT Enabled")
     endif()
 endif()
 
@@ -107,6 +107,9 @@ if(ENABLE_KOKKOS)
     if(Kokkos_ENABLE_CUDA)
         set_source_files_properties(modules/su3v_kokkos.cpp PROPERTIES LANGUAGE CUDA)
         set_target_properties(su3kokkoskernel PROPERTIES CUDA_ARCHITECTURES "90")
+        target_compile_options(su3kokkoskernel PRIVATE
+            $<$<COMPILE_LANGUAGE:CUDA>:--extended-lambda>
+        )
     endif()
 
     message(STATUS "Kokkos kernel enabled")
