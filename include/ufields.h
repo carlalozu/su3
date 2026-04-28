@@ -17,7 +17,11 @@
 
 // SoA operations
 #pragma omp declare target
-static inline void fsu3matxsu3vec(su3_vec_dble *restrict res, const su3_mat_field *restrict u, const su3_vec_field *restrict v, const size_t i)
+static inline void fsu3matxsu3vec(
+    su3_vec_dble *restrict res,
+    const su3_mat_field *restrict u,
+    const su3_vec_field *restrict v,
+    const size_t i)
 {
     res->c1re = u->c1.c1re[i] * v->c1re[i] - u->c1.c1im[i] * v->c1im[i] +
                 u->c1.c2re[i] * v->c2re[i] - u->c1.c2im[i] * v->c2im[i] +
@@ -73,18 +77,27 @@ void fsu3matdagxsu3vec(su3_vec_dble *r, const su3_mat_field *u, const su3_vec_fi
 
 
 #pragma omp declare target
-static inline double su3matdxsu3matd_retrace(
-    const su3_mat_dble *u, const su3_mat_dble *v)
+static inline double su3matdxsu3matd_retrace(const su3_mat_dble *u, const su3_mat_dble *v)
 {
-    double tr_1 = u->c1.c1re * v->c1.c1re - u->c1.c1im * v->c1.c1im + u->c1.c2re * v->c2.c1re - u->c1.c2im * v->c2.c1im + u->c1.c3re * v->c3.c1re - u->c1.c3im * v->c3.c1im;
-    double tr_2 = u->c2.c1re * v->c1.c2re - u->c2.c1im * v->c1.c2im + u->c2.c2re * v->c2.c2re - u->c2.c2im * v->c2.c2im + u->c2.c3re * v->c3.c2re - u->c2.c3im * v->c3.c2im;
-    double tr_3 = u->c3.c1re * v->c1.c3re - u->c3.c1im * v->c1.c3im + u->c3.c2re * v->c2.c3re - u->c3.c2im * v->c2.c3im + u->c3.c3re * v->c3.c3re - u->c3.c3im * v->c3.c3im;
+    double tr_1 = u->c1.c1re * v->c1.c1re - u->c1.c1im * v->c1.c1im 
+                + u->c1.c2re * v->c2.c1re - u->c1.c2im * v->c2.c1im 
+                + u->c1.c3re * v->c3.c1re - u->c1.c3im * v->c3.c1im;
+    double tr_2 = u->c2.c1re * v->c1.c2re - u->c2.c1im * v->c1.c2im 
+                + u->c2.c2re * v->c2.c2re - u->c2.c2im * v->c2.c2im 
+                + u->c2.c3re * v->c3.c2re - u->c2.c3im * v->c3.c2im;
+    double tr_3 = u->c3.c1re * v->c1.c3re - u->c3.c1im * v->c1.c3im 
+                + u->c3.c2re * v->c2.c3re - u->c3.c2im * v->c2.c3im 
+                + u->c3.c3re * v->c3.c3re - u->c3.c3im * v->c3.c3im;
     return tr_1 + tr_2 + tr_3;
 }
 #pragma omp end declare target
 
 #pragma omp declare target
-static inline void fsu3matxsu3mat(su3_mat_dble *restrict res, const su3_mat_field *restrict u, const su3_mat_field *restrict v, const size_t i)
+static inline void fsu3matxsu3mat(
+    su3_mat_dble *restrict res,
+    const su3_mat_field *restrict u,
+    const su3_mat_field *restrict v,
+    const size_t i)
 {
     // if (res == u || res == v || u == v)
     // {
@@ -155,7 +168,11 @@ static inline void fsu3matxsu3mat(su3_mat_dble *restrict res, const su3_mat_fiel
  * Computes w=u^dag*v^dag assuming that w is different from u and v.
  */
 #pragma omp declare target
-static inline void fsu3matdagxsu3matdag(su3_mat_dble *restrict w, const su3_mat_field *restrict u, const su3_mat_field *restrict v, const size_t i)
+static inline void fsu3matdagxsu3matdag(
+    su3_mat_dble *restrict w,
+    const su3_mat_field *restrict u,
+    const su3_mat_field *restrict v,
+    const size_t i)
 {
     w->c1.c1re = u->c1.c1re[i] * v->c1.c1re[i] + u->c1.c1im[i] * -v->c1.c1im[i] +
                  u->c2.c1re[i] * v->c1.c2re[i] + u->c2.c1im[i] * -v->c1.c2im[i] +
