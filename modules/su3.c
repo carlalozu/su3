@@ -307,20 +307,4 @@ double su3matxsu3mat_retrace(const su3_mat_c *u, const su3_mat_c *v)
     return tr_1 + tr_2 + tr_3;
 }
 
-
-LQCD_DEVICE double su3matdxsu3matd_retrace(const su3_mat_dble *u, const su3_mat_dble *v)
-{
-    double tr_1 = u->c1.c1re * v->c1.c1re - u->c1.c1im * v->c1.c1im 
-                + u->c1.c2re * v->c2.c1re - u->c1.c2im * v->c2.c1im 
-                + u->c1.c3re * v->c3.c1re - u->c1.c3im * v->c3.c1im;
-    double tr_2 = u->c2.c1re * v->c1.c2re - u->c2.c1im * v->c1.c2im 
-                + u->c2.c2re * v->c2.c2re - u->c2.c2im * v->c2.c2im 
-                + u->c2.c3re * v->c3.c2re - u->c2.c3im * v->c3.c2im;
-    double tr_3 = u->c3.c1re * v->c1.c3re - u->c3.c1im * v->c1.c3im 
-                + u->c3.c2re * v->c2.c3re - u->c3.c2im * v->c2.c3im 
-                + u->c3.c3re * v->c3.c3re - u->c3.c3im * v->c3.c3im;
-    return tr_1 + tr_2 + tr_3;
-}
-
-
 #endif // SU3PROD_C
