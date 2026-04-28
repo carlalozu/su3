@@ -33,10 +33,10 @@ __global__ void fsu3_combined_kernel(
     if (i >= volume)
         return;
 
-    su3_mat_reg temp, res;
-    fsu3matxsu3mat_reg      (&temp, &u, &v, i);
-    fsu3matdagxsu3matdag_reg(&res,  &w, &x, i);
-    res_base[i] = fsu3matxsu3mat_retrace_reg(&temp, &res);
+    su3_mat_dble temp, res;
+    fsu3matxsu3mat      (&temp, &u, &v, i);
+    fsu3matdagxsu3matdag(&res,  &w, &x, i);
+    res_base[i] = su3matdxsu3matd_retrace(&temp, &res);
 }
 
 // ---------------------------------------------------------------------------
