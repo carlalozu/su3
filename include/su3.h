@@ -16,6 +16,12 @@
 #include <string.h>
 #include <stdint.h>
 
+#ifdef __CUDACC__
+  #define LQCD_DEVICE    __device__
+#else
+  #define LQCD_DEVICE
+#endif
+
 typedef struct
 {
     double re, im;
@@ -56,6 +62,7 @@ void vec_add(su3_vec_c *res, const su3_vec_c *u, const su3_vec_c *v);
 #pragma omp declare target
 complex su3mat_trace(const su3_mat_c *u);
 double su3matxsu3mat_retrace(const su3_mat_c *u, const su3_mat_c *v);
+LQCD_DEVICE double su3matdxsu3matd_retrace(const su3_mat_dble *u, const su3_mat_dble *v);
 void su3matxsu3vec(su3_vec_c *res, const su3_mat_c *u, const su3_vec_c *v);
 void su3matdagxsu3vec(su3_vec_c*, const su3_mat_c*, const su3_vec_c*);
 void su3matxsu3vec(su3_vec_c *res, const su3_mat_c *u, const su3_vec_c *v);
