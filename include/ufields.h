@@ -21,6 +21,10 @@
   #define LQCD_DEVICE    __device__
   #define LQCD_OMP_BEGIN
   #define LQCD_OMP_END
+#elif defined(KOKKOS_CORE_HPP)
+  #define LQCD_DEVICE    KOKKOS_INLINE_FUNCTION
+  #define LQCD_OMP_BEGIN
+  #define LQCD_OMP_END
 #else
   #define LQCD_DEVICE
   #define LQCD_OMP_BEGIN _Pragma("omp declare target")

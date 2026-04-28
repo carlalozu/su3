@@ -74,4 +74,32 @@ else()
     message(STATUS "CUDA kernel NOT enabled")
 endif()
 
+
+option(ENABLE_KOKKOS "Enable Kokkos kernel" OFF)
+if(ENABLE_KOKKOS)
+    enable_language(CXX)
+
+    option(Kokkos_ENABLE_CUDA   "Kokkos CUDA backend"   OFF)
+    option(Kokkos_ENABLE_OPENMP "Kokkos OpenMP backend" OFF)
+
+    include(FetchContent)
+    FetchContent_Declare(
+        Kokkos
+        GIT_REPOSITORY https://github.com/kokkos/kokkos.git
+        GIT_TAG        4.5.01
+    )
+    FetchContent_MakeAvailable(Kokkos)
+
+    add_library(su3kokkoskernel STATIC
+        modules/su3v_kokkos.cpp
+    )
+    target_include_directories(su3kokkoskernel PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_link_libraries(su3kokkoskernel PUBLIC su3lib Kokkos::kokkos)
+
+    message(STATUS "Kokkos kernel enabled")
+else()
+    message(STATUS "Kokkos kernel NOT enabled")
+endif()
+
+
 add_subdirectory(main)

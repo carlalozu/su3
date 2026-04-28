@@ -18,3 +18,8 @@ if(ENABLE_CUDA)
     target_link_libraries(soa_gpu_cuda PRIVATE su3cudakernel)
     set_target_properties(soa_gpu_cuda PROPERTIES CUDA_ARCHITECTURES "90")
 endif()
+
+if(ENABLE_KOKKOS)
+    add_executable(soa_gpu_kokkos soa_gpu_kokkos.cpp)
+    target_link_libraries(soa_gpu_kokkos PRIVATE su3kokkoskernel)
+endif()
