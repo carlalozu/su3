@@ -5,6 +5,7 @@
 #include "ufields.h"
 #include <time.h>
 #include "profiler.h"
+#include "su3v_openmp.h"
 
 void flush_cache(size_t flush_size, double* flush_buf)
 {

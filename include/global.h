@@ -13,10 +13,10 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#define L0 32
-#define L1 32
-#define L2 32
-#define L3 32
+#define L0 10368
+#define L1 4
+#define L2 4
+#define L3 4
 
 #define VOLUME (L0*L1*L2*L3)
 #define ALIGN 64
