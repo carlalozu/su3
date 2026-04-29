@@ -42,7 +42,12 @@ if(ENABLE_KOKKOS)
         set_target_properties(aos_gpu_kokkos PROPERTIES CUDA_ARCHITECTURES "90")
 
         target_compile_options(su3kokkoskernel PRIVATE
-            $<$<COMPILE_LANGUAGE:CUDA>:--extended-lambda>
-        )
+            $<$<COMPILE_LANGUAGE:CUDA>:--extended-lambda>)
+
+        target_compile_options(soa_gpu_kokkos PRIVATE
+            $<$<COMPILE_LANGUAGE:CUDA>:--extended-lambda>)
+
+        target_compile_options(aos_gpu_kokkos PRIVATE
+            $<$<COMPILE_LANGUAGE:CUDA>:--extended-lambda>)
     endif()
 endif()

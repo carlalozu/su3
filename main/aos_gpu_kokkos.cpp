@@ -4,6 +4,7 @@
 #include <Kokkos_Timer.hpp>
 #include "global.h"
 #include "su3prod.h"
+#include "ufields.h"
 #include "su3v_kokkos.hpp"
 
 static const size_t FLUSH_NELEMS = 15728640UL;
@@ -115,7 +116,7 @@ int main(int argc, char *argv[])
         // -------------------------------------------------------------------
         // Verify one element
         // -------------------------------------------------------------------
-        doublev tmp_dv = { h_res, (size_t)VOLUME };
+        doublev tmp_dv = { (size_t)VOLUME, h_res};
         doublev_kokkos_download(&tmp_dv, &d_res);
         if (idx >= 0 && (size_t)idx < (size_t)VOLUME)
             printf("  res[%d] = %.10f\n", idx, h_res[idx]);

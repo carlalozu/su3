@@ -4,6 +4,8 @@
 #include <Kokkos_Timer.hpp>
 #include "global.h"
 #include "su3v.h"
+#include "su3prod.h"
+#include "ufields.h"
 #include "su3v_kokkos.hpp"
 
 // Flush L2 cache: ~120 MB, large enough for all current NVIDIA GPUs.

@@ -2,6 +2,7 @@
 #define SU3V_KOKKOS_HPP
 
 #include <Kokkos_Core.hpp>
+#include "su3.h"
 #include "su3v.h"
 
 struct KokkosSu3MatField {
@@ -33,7 +34,7 @@ void su3_aos_kokkos_free(KokkosSu3Mat *km);
 void su3_aos_kokkos_upload(KokkosSu3Mat *d, const su3_mat_c *h);
 void su3_aos_kokkos_download(su3_mat_c *h, const KokkosSu3Mat *d);
 
-void launch_flush_kokkos(KokkosDoublev *buf)
+static void launch_flush_kokkos(KokkosDoublev *buf)
 {
     double *ptr = buf->data.data();
     size_t  n   = buf->dv.volume;
