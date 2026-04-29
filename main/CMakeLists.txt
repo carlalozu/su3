@@ -23,6 +23,10 @@ if(ENABLE_CUDA)
     add_executable(soa_gpu_cuda soa_gpu_cuda.cu)
     target_link_libraries(soa_gpu_cuda PRIVATE su3cudakernel)
     set_target_properties(soa_gpu_cuda PROPERTIES CUDA_ARCHITECTURES "90")
+
+    add_executable(aos_gpu_cuda aos_gpu_cuda.cu)
+    target_link_libraries(aos_gpu_cuda PRIVATE su3cudakernel)
+    set_target_properties(aos_gpu_cuda PROPERTIES CUDA_ARCHITECTURES "90")
 endif()
 
 if(ENABLE_KOKKOS)

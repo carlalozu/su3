@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "su3.h"
+#include "su3prod.h"
 #include "su3v.h"
 #include "ufields.h"
 
@@ -37,6 +37,12 @@ void launch_plaq_dble(
     const su3_mat_field *d_w, const su3_mat_field *d_x,
     size_t volume, int threads_per_block);
 
+void launch_plaq_aos(
+    double           *d_res,
+    const su3_mat_c  *d_u, const su3_mat_c *d_v,
+    const su3_mat_c  *d_w, const su3_mat_c *d_x,
+    size_t volume, int threads_per_block);
+    
 void launch_flush_cache(double *d_buf, size_t n);
 
 #endif // SU3V_CUDA_CUH

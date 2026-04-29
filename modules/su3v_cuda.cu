@@ -10,13 +10,6 @@ __global__ void flush_cache_kernel(double *buf, size_t n)
         buf[i] += 1.0;
 }
 
-void launch_flush_cache(double *d_buf, size_t n)
-{
-    int threads = 256;
-    int blocks  = (int)((n + threads - 1) / threads);
-    flush_cache_kernel<<<blocks, threads>>>(d_buf, n);
-}
-
 // ---------------------------------------------------------------------------
 // Plaquette action: temp = u*v, res = w†*x†, output = Re Tr(temp * res)
 // All intermediate matrices stay in registers.
@@ -37,6 +30,29 @@ __global__ void plaq_dble(
     fsu3matxsu3mat      (&temp, &u, &v, i);
     fsu3matdagxsu3matdag(&res,  &w, &x, i);
     res_base[i] = su3matdxsu3matd_retrace(&temp, &res);
+}
+
+// ---------------------------------------------------------------------------
+// AoS plaquette kernel: temp = u*v, res = w†*x†, output = Re Tr(temp * res)
+// su3matxsu3mat, su3matdagxsu3matdag, su3matxsu3mat_retrace are __device__
+// static inline via DEVICE_KEYWORD in su3prod.h.
+// ---------------------------------------------------------------------------
+__global__ void plaq_aos(
+    double          *__restrict__ d_res,
+    const su3_mat_c *__restrict__ d_u,
+    const su3_mat_c *__restrict__ d_v,
+    const su3_mat_c *__restrict__ d_w,
+    const su3_mat_c *__restrict__ d_x,
+    size_t volume)
+{
+    size_t i = (size_t)blockIdx.x * blockDim.x + threadIdx.x;
+    if (i >= volume)
+        return;
+
+    su3_mat_c temp, res;
+    su3matxsu3mat      (&temp, &d_u[i], &d_v[i]);
+    su3matdagxsu3matdag(&res,  &d_w[i], &d_x[i]);
+    d_res[i] = su3matxsu3mat_retrace(&temp, &res);
 }
 
 // ---------------------------------------------------------------------------
@@ -116,7 +132,7 @@ void doublev_cuda_download(doublev *h, const doublev *d)
 }
 
 // ---------------------------------------------------------------------------
-// Kernel launcher
+// Kernel launchers
 // ---------------------------------------------------------------------------
 void launch_plaq_dble(
     doublev              *d_res,
@@ -133,4 +149,22 @@ void launch_plaq_dble(
         *d_u, *d_v, *d_w, *d_x,
         volume);
     CUDA_CHECK(cudaGetLastError());
+}
+
+void launch_plaq_aos(
+    double           *d_res,
+    const su3_mat_c  *d_u, const su3_mat_c *d_v,
+    const su3_mat_c  *d_w, const su3_mat_c *d_x,
+    size_t volume, int threads_per_block)
+{
+    int blocks = (int)((volume + threads_per_block - 1) / threads_per_block);
+    plaq_aos<<<blocks, threads_per_block>>>(d_res, d_u, d_v, d_w, d_x, volume);
+    CUDA_CHECK(cudaGetLastError());
+}
+
+void launch_flush_cache(double *d_buf, size_t n)
+{
+    int threads = 256;
+    int blocks  = (int)((n + threads - 1) / threads);
+    flush_cache_kernel<<<blocks, threads>>>(d_buf, n);
 }
