@@ -8,6 +8,7 @@
 
 int main(int argc, char *argv[])
 {
+    int n_threads = 0;
 #ifdef _OPENMP
     // Make OpenMP behavior predictable for benchmarking:
     printf("OpenMP is enabled\n");
@@ -43,10 +44,10 @@ int main(int argc, char *argv[])
     prof_section comp_AoSoA = {.name = "AoSoA compute", .threads=n_threads};
 
     // AoS
-    su3_mat u_field[VOLUME];
-    su3_mat v_field[VOLUME];
-    su3_mat w_field[VOLUME];
-    su3_mat x_field[VOLUME];
+    su3_mat_c u_field[VOLUME];
+    su3_mat_c v_field[VOLUME];
+    su3_mat_c w_field[VOLUME];
+    su3_mat_c x_field[VOLUME];
     double res_aos[VOLUME];
 
     // SoA
@@ -87,8 +88,8 @@ int main(int argc, char *argv[])
     
     #pragma omp parallel
     {
-        su3_mat temp_field;
-        su3_mat res_field;
+        su3_mat_c temp_field;
+        su3_mat_c res_field;
     
         #pragma omp single
         prof_begin(&init_AoS);

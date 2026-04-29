@@ -5,6 +5,7 @@
 #include "ufields.h"
 #include <time.h>
 #include "profiler.h"
+#include "su3v_openmp.h"
 
 void flush_cache(size_t flush_size, double* flush_buf)
 {
@@ -30,11 +31,11 @@ int main(int argc, char *argv[])
     prof_section init_AoS = {.name = "AoS init", .threads = n_threads};
     prof_section comp_AoS = {.name = "AoS compute", .threads = n_threads};
 
-    // Pro-Tip: Consider aligned_alloc(64, VOLUME * sizeof(su3_mat)) for SIMD performance
-    su3_mat *u_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
-    su3_mat *v_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
-    su3_mat *w_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
-    su3_mat *x_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
+    // Pro-Tip: Consider aligned_alloc(64, VOLUME * sizeof(su3_mat_c)) for SIMD performance
+    su3_mat_c *u_field = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
+    su3_mat_c *v_field = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
+    su3_mat_c *w_field = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
+    su3_mat_c *x_field = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
     float *res_aos = (float *)malloc(VOLUME * sizeof(float));
 
     prof_begin(&init_AoS);
@@ -62,8 +63,8 @@ int main(int argc, char *argv[])
     for (size_t i = 0; i < VOLUME; i++)
     {
 
-        su3_mat temp_field;
-        su3_mat res_field; 
+        su3_mat_c temp_field;
+        su3_mat_c res_field; 
         su3matxsu3mat(&temp_field, &u_field[i], &v_field[i]);
         su3matdagxsu3matdag(&res_field, &w_field[i], &x_field[i]);
         res_aos[i] = su3matxsu3mat_retrace(&temp_field, &res_field);
@@ -77,8 +78,8 @@ int main(int argc, char *argv[])
         #pragma omp parallel for schedule(static)
         for (size_t i = 0; i < VOLUME; i++)
         {
-            su3_mat temp_field; 
-            su3_mat res_field;  
+            su3_mat_c temp_field; 
+            su3_mat_c res_field;  
             su3matxsu3mat(&temp_field, &u_field[i], &v_field[i]);
             su3matdagxsu3matdag(&res_field, &w_field[i], &x_field[i]);
             res_aos[i] += su3matxsu3mat_retrace(&temp_field, &res_field);

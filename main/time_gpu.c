@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "su3v.h"
+#include "su3v_openmp.h"
 #include "global.h"
 #include "ufields.h"
 #include <time.h>
@@ -59,10 +60,10 @@ int main(int argc, char *argv[])
     #pragma omp target enter data map(alloc : flush_buf[0:flush_size])
 
     // AoS
-    su3_mat *u_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
-    su3_mat *v_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
-    su3_mat *w_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
-    su3_mat *x_field = (su3_mat *)malloc(VOLUME * sizeof(su3_mat));
+    su3_mat_c *u_field = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
+    su3_mat_c *v_field = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
+    su3_mat_c *w_field = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
+    su3_mat_c *x_field = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
     double *res_aos = (double *)malloc(VOLUME * sizeof(double));
 
     #pragma omp target enter data map(to : v_field[0:VOLUME], u_field[0:VOLUME], w_field[0:VOLUME], x_field[0:VOLUME])
@@ -87,8 +88,8 @@ int main(int argc, char *argv[])
         #pragma omp target teams distribute parallel for
         for (size_t i = 0; i < VOLUME; i++)
         {
-            su3_mat temp_field;
-            su3_mat res_field;
+            su3_mat_c temp_field;
+            su3_mat_c res_field;
             su3matxsu3mat(&temp_field, &u_field[i], &v_field[i]);
             su3matdagxsu3matdag(&res_field, &w_field[i], &x_field[i]);
             res_aos[i] = su3matxsu3mat_retrace(&temp_field, &res_field);
@@ -103,16 +104,12 @@ int main(int argc, char *argv[])
     su3_mat_field *v_fieldv = (su3_mat_field*)malloc(sizeof(su3_mat_field));
     su3_mat_field *w_fieldv = (su3_mat_field*)malloc(sizeof(su3_mat_field));
     su3_mat_field *x_fieldv = (su3_mat_field*)malloc(sizeof(su3_mat_field));
-    su3_mat_field *temp_fieldv = (su3_mat_field*)malloc(sizeof(su3_mat_field));
-    su3_mat_field *res_fieldv = (su3_mat_field*)malloc(sizeof(su3_mat_field));
     doublev *res_soa  = (doublev*)malloc(sizeof(doublev));
 
     su3_mat_field_init(u_fieldv, VOLUME);
     su3_mat_field_init(v_fieldv, VOLUME);
     su3_mat_field_init(w_fieldv, VOLUME);
     su3_mat_field_init(x_fieldv, VOLUME);
-    su3_mat_field_init(temp_fieldv, VOLUME);
-    su3_mat_field_init(res_fieldv, VOLUME);
     doublev_init(res_soa, VOLUME);
 
     prof_begin(&init_SoA);
@@ -126,8 +123,6 @@ int main(int argc, char *argv[])
     enter_su3_mat_field(v_fieldv);    
     enter_su3_mat_field(w_fieldv);
     enter_su3_mat_field(x_fieldv);
-    enter_su3_mat_field(temp_fieldv);
-    enter_su3_mat_field(res_fieldv);
     enter_double_field(res_soa);
 
     for (int r = 0; r < reps; r++)
@@ -137,10 +132,11 @@ int main(int argc, char *argv[])
         #pragma omp target teams distribute parallel for
         for (size_t i=0; i<VOLUME; i++)
         {
-            // if (r==0 && i==0) is_gpu();
-            fsu3matxsu3mat(temp_fieldv, u_fieldv, v_fieldv, i);
-            fsu3matdagxsu3matdag(res_fieldv, w_fieldv, x_fieldv, i);
-            fsu3matxsu3mat_retrace(res_soa, temp_fieldv, res_fieldv, i);
+            su3_mat_dble temp_a;
+            su3_mat_dble temp_b;
+            fsu3matxsu3mat(&temp_a, u_fieldv, v_fieldv, i);
+            fsu3matdagxsu3matdag(&temp_b, w_fieldv, x_fieldv, i);
+            res_soa->base[i] = su3matdxsu3matd_retrace(&temp_a, &temp_b);
         }
         prof_end(&comp_SoA);
     }
@@ -164,11 +160,7 @@ int main(int argc, char *argv[])
     w_fieldva = malloc(n_blocks * sizeof(su3_mat_field));
     x_fieldva = malloc(n_blocks * sizeof(su3_mat_field));
     res_aosoa = malloc(n_blocks * sizeof(doublev));
-    temp_fieldva = malloc(sizeof(su3_mat_field));
-    res_fieldva = malloc(sizeof(su3_mat_field));
 
-    su3_mat_field_init(temp_fieldva, CACHELINE);
-    su3_mat_field_init(res_fieldva, CACHELINE);
     for (size_t i = 0; i < n_blocks; i++)
     {
         su3_mat_field_init(&u_fieldva[i], CACHELINE);
@@ -189,8 +181,6 @@ int main(int argc, char *argv[])
     }
     prof_end(&init_AoSoA);
 
-    enter_su3_mat_field(temp_fieldva);
-    enter_su3_mat_field(res_fieldva);
     enter_su3_mat_field_array(u_fieldva, n_blocks);
     enter_su3_mat_field_array(v_fieldva, n_blocks);
     enter_su3_mat_field_array(w_fieldva, n_blocks);
@@ -209,9 +199,12 @@ int main(int argc, char *argv[])
             // if (r==0 & b==0) is_gpu();
             for (size_t i=0; i<CACHELINE; i++)
             {
-                fsu3matxsu3mat(temp_fieldva, &u_fieldva[b], &v_fieldva[b], i);
-                fsu3matdagxsu3matdag(res_fieldva, &w_fieldva[b], &x_fieldva[b], i);
-                fsu3matxsu3mat_retrace(&res_aosoa[b], temp_fieldva, res_fieldva, i);
+                su3_mat_dble temp_a;
+                su3_mat_dble temp_b;
+
+                fsu3matxsu3mat(&temp_a, &u_fieldva[b], &v_fieldva[b], i);
+                fsu3matdagxsu3matdag(&temp_b, &w_fieldva[b], &x_fieldva[b], i);
+                res_aosoa[b].base[i] = su3matdxsu3matd_retrace(&temp_a, &temp_b);
             }
         }
         prof_end(&comp_AoSoA);
