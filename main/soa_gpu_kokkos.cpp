@@ -9,6 +9,30 @@
 // Flush L2 cache: ~120 MB, large enough for all current NVIDIA GPUs.
 static const size_t FLUSH_NELEMS = 15728640UL;
 
+void launch_plaq_dble_kokkos(
+    KokkosDoublev           *d_res,
+    const KokkosSu3MatField *d_u,
+    const KokkosSu3MatField *d_v,
+    const KokkosSu3MatField *d_w,
+    const KokkosSu3MatField *d_x,
+    size_t volume)
+{
+    // Capture field descriptors (raw device pointers) by value
+    su3_mat_field u = d_u->field;
+    su3_mat_field v = d_v->field;
+    su3_mat_field w = d_w->field;
+    su3_mat_field x = d_x->field;
+    double *res_base = d_res->data.data();
+
+    Kokkos::parallel_for("plaq_dble", volume, KOKKOS_LAMBDA(const size_t i) {
+        su3_mat_dble temp, res;
+        fsu3matxsu3mat      (&temp, &u, &v, i);
+        fsu3matdagxsu3matdag(&res,  &w, &x, i);
+        res_base[i] = su3matdxsu3matd_retrace(&temp, &res);
+    });
+    Kokkos::fence();
+}
+
 int main(int argc, char *argv[])
 {
     int reps = 100;

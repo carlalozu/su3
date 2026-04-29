@@ -23,14 +23,14 @@ void doublev_kokkos_alloc(KokkosDoublev *kd, size_t volume);
 void doublev_kokkos_free(KokkosDoublev *kd);
 void doublev_kokkos_download(doublev *h, const KokkosDoublev *d);
 
-void launch_plaq_dble_kokkos(
-    KokkosDoublev           *d_res,
-    const KokkosSu3MatField *d_u,
-    const KokkosSu3MatField *d_v,
-    const KokkosSu3MatField *d_w,
-    const KokkosSu3MatField *d_x,
-    size_t volume);
-
-void launch_flush_kokkos(KokkosDoublev *buf);
+void launch_flush_kokkos(KokkosDoublev *buf)
+{
+    double *ptr = buf->data.data();
+    size_t  n   = buf->dv.volume;
+    Kokkos::parallel_for("flush_cache", n, KOKKOS_LAMBDA(const size_t i) {
+        ptr[i] += 1.0;
+    });
+    Kokkos::fence();
+}
 
 #endif // SU3V_KOKKOS_HPP
