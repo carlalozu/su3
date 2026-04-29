@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <omp.h>
 #include "global.h"
+#include "su3prod.h"
 #include "su3v.h"
 #include "su3v_openmp.h"
 #include "ufields.h"

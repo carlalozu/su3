@@ -11,6 +11,7 @@ set(CMAKE_C_EXTENSIONS OFF)
 
 add_library(su3lib
     modules/su3.c
+    modules/su3prod.c
     modules/su3v.c
 )
 target_include_directories(su3lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
