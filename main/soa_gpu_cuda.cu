@@ -4,8 +4,28 @@
 #include "su3v.h"
 #include "su3v_cuda.cuh"
 
-// Flush L2 cache: ~120 MB, large enough for all current NVIDIA GPUs.
 static const size_t FLUSH_NELEMS = 15728640UL;
+
+__global__ static void flush_cache_kernel(double *buf, size_t n)
+{
+    size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i < n) buf[i] += 1.0;
+}
+
+__global__ static void plaq_dblev(
+    double *res,
+    const su3_mat_field d_u, const su3_mat_field d_v,
+    const su3_mat_field d_w, const su3_mat_field d_x,
+    size_t volume)
+{
+    size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i >= volume) return;
+
+    su3_mat_c u, v, w, x, tmp;
+    fsu3matxsu3mat(&tmp, &u, &v);
+    fsu3matdagxsu3matdag(&tmp, &tmp, &w);
+    res[i] = su3matdxsu3matd_retrace(&tmp, &x);
+}
 
 int main(int argc, char *argv[])
 {
@@ -62,8 +82,9 @@ int main(int argc, char *argv[])
     // -----------------------------------------------------------------------
     // Warm-up
     // -----------------------------------------------------------------------
+    int blocks = ((int)VOLUME + THREADS - 1) / THREADS;
     for (int r = 0; r < 3; r++) {
-        launch_plaq_dble(&d_res, &d_u, &d_v, &d_w, &d_x, VOLUME, THREADS);
+        plaq_dblev<<<blocks, THREADS>>>(d_res.base, d_u, d_v, d_w, d_x, VOLUME);
     }
     CUDA_CHECK(cudaDeviceSynchronize());
 
@@ -75,13 +96,14 @@ int main(int argc, char *argv[])
     CUDA_CHECK(cudaEventCreate(&ev_stop));
 
     double total_ms = 0.0;
+    int flush_blocks = ((int)FLUSH_NELEMS + THREADS - 1) / THREADS;
 
     for (int r = 0; r < reps; r++) {
-        launch_flush_cache(d_flush, FLUSH_NELEMS);
+        flush_cache_kernel<<<flush_blocks, THREADS>>>(d_flush, FLUSH_NELEMS);
         CUDA_CHECK(cudaDeviceSynchronize());
 
         CUDA_CHECK(cudaEventRecord(ev_start));
-        launch_plaq_dble(&d_res, &d_u, &d_v, &d_w, &d_x, VOLUME, THREADS);
+        plaq_dblev<<<blocks, THREADS>>>(d_res.base, d_u, d_v, d_w, d_x, VOLUME);
         CUDA_CHECK(cudaEventRecord(ev_stop));
         CUDA_CHECK(cudaEventSynchronize(ev_stop));
 

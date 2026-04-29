@@ -30,19 +30,5 @@ void doublev_cuda_alloc(doublev *d, size_t volume);
 void doublev_cuda_free(doublev *d);
 void doublev_cuda_download(doublev *h, const doublev *d);
 
-// Fused kernel launcher
-void launch_plaq_dble(
-    doublev *d_res,
-    const su3_mat_field *d_u, const su3_mat_field *d_v,
-    const su3_mat_field *d_w, const su3_mat_field *d_x,
-    size_t volume, int threads_per_block);
-
-void launch_plaq_aos(
-    double           *d_res,
-    const su3_mat_c  *d_u, const su3_mat_c *d_v,
-    const su3_mat_c  *d_w, const su3_mat_c *d_x,
-    size_t volume, int threads_per_block);
-    
-void launch_flush_cache(double *d_buf, size_t n);
 
 #endif // SU3V_CUDA_CUH

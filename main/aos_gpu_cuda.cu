@@ -5,6 +5,27 @@
 
 static const size_t FLUSH_NELEMS = 15728640UL;
 
+__global__ static void flush_cache_kernel(double *buf, size_t n)
+{
+    size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i < n) buf[i] += 1.0;
+}
+
+__global__ static void plaq_dble(
+    double *res,
+    const su3_mat_c *d_u, const su3_mat_c *d_v,
+    const su3_mat_c *d_w, const su3_mat_c *d_x,
+    size_t volume)
+{
+    size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i >= volume) return;
+
+    su3_mat_c tmp;
+    su3matxsu3mat(&tmp, &d_u[i], &d_v[i]);
+    su3matdagxsu3matdag(&tmp, &tmp, &d_w[i]);
+    res[i] = su3matxsu3mat_retrace(&tmp, &d_x[i]);
+}
+
 int main(int argc, char *argv[])
 {
     int reps = 100;
@@ -60,8 +81,9 @@ int main(int argc, char *argv[])
     // -----------------------------------------------------------------------
     // Warm-up
     // -----------------------------------------------------------------------
+    int blocks = ((int)VOLUME + THREADS - 1) / THREADS;
     for (int r = 0; r < 3; r++) {
-        launch_plaq_aos(d_res, d_u, d_v, d_w, d_x, VOLUME, THREADS);
+        plaq_dble<<<blocks, THREADS>>>(d_res, d_u, d_v, d_w, d_x, VOLUME);
     }
     CUDA_CHECK(cudaDeviceSynchronize());
 
@@ -73,13 +95,14 @@ int main(int argc, char *argv[])
     CUDA_CHECK(cudaEventCreate(&ev_stop));
 
     double total_ms = 0.0;
+    int flush_blocks = ((int)FLUSH_NELEMS + THREADS - 1) / THREADS;
 
     for (int r = 0; r < reps; r++) {
-        launch_flush_cache(d_flush, FLUSH_NELEMS);
+        flush_cache_kernel<<<flush_blocks, THREADS>>>(d_flush, FLUSH_NELEMS);
         CUDA_CHECK(cudaDeviceSynchronize());
 
         CUDA_CHECK(cudaEventRecord(ev_start));
-        launch_plaq_aos(d_res, d_u, d_v, d_w, d_x, VOLUME, THREADS);
+        plaq_dble<<<blocks, THREADS>>>(d_res, d_u, d_v, d_w, d_x, VOLUME);
         CUDA_CHECK(cudaEventRecord(ev_stop));
         CUDA_CHECK(cudaEventSynchronize(ev_stop));
 
