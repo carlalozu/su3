@@ -18,6 +18,10 @@
   #define PRAGMA_OMP_END   _Pragma("omp end declare target")
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 complex add(const complex a, const complex b);
 void vec_add(su3_vec_c *res, const su3_vec_c *u, const su3_vec_c *v);
 
@@ -26,6 +30,10 @@ complex su3mat_trace(const su3_mat_c *u);
 void su3matxsu3vec(su3_vec_c *res, const su3_mat_c *u, const su3_vec_c *v);
 void su3matdagxsu3vec(su3_vec_c *r, const su3_mat_c *u, const su3_vec_c *s);
 PRAGMA_OMP_END
+
+#ifdef __cplusplus
+}
+#endif
 
 
 // ---------------------------------------------------------------------------

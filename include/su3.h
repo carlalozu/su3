@@ -42,11 +42,19 @@ typedef struct
     complex c11, c12, c13, c21, c22, c23, c31, c32, c33;
 } su3_mat_c;
 
-// SU3 initialization (bodies in su3.c)
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #pragma omp declare target
 void unit_su3mat(su3_mat_c *su3_mat);
 void random_su3mat(su3_mat_c *su3_mat, uint64_t *state);
 void unit_su3vec(su3_vec_c *su3_vec);
 #pragma omp end declare target
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SU3_H
