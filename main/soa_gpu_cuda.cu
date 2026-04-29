@@ -6,12 +6,6 @@
 
 static const size_t FLUSH_NELEMS = 15728640UL;
 
-__global__ static void flush_cache_kernel(double *buf, size_t n)
-{
-    size_t i = blockIdx.x * blockDim.x + threadIdx.x;
-    if (i < n) buf[i] += 1.0;
-}
-
 __global__ static void plaq_dblev(
     double *res,
     const su3_mat_field d_u, const su3_mat_field d_v,
@@ -21,10 +15,10 @@ __global__ static void plaq_dblev(
     size_t i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i >= volume) return;
 
-    su3_mat_c u, v, w, x, tmp;
-    fsu3matxsu3mat(&tmp, &u, &v);
-    fsu3matdagxsu3matdag(&tmp, &tmp, &w);
-    res[i] = su3matdxsu3matd_retrace(&tmp, &x);
+    su3_mat_dble temp_a, temp_b;
+    fsu3matxsu3mat(&temp_a, &d_u, &d_v, i);
+    fsu3matdagxsu3matdag(&temp_b, &d_w, &d_x, i);
+    res[i] = su3matdxsu3matd_retrace(&temp_a, &temp_b);
 }
 
 int main(int argc, char *argv[])

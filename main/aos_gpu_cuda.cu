@@ -1,15 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "global.h"
+#include "su3.h"
 #include "su3v_cuda.cuh"
 
 static const size_t FLUSH_NELEMS = 15728640UL;
-
-__global__ static void flush_cache_kernel(double *buf, size_t n)
-{
-    size_t i = blockIdx.x * blockDim.x + threadIdx.x;
-    if (i < n) buf[i] += 1.0;
-}
 
 __global__ static void plaq_dble(
     double *res,
@@ -20,10 +15,10 @@ __global__ static void plaq_dble(
     size_t i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i >= volume) return;
 
-    su3_mat_c tmp;
-    su3matxsu3mat(&tmp, &d_u[i], &d_v[i]);
-    su3matdagxsu3matdag(&tmp, &tmp, &d_w[i]);
-    res[i] = su3matxsu3mat_retrace(&tmp, &d_x[i]);
+    su3_mat_c tmp_a, temp_b;
+    su3matxsu3mat(&tmp_a, &d_u[i], &d_v[i]);
+    su3matdagxsu3matdag(&temp_b, &d_w[i], &d_x[i]);
+    res[i] = su3matxsu3mat_retrace(&tmp_a, &temp_b);
 }
 
 int main(int argc, char *argv[])
