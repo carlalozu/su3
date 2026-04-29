@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "su3v.h"
+#include "su3prod.h"
 #include "global.h"
 #include "ufields.h"
 #include <time.h>

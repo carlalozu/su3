@@ -1,9 +1,7 @@
 
 macro(add_su3_executable name source)
     add_executable(${name} ${source})
-    if(ENABLE_GPU_OFFLOAD)
-        target_link_libraries(${name} PRIVATE su3openmp)
-    endif()
+    target_link_libraries(${name} PRIVATE su3openmp)
     target_link_libraries(${name} PRIVATE su3lib)
 endmacro()
 
