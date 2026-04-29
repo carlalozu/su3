@@ -84,3 +84,33 @@ void doublev_kokkos_download(doublev *h, const KokkosDoublev *d)
     Kokkos::deep_copy(HV(h->base, d->dv.volume), d->data);
 }
 
+// ---------------------------------------------------------------------------
+// KokkosSu3Mat memory management
+// ---------------------------------------------------------------------------
+
+void su3_aos_kokkos_alloc(KokkosSu3Mat *km, size_t volume)
+{
+    km->data   = Kokkos::View<su3_mat_c*>("aos_mat", volume);
+    km->volume = volume;
+}
+
+void su3_aos_kokkos_free(KokkosSu3Mat *km)
+{
+    km->data   = Kokkos::View<su3_mat_c*>();
+    km->volume = 0;
+}
+
+void su3_aos_kokkos_upload(KokkosSu3Mat *d, const su3_mat_c *h)
+{
+    using HV = Kokkos::View<const su3_mat_c*, Kokkos::HostSpace,
+                             Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
+    Kokkos::deep_copy(d->data, HV(h, d->volume));
+}
+
+void su3_aos_kokkos_download(su3_mat_c *h, const KokkosSu3Mat *d)
+{
+    using HV = Kokkos::View<su3_mat_c*, Kokkos::HostSpace,
+                             Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
+    Kokkos::deep_copy(HV(h, d->volume), d->data);
+}
+
