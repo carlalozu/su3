@@ -34,14 +34,12 @@ if(ENABLE_GPU_OFFLOAD)
     target_include_directories(su3openmp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
     target_link_libraries(su3openmp PUBLIC su3lib)
     set(OMP_OFFLOAD_FLAGS
-        -fopenmp
-        -fopenmp-targets=nvptx64-nvidia-cuda
-        -Xopenmp-target=nvptx64-nvidia-cuda --offload-arch=sm_90
+        -mp=gpu -gpu=cc90
     )
     target_compile_options(su3lib PUBLIC ${OMP_OFFLOAD_FLAGS})
-    target_link_options(su3lib PUBLIC ${OMP_OFFLOAD_FLAGS} -lmpi_gtl_cuda)
+    target_link_options(su3lib PUBLIC ${OMP_OFFLOAD_FLAGS})
     target_compile_options(su3openmp PUBLIC ${OMP_OFFLOAD_FLAGS})
-    target_link_options(su3openmp PUBLIC ${OMP_OFFLOAD_FLAGS} -lmpi_gtl_cuda)
+    target_link_options(su3openmp PUBLIC ${OMP_OFFLOAD_FLAGS})
 
     message(STATUS "GPU OpenMP Offloading Enabled (SM_90)")
 else()

@@ -68,3 +68,6 @@ output/*
 
 # build files
 build/*
+build_cuda/*
+build_kokkos/*
+build_openmp/*
