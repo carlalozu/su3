@@ -42,9 +42,9 @@ if(ENABLE_GPU_OFFLOAD)
     target_compile_options(su3openmp PUBLIC ${OMP_OFFLOAD_FLAGS})
     target_link_options(su3openmp PUBLIC ${OMP_OFFLOAD_FLAGS} -lmpi_gtl_cuda)
 
-    message(STATUS "GPU Offloading Enabled")
+    message(STATUS "GPU OpenMP Offloading Enabled (SM_90)")
 else()
-    message(STATUS "GPU Offloading NOT Enabled")
+    message(STATUS "GPU OpenMP Offloading NOT Enabled")
 endif()
 
 
@@ -54,7 +54,7 @@ if(ENABLE_AVX)
 else()
     if(NOT ENABLE_GPU_OFFLOAD)
         target_compile_options(su3lib PUBLIC -fno-tree-vectorize -fno-tree-slp-vectorize)
-        message(STATUS "CPU Vectorization disabled")
+        message(STATUS "CPU Vectorization NOT Enabled")
     endif()
 endif()
 
@@ -73,9 +73,49 @@ if(ENABLE_CUDA)
         CUDA_SEPARABLE_COMPILATION ON
     )
 
-    message(STATUS "CUDA kernel enabled (SM_90)")
+    message(STATUS "CUDA native kernel enabled (SM_90)")
 else()
-    message(STATUS "CUDA kernel NOT enabled")
+    message(STATUS "CUDA native kernel NOT enabled")
 endif()
+
+
+option(ENABLE_KOKKOS "Enable Kokkos kernel" OFF)
+if(ENABLE_KOKKOS)
+    enable_language(CXX)
+
+    option(Kokkos_ENABLE_CUDA   "Kokkos CUDA backend"   OFF)
+    option(Kokkos_ENABLE_OPENMP "Kokkos OpenMP backend" OFF)
+
+    if(Kokkos_ENABLE_CUDA)
+        enable_language(CUDA)
+    endif()
+
+    include(FetchContent)
+    FetchContent_Declare(
+        Kokkos
+        GIT_REPOSITORY https://github.com/kokkos/kokkos.git
+        GIT_TAG        4.5.01
+    )
+    FetchContent_MakeAvailable(Kokkos)
+
+    add_library(su3kokkoskernel STATIC
+        modules/su3v_kokkos.cpp
+    )
+    target_include_directories(su3kokkoskernel PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_link_libraries(su3kokkoskernel PUBLIC su3lib Kokkos::kokkos)
+
+    if(Kokkos_ENABLE_CUDA)
+        set_source_files_properties(modules/su3v_kokkos.cpp PROPERTIES LANGUAGE CUDA)
+        set_target_properties(su3kokkoskernel PROPERTIES CUDA_ARCHITECTURES "90")
+        target_compile_options(su3kokkoskernel PRIVATE
+            $<$<COMPILE_LANGUAGE:CUDA>:--extended-lambda>
+        )
+    endif()
+
+    message(STATUS "Kokkos kernel enabled")
+else()
+    message(STATUS "Kokkos kernel NOT enabled")
+endif()
+
 
 add_subdirectory(main)
