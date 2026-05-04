@@ -44,10 +44,10 @@ int main(int argc, char *argv[])
     for (size_t i = 0; i < VOLUME; i++)
     {
         uint64_t thread_state = 12345ULL + omp_get_thread_num();
-        random_su3mat(&u_field[i], &thread_state);
-        random_su3mat(&v_field[i], &thread_state);
-        random_su3mat(&w_field[i], &thread_state);
-        random_su3mat(&x_field[i], &thread_state);
+        random_su3_dble(&u_field[i]);
+        random_su3_dble(&v_field[i]);
+        random_su3_dble(&w_field[i]);
+        random_su3_dble(&x_field[i]);
     }
     prof_end(&init_AoS);
 

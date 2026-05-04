@@ -37,8 +37,8 @@ int main(int argc, char *argv[])
     su3_vec_field_init(resv_field, VOLUME);
 
     random_su3vec_field(v_field);
-    random_su3mat_field(m_field);
-    random_su3mat_field(u_field);
+    random_su3_dble_field(m_field);
+    random_su3_dble_field(u_field);
     printf("v_field[%i]->c1re[%i] = %f\n", idx, idx, v_field->c1re[idx]);
     printf("v_field[%i]->c2im[%i] = %f\n", idx, idx, v_field->c2im[idx]);
     printf("m_field[%i]->c2.c3re[%i] = %f\n", idx, idx, m_field->c2.c3re[idx]);

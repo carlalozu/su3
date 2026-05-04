@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     su3_mat_field_init(&h_fld, 4*VOLUME);
     doublev_init(&h_res, VOLUME);
 
-    random_su3mat_field(&h_fld);
+    random_su3_dble_field(&h_fld);
 
     // -----------------------------------------------------------------------
     // Device fields

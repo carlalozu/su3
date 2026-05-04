@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     su3_mat_field_init(&u_fld, 4*VOLUME);
     doublev_init(&h_res, VOLUME);
 
-    random_su3mat_field(&u_fld);
+    random_su3_dble_field(&u_fld);
 
     // -----------------------------------------------------------------------
     // Map data to device

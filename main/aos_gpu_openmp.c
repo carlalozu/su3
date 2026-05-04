@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     #pragma omp target teams distribute parallel for
     for (size_t i = 0; i <4*VOLUME; i++) {
         uint64_t thread_state = 12345ULL + i;
-        random_su3mat(&u_fld[i], &thread_state);
+        random_su3_dble(&u_fld[i]);
     }
 
     double *flush_buf = (double *)malloc(FLUSH_NELEMS * sizeof(double));

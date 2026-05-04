@@ -48,8 +48,8 @@ int main(int argc, char *argv[])
         su3_vec_field_init(&res_field[n], CACHELINE);
         
         random_su3vec_field(&v_field[n]);
-        random_su3mat_field(&m_field[n]);
-        random_su3mat_field(&u_field[n]);
+        random_su3_dble_field(&m_field[n]);
+        random_su3_dble_field(&u_field[n]);
     }
 
     int idxo = idx / CACHELINE;

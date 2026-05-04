@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 
         for (size_t i = 0; i < 4*(size_t)VOLUME; i++) {
             uint64_t state = 12345ULL + i;
-            random_su3mat(&h_fld[i], &state);
+            random_su3_dble(&h_fld[i]);
         }
 
         // -------------------------------------------------------------------

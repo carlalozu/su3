@@ -20,14 +20,14 @@ void unit_su3vec_field(su3_vec_field *su3vf)
         d[i] = 1.0;
 }
 
-void random_su3mat_field(su3_mat_field *su3mf)
+void random_su3_dble_field(su3_mat_field *su3mf)
 {
     size_t volume = su3mf->c1.volume;
     uint64_t state = 12345678ULL;
     su3_dble tmp;
 
     for (size_t i = 0; i < volume; i++) {
-        random_su3mat(&tmp, &state);
+        random_su3_dble(&tmp);
 
         su3mf->c1.c1re[i] = tmp.c11.re;  su3mf->c1.c1im[i] = tmp.c11.im;
         su3mf->c1.c2re[i] = tmp.c21.re;  su3mf->c1.c2im[i] = tmp.c21.im;
