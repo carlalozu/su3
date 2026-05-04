@@ -42,6 +42,11 @@ typedef struct
     complex c11, c12, c13, c21, c22, c23, c31, c32, c33;
 } su3_dble;
 
+typedef struct
+{
+   double q[2];
+} qflt;
+
 
 #ifdef __cplusplus
 extern "C" {

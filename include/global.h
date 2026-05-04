@@ -46,6 +46,8 @@
 #define VOLUME_TRD (L0_TRD*L1_TRD*L2_TRD*L3_TRD)
 #define NTHREAD (VOLUME/VOLUME_TRD)
 
+#define N0 (NPROC0*L0)
+
 #if defined MAIN_PROGRAM
 
 #pragma omp declare target

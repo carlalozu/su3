@@ -5,6 +5,8 @@
 #include "uflds.h"
 #include "global.h"
 
+static su3_dble *udb;
+
 #pragma omp declare target
 static double plaq_dble(su3_dble *udb, int mu, int nu,int ix)
 {
