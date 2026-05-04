@@ -10,21 +10,17 @@
 static const size_t FLUSH_NELEMS = 15728640UL;
 
 void launch_plaq_aos_kokkos(
-    KokkosDoublev       *d_res,
-    const KokkosSu3Mat  *d_u, const KokkosSu3Mat *d_v,
-    const KokkosSu3Mat  *d_w, const KokkosSu3Mat *d_x,
+    KokkosDoublev      *d_res,
+    const KokkosSu3Mat *d_fld,
     size_t volume)
 {
-    const su3_mat_c *u   = d_u->data.data();
-    const su3_mat_c *v   = d_v->data.data();
-    const su3_mat_c *w   = d_w->data.data();
-    const su3_mat_c *x   = d_x->data.data();
+    const su3_mat_c *fld = d_fld->data.data();
     double          *res = d_res->data.data();
 
     Kokkos::parallel_for("plaq_aos", volume, KOKKOS_LAMBDA(const size_t i) {
         su3_mat_c tmp_a, tmp_b;
-        su3matxsu3mat(&tmp_a, &u[i], &v[i]);
-        su3matdagxsu3matdag(&tmp_b, &w[i], &x[i]);
+        su3matxsu3mat      (&tmp_a, &fld[0*volume+i], &fld[1*volume+i]);
+        su3matdagxsu3matdag(&tmp_b, &fld[2*volume+i], &fld[3*volume+i]);
         res[i] = su3matxsu3mat_retrace(&tmp_a, &tmp_b);
     });
     Kokkos::fence();
@@ -46,36 +42,24 @@ int main(int argc, char *argv[])
         // -------------------------------------------------------------------
         // Host fields
         // -------------------------------------------------------------------
-        su3_mat_c *h_u   = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
-        su3_mat_c *h_v   = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
-        su3_mat_c *h_w   = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
-        su3_mat_c *h_x   = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
+        su3_mat_c *h_fld = (su3_mat_c *)malloc(4*VOLUME * sizeof(su3_mat_c));
         double    *h_res = (double    *)malloc(VOLUME * sizeof(double));
 
-        for (size_t i = 0; i < (size_t)VOLUME; i++) {
+        for (size_t i = 0; i < 4*(size_t)VOLUME; i++) {
             uint64_t state = 12345ULL + i;
-            random_su3mat(&h_u[i], &state);
-            random_su3mat(&h_v[i], &state);
-            random_su3mat(&h_w[i], &state);
-            random_su3mat(&h_x[i], &state);
+            random_su3mat(&h_fld[i], &state);
         }
 
         // -------------------------------------------------------------------
         // Device fields
         // -------------------------------------------------------------------
-        KokkosSu3Mat  d_u, d_v, d_w, d_x;
+        KokkosSu3Mat  d_fld;
         KokkosDoublev d_res;
 
-        su3_aos_kokkos_alloc(&d_u, VOLUME);
-        su3_aos_kokkos_alloc(&d_v, VOLUME);
-        su3_aos_kokkos_alloc(&d_w, VOLUME);
-        su3_aos_kokkos_alloc(&d_x, VOLUME);
+        su3_aos_kokkos_alloc(&d_fld, 4*VOLUME);
         doublev_kokkos_alloc(&d_res, VOLUME);
 
-        su3_aos_kokkos_upload(&d_u, h_u);
-        su3_aos_kokkos_upload(&d_v, h_v);
-        su3_aos_kokkos_upload(&d_w, h_w);
-        su3_aos_kokkos_upload(&d_x, h_x);
+        su3_aos_kokkos_upload(&d_fld, h_fld);
 
         // Flush buffer
         KokkosDoublev d_flush;
@@ -85,7 +69,7 @@ int main(int argc, char *argv[])
         // Warm-up
         // -------------------------------------------------------------------
         for (int r = 0; r < 3; r++)
-            launch_plaq_aos_kokkos(&d_res, &d_u, &d_v, &d_w, &d_x, VOLUME);
+            launch_plaq_aos_kokkos(&d_res, &d_fld, VOLUME);
         Kokkos::fence();
 
         // -------------------------------------------------------------------
@@ -98,7 +82,7 @@ int main(int argc, char *argv[])
             Kokkos::fence();
 
             Kokkos::Timer timer;
-            launch_plaq_aos_kokkos(&d_res, &d_u, &d_v, &d_w, &d_x, VOLUME);
+            launch_plaq_aos_kokkos(&d_res, &d_fld, VOLUME);
             Kokkos::fence();
             total_s += timer.seconds();
         }
@@ -124,14 +108,11 @@ int main(int argc, char *argv[])
         // -------------------------------------------------------------------
         // Cleanup
         // -------------------------------------------------------------------
-        su3_aos_kokkos_free(&d_u);
-        su3_aos_kokkos_free(&d_v);
-        su3_aos_kokkos_free(&d_w);
-        su3_aos_kokkos_free(&d_x);
+        su3_aos_kokkos_free(&d_fld);
         doublev_kokkos_free(&d_res);
         doublev_kokkos_free(&d_flush);
 
-        free(h_u); free(h_v); free(h_w); free(h_x); free(h_res);
+        free(h_fld); free(h_res);
     }
     Kokkos::finalize();
     return 0;

@@ -8,16 +8,15 @@ static const size_t FLUSH_NELEMS = 15728640UL;
 
 __global__ static void plaq_dblev(
     double *res,
-    const su3_mat_field d_u, const su3_mat_field d_v,
-    const su3_mat_field d_w, const su3_mat_field d_x,
+    const su3_mat_field d_fld,
     size_t volume)
 {
     size_t i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i >= volume) return;
 
     su3_mat_dble temp_a, temp_b;
-    fsu3matxsu3mat(&temp_a, &d_u, &d_v, i);
-    fsu3matdagxsu3matdag(&temp_b, &d_w, &d_x, i);
+    fsu3matxsu3mat      (&temp_a, &d_fld, 0*volume+i, 1*volume+i);
+    fsu3matdagxsu3matdag(&temp_b, &d_fld, 2*volume+i, 3*volume+i);
     res[i] = su3matdxsu3matd_retrace(&temp_a, &temp_b);
 }
 
@@ -35,36 +34,24 @@ int main(int argc, char *argv[])
     // -----------------------------------------------------------------------
     // Host fields
     // -----------------------------------------------------------------------
-    su3_mat_field h_u, h_v, h_w, h_x;
+    su3_mat_field h_fld;
     doublev       h_res;
 
-    su3_mat_field_init(&h_u, VOLUME);
-    su3_mat_field_init(&h_v, VOLUME);
-    su3_mat_field_init(&h_w, VOLUME);
-    su3_mat_field_init(&h_x, VOLUME);
+    su3_mat_field_init(&h_fld, 4*VOLUME);
     doublev_init(&h_res, VOLUME);
 
-    random_su3mat_field(&h_u);
-    random_su3mat_field(&h_v);
-    random_su3mat_field(&h_w);
-    random_su3mat_field(&h_x);
+    random_su3mat_field(&h_fld);
 
     // -----------------------------------------------------------------------
     // Device fields
     // -----------------------------------------------------------------------
-    su3_mat_field d_u, d_v, d_w, d_x;
+    su3_mat_field d_fld;
     doublev       d_res;
 
-    su3_mat_field_cuda_alloc(&d_u, VOLUME);
-    su3_mat_field_cuda_alloc(&d_v, VOLUME);
-    su3_mat_field_cuda_alloc(&d_w, VOLUME);
-    su3_mat_field_cuda_alloc(&d_x, VOLUME);
+    su3_mat_field_cuda_alloc(&d_fld, 4*VOLUME);
     doublev_cuda_alloc(&d_res, VOLUME);
 
-    su3_mat_field_cuda_upload(&d_u, &h_u);
-    su3_mat_field_cuda_upload(&d_v, &h_v);
-    su3_mat_field_cuda_upload(&d_w, &h_w);
-    su3_mat_field_cuda_upload(&d_x, &h_x);
+    su3_mat_field_cuda_upload(&d_fld, &h_fld);
 
     // Flush buffer
     double *d_flush = nullptr;
@@ -78,7 +65,7 @@ int main(int argc, char *argv[])
     // -----------------------------------------------------------------------
     int blocks = ((int)VOLUME + THREADS - 1) / THREADS;
     for (int r = 0; r < 3; r++) {
-        plaq_dblev<<<blocks, THREADS>>>(d_res.base, d_u, d_v, d_w, d_x, VOLUME);
+        plaq_dblev<<<blocks, THREADS>>>(d_res.base, d_fld, VOLUME);
     }
     CUDA_CHECK(cudaDeviceSynchronize());
 
@@ -97,7 +84,7 @@ int main(int argc, char *argv[])
         CUDA_CHECK(cudaDeviceSynchronize());
 
         CUDA_CHECK(cudaEventRecord(ev_start));
-        plaq_dblev<<<blocks, THREADS>>>(d_res.base, d_u, d_v, d_w, d_x, VOLUME);
+        plaq_dblev<<<blocks, THREADS>>>(d_res.base, d_fld, VOLUME);
         CUDA_CHECK(cudaEventRecord(ev_stop));
         CUDA_CHECK(cudaEventSynchronize(ev_stop));
 
@@ -108,12 +95,8 @@ int main(int argc, char *argv[])
 
     double avg_ms = total_ms / reps;
     double avg_s  = avg_ms * 1e-3;
-
-    // Arithmetic intensity: 2*(198+198+36) FLOP per site (mat*mat + dagdag + retrace)
-    // Memory: 4 input matrices * 18 complex doubles = 4*18*2*8 = 1152 B/site
-    //         + 1 output double = 8 B/site → 1160 B/site
-    double gflops   = (double)VOLUME * 432.0 / avg_s * 1e-9;
-    double gbytes   = (double)VOLUME * 1160.0;
+    double gflops = (double)VOLUME * 432.0 / avg_s * 1e-9;
+    double gbytes = (double)VOLUME * 1160.0;
 
     printf("\nResults\n");
     printf("  total  = %.6f s  (%d reps)\n", total_ms * 1e-3, reps);
@@ -135,16 +118,10 @@ int main(int argc, char *argv[])
     CUDA_CHECK(cudaEventDestroy(ev_stop));
     CUDA_CHECK(cudaFree(d_flush));
 
-    su3_mat_field_cuda_free(&d_u);
-    su3_mat_field_cuda_free(&d_v);
-    su3_mat_field_cuda_free(&d_w);
-    su3_mat_field_cuda_free(&d_x);
+    su3_mat_field_cuda_free(&d_fld);
     doublev_cuda_free(&d_res);
 
-    su3_mat_field_free(&h_u);
-    su3_mat_field_free(&h_v);
-    su3_mat_field_free(&h_w);
-    su3_mat_field_free(&h_x);
+    su3_mat_field_free(&h_fld);
     free(h_res.base);
 
     return 0;
