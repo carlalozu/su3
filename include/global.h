@@ -43,6 +43,8 @@
     #define omp_get_thread_num() 0
 #endif
 
+#define VOLUME_TRD (L0_TRD*L1_TRD*L2_TRD*L3_TRD)
+#define NTHREAD (VOLUME/VOLUME_TRD)
 
 #if defined MAIN_PROGRAM
 

@@ -24,7 +24,7 @@ void random_su3mat_field(su3_mat_field *su3mf)
 {
     size_t volume = su3mf->c1.volume;
     uint64_t state = 12345678ULL;
-    su3_mat_c tmp;
+    su3_dble tmp;
 
     for (size_t i = 0; i < volume; i++) {
         random_su3mat(&tmp, &state);

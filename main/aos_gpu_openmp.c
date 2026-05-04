@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     // -----------------------------------------------------------------------
     // Host fields
     // -----------------------------------------------------------------------
-    su3_mat_c *u_fld = (su3_mat_c *)malloc(4*VOLUME * sizeof(su3_mat_c));
+    su3_dble *u_fld = (su3_dble *)malloc(4*VOLUME * sizeof(su3_dble));
     double    *h_res = (double    *)malloc(VOLUME * sizeof(double));
 
     // -----------------------------------------------------------------------
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     for (int r = 0; r < 3; r++) {
         #pragma omp target teams distribute parallel for
         for (size_t i = 0; i < VOLUME; i++) {
-            su3_mat_c temp, res;
+            su3_dble temp, res;
             su3xsu3      (&temp, &u_fld[0*VOLUME+i], &u_fld[1*VOLUME+i]);
             su3dagxsu3dag(&res,  &u_fld[2*VOLUME+i], &u_fld[3*VOLUME+i]);
             h_res[i] = cm3x3_retr(&temp, &res);
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
         double t0 = omp_get_wtime();
         #pragma omp target teams distribute parallel for
         for (size_t i = 0; i < VOLUME; i++) {
-            su3_mat_c temp, res;
+            su3_dble temp, res;
             su3xsu3      (&temp, &u_fld[0*VOLUME+i], &u_fld[1*VOLUME+i]);
             su3dagxsu3dag(&res,  &u_fld[2*VOLUME+i], &u_fld[3*VOLUME+i]);
             h_res[i] = cm3x3_retr(&temp, &res);

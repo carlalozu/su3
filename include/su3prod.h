@@ -26,9 +26,9 @@ complex add(const complex a, const complex b);
 void vec_add(su3_vec_c *res, const su3_vec_c *u, const su3_vec_c *v);
 
 PRAGMA_OMP_BEGIN
-complex su3mat_trace(const su3_mat_c *u);
-void su3matxsu3vec(su3_vec_c *res, const su3_mat_c *u, const su3_vec_c *v);
-void su3matdagxsu3vec(su3_vec_c *r, const su3_mat_c *u, const su3_vec_c *s);
+complex su3mat_trace(const su3_dble *u);
+void su3matxsu3vec(su3_vec_c *res, const su3_dble *u, const su3_vec_c *v);
+void su3matdagxsu3vec(su3_vec_c *r, const su3_dble *u, const su3_vec_c *s);
 PRAGMA_OMP_END
 
 #ifdef __cplusplus
@@ -41,7 +41,7 @@ PRAGMA_OMP_END
 // ---------------------------------------------------------------------------
 
 PRAGMA_OMP_BEGIN
-DEVICE_KEYWORD double cm3x3_retr(const su3_mat_c *u, const su3_mat_c *v)
+DEVICE_KEYWORD double cm3x3_retr(const su3_dble *u, const su3_dble *v)
 {
     double tr_1 = u->c11.re * v->c11.re - u->c11.im * v->c11.im
                 + u->c12.re * v->c21.re - u->c12.im * v->c21.im
@@ -57,7 +57,7 @@ DEVICE_KEYWORD double cm3x3_retr(const su3_mat_c *u, const su3_mat_c *v)
 PRAGMA_OMP_END
 
 PRAGMA_OMP_BEGIN
-DEVICE_KEYWORD void su3xsu3(su3_mat_c *res, const su3_mat_c *u, const su3_mat_c *v)
+DEVICE_KEYWORD void su3xsu3(su3_dble *res, const su3_dble *u, const su3_dble *v)
 {
     // --- Column 1 ---
     res->c11.re = u->c11.re * v->c11.re - u->c11.im * v->c11.im +
@@ -128,7 +128,7 @@ DEVICE_KEYWORD void su3xsu3(su3_mat_c *res, const su3_mat_c *u, const su3_mat_c 
 PRAGMA_OMP_END
 
 PRAGMA_OMP_BEGIN
-DEVICE_KEYWORD void su3dagxsu3dag(su3_mat_c *w, const su3_mat_c *u, const su3_mat_c *v)
+DEVICE_KEYWORD void su3dagxsu3dag(su3_dble *w, const su3_dble *u, const su3_dble *v)
 {
     w->c11.re = u->c11.re * v->c11.re + u->c11.im * -v->c11.im +
                 u->c21.re * v->c12.re + u->c21.im * -v->c12.im +

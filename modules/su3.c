@@ -26,18 +26,18 @@ double local_rand(uint64_t *state) {
 }
 #pragma omp end declare target
 
-void unit_su3mat(su3_mat_c *su3)
+void unit_su3mat(su3_dble *su3)
 {
-    _Static_assert(sizeof(su3_mat_c) == 18 * sizeof(double),
+    _Static_assert(sizeof(su3_dble) == 18 * sizeof(double),
                    "su3 layout assumption broken");
     double *d = (double *)su3;
     for (int i = 0; i < 18; i++)
         d[i] = 1.0;
 }
 
-void random_su3mat(su3_mat_c *su3, uint64_t *state)
+void random_su3mat(su3_dble *su3, uint64_t *state)
 {
-    _Static_assert(sizeof(su3_mat_c) == 18 * sizeof(double),
+    _Static_assert(sizeof(su3_dble) == 18 * sizeof(double),
                    "su3 layout assumption broken");
     double *d = (double *)su3;
     for (int i = 0; i < 18; i++)

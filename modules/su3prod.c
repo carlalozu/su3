@@ -43,7 +43,7 @@ void vec_add(su3_vec_c *res, const su3_vec_c *s1, const su3_vec_c *s2)
  * r.c2=(u*s).c2
  * r.c3=(u*s).c3
  */
-void su3matxsu3vec(su3_vec_c *res, const su3_mat_c *u, const su3_vec_c *s)
+void su3matxsu3vec(su3_vec_c *res, const su3_dble *u, const su3_vec_c *s)
 {
     res->c1.re = u->c11.re * s->c1.re - u->c11.im * s->c1.im +
                  u->c12.re * s->c2.re - u->c12.im * s->c2.im +
@@ -72,7 +72,7 @@ void su3matxsu3vec(su3_vec_c *res, const su3_mat_c *u, const su3_vec_c *s)
  * r.c2=(u^dagger*s).c2
  * r.c3=(u^dagger*s).c3
  */
-void su3matdagxsu3vec(su3_vec_c *r, const su3_mat_c *u, const su3_vec_c *s)
+void su3matdagxsu3vec(su3_vec_c *r, const su3_dble *u, const su3_vec_c *s)
 {
     (*r).c1.re = (*u).c11.re * (*s).c1.re + (*u).c11.im * (*s).c1.im +
                  (*u).c21.re * (*s).c2.re + (*u).c21.im * (*s).c2.im +
@@ -98,7 +98,7 @@ void su3matdagxsu3vec(su3_vec_c *r, const su3_mat_c *u, const su3_vec_c *s)
  *
  * tr = trace(u)
  */
-complex su3mat_trace(const su3_mat_c *u)
+complex su3mat_trace(const su3_dble *u)
 {
     complex tr;
     tr.re = u->c11.re + u->c22.re + u->c33.re;

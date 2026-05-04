@@ -7,8 +7,8 @@ int main(int argc, char *argv[])
 {
     printf("SU(3) algebra!\n");
 
-    su3_mat_c u;
-    su3_mat_c w;
+    su3_dble u;
+    su3_dble w;
     su3_vec_c v;
 
     unit_su3mat(&w);
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     printf("c3 = (%f, %f)\n", result_vec.c3.re, result_vec.c3.im);
 
     // multiply u and w
-    su3_mat_c result_mat;
+    su3_dble result_mat;
     su3matxsu3mat(&result_mat, &u, &w);
     printf("result matrix:\n");
     printf("c11 = (%f, %f)\n", result_mat.c11.re, result_mat.c11.im);

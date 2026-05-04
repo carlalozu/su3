@@ -14,11 +14,11 @@ void launch_plaq_aos_kokkos(
     const KokkosSu3Mat *d_fld,
     size_t volume)
 {
-    const su3_mat_c *fld = d_fld->data.data();
+    const su3_dble *fld = d_fld->data.data();
     double          *res = d_res->data.data();
 
     Kokkos::parallel_for("plaq_aos", volume, KOKKOS_LAMBDA(const size_t i) {
-        su3_mat_c tmp_a, tmp_b;
+        su3_dble tmp_a, tmp_b;
         su3xsu3      (&tmp_a, &fld[0*volume+i], &fld[1*volume+i]);
         su3dagxsu3dag(&tmp_b, &fld[2*volume+i], &fld[3*volume+i]);
         res[i] = cm3x3_retr(&tmp_a, &tmp_b);
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
         // -------------------------------------------------------------------
         // Host fields
         // -------------------------------------------------------------------
-        su3_mat_c *h_fld = (su3_mat_c *)malloc(4*VOLUME * sizeof(su3_mat_c));
+        su3_dble *h_fld = (su3_dble *)malloc(4*VOLUME * sizeof(su3_dble));
         double    *h_res = (double    *)malloc(VOLUME * sizeof(double));
 
         for (size_t i = 0; i < 4*(size_t)VOLUME; i++) {

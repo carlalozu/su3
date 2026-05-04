@@ -16,7 +16,7 @@ struct KokkosDoublev {
 };
 
 struct KokkosSu3Mat {
-    Kokkos::View<su3_mat_c*> data;
+    Kokkos::View<su3_dble*> data;
     size_t volume = 0;
 };
 
@@ -31,8 +31,8 @@ void doublev_kokkos_download(doublev *h, const KokkosDoublev *d);
 
 void su3_aos_kokkos_alloc(KokkosSu3Mat *km, size_t volume);
 void su3_aos_kokkos_free(KokkosSu3Mat *km);
-void su3_aos_kokkos_upload(KokkosSu3Mat *d, const su3_mat_c *h);
-void su3_aos_kokkos_download(su3_mat_c *h, const KokkosSu3Mat *d);
+void su3_aos_kokkos_upload(KokkosSu3Mat *d, const su3_dble *h);
+void su3_aos_kokkos_download(su3_dble *h, const KokkosSu3Mat *d);
 
 static void launch_flush_kokkos(KokkosDoublev *buf)
 {

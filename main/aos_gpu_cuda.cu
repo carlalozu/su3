@@ -8,13 +8,13 @@ static const size_t FLUSH_NELEMS = 15728640UL;
 
 __global__ static void plaq_dble(
     double *res,
-    const su3_mat_c *d_fld,
+    const su3_dble *d_fld,
     size_t volume)
 {
     size_t i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i >= volume) return;
 
-    su3_mat_c tmp_a, temp_b;
+    su3_dble tmp_a, temp_b;
     su3xsu3      (&tmp_a,  &d_fld[0*volume+i], &d_fld[1*volume+i]);
     su3dagxsu3dag(&temp_b, &d_fld[2*volume+i], &d_fld[3*volume+i]);
     res[i] = cm3x3_retr(&tmp_a, &temp_b);
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     // -----------------------------------------------------------------------
     // Host fields
     // -----------------------------------------------------------------------
-    su3_mat_c *h_fld = (su3_mat_c *)malloc(4*VOLUME * sizeof(su3_mat_c));
+    su3_dble *h_fld = (su3_dble *)malloc(4*VOLUME * sizeof(su3_dble));
     double    *h_res = (double    *)malloc(VOLUME * sizeof(double));
 
     for (size_t i = 0; i < 4*(size_t)VOLUME; i++) {
@@ -45,13 +45,13 @@ int main(int argc, char *argv[])
     // -----------------------------------------------------------------------
     // Device fields
     // -----------------------------------------------------------------------
-    su3_mat_c *d_fld;
+    su3_dble *d_fld;
     double    *d_res;
 
-    CUDA_CHECK(cudaMalloc(&d_fld, 4*VOLUME * sizeof(su3_mat_c)));
+    CUDA_CHECK(cudaMalloc(&d_fld, 4*VOLUME * sizeof(su3_dble)));
     CUDA_CHECK(cudaMalloc(&d_res,   VOLUME * sizeof(double)));
 
-    CUDA_CHECK(cudaMemcpy(d_fld, h_fld, 4*VOLUME * sizeof(su3_mat_c), cudaMemcpyHostToDevice));
+    CUDA_CHECK(cudaMemcpy(d_fld, h_fld, 4*VOLUME * sizeof(su3_dble), cudaMemcpyHostToDevice));
 
     // Flush buffer
     double *d_flush = nullptr;

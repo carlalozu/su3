@@ -4,6 +4,8 @@
 #include "uflds.h"
 #include "global.h"
 
+static su3_dble *udb=NULL;
+
 su3_dble *udfld(void)
 {
    if (udb==NULL)
@@ -29,7 +31,6 @@ static void alloc_ud(void)
    udb=amalloc(n*sizeof(*udb),ALIGN);
    error(udb==NULL,1,"alloc_ud [uflds.c]",
          "Unable to allocate memory space for the gauge field");
-   set_ud2unity(4*VOLUME_TRD,2,udb);
 
    set_bc();
    #pragma omp target enter data map(to: udb[:n])
@@ -65,8 +66,6 @@ void random_ud(void)
       }
    }
 
-   set_flags(UPDATED_UD);
-   set_flags(UNSET_UD_PHASE);
    set_bc();
    #pragma omp target update to(udb[:4*VOLUME])
 }

@@ -32,11 +32,11 @@ int main(int argc, char *argv[])
     prof_section init_AoS = {.name = "AoS init", .threads = n_threads};
     prof_section comp_AoS = {.name = "AoS compute", .threads = n_threads};
 
-    // Pro-Tip: Consider aligned_alloc(64, VOLUME * sizeof(su3_mat_c)) for SIMD performance
-    su3_mat_c *u_field = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
-    su3_mat_c *v_field = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
-    su3_mat_c *w_field = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
-    su3_mat_c *x_field = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
+    // Pro-Tip: Consider aligned_alloc(64, VOLUME * sizeof(su3_dble)) for SIMD performance
+    su3_dble *u_field = (su3_dble *)malloc(VOLUME * sizeof(su3_dble));
+    su3_dble *v_field = (su3_dble *)malloc(VOLUME * sizeof(su3_dble));
+    su3_dble *w_field = (su3_dble *)malloc(VOLUME * sizeof(su3_dble));
+    su3_dble *x_field = (su3_dble *)malloc(VOLUME * sizeof(su3_dble));
     float *res_aos = (float *)malloc(VOLUME * sizeof(float));
 
     prof_begin(&init_AoS);
@@ -64,8 +64,8 @@ int main(int argc, char *argv[])
     for (size_t i = 0; i < VOLUME; i++)
     {
 
-        su3_mat_c temp_field;
-        su3_mat_c res_field; 
+        su3_dble temp_field;
+        su3_dble res_field; 
         su3xsu3(&temp_field, &u_field[i], &v_field[i]);
         su3dagxsu3dag(&res_field, &w_field[i], &x_field[i]);
         res_aos[i] = cm3x3_retr(&temp_field, &res_field);
@@ -79,8 +79,8 @@ int main(int argc, char *argv[])
         #pragma omp parallel for schedule(static)
         for (size_t i = 0; i < VOLUME; i++)
         {
-            su3_mat_c temp_field; 
-            su3_mat_c res_field;  
+            su3_dble temp_field; 
+            su3_dble res_field;  
             su3xsu3(&temp_field, &u_field[i], &v_field[i]);
             su3dagxsu3dag(&res_field, &w_field[i], &x_field[i]);
             res_aos[i] += cm3x3_retr(&temp_field, &res_field);
