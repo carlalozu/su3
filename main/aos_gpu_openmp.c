@@ -23,25 +23,19 @@ int main(int argc, char *argv[])
     // -----------------------------------------------------------------------
     // Host fields
     // -----------------------------------------------------------------------
-    su3_mat_c *h_u   = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
-    su3_mat_c *h_v   = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
-    su3_mat_c *h_w   = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
-    su3_mat_c *h_x   = (su3_mat_c *)malloc(VOLUME * sizeof(su3_mat_c));
+    su3_mat_c *u_fld = (su3_mat_c *)malloc(4*VOLUME * sizeof(su3_mat_c));
     double    *h_res = (double    *)malloc(VOLUME * sizeof(double));
 
     // -----------------------------------------------------------------------
     // Map data to device
     // -----------------------------------------------------------------------
-    #pragma omp target enter data map(alloc: h_u[0:VOLUME], h_v[0:VOLUME], h_w[0:VOLUME], h_x[0:VOLUME])
+    #pragma omp target enter data map(alloc: u_fld[0:4*VOLUME])
     #pragma omp target enter data map(alloc: h_res[0:VOLUME])
 
     #pragma omp target teams distribute parallel for
-    for (size_t i = 0; i < VOLUME; i++) {
+    for (size_t i = 0; i <4*VOLUME; i++) {
         uint64_t thread_state = 12345ULL + i;
-        random_su3mat(&h_u[i], &thread_state);
-        random_su3mat(&h_v[i], &thread_state);
-        random_su3mat(&h_w[i], &thread_state);
-        random_su3mat(&h_x[i], &thread_state);
+        random_su3mat(&u_fld[i], &thread_state);
     }
 
     double *flush_buf = (double *)malloc(FLUSH_NELEMS * sizeof(double));
@@ -54,8 +48,8 @@ int main(int argc, char *argv[])
         #pragma omp target teams distribute parallel for
         for (size_t i = 0; i < VOLUME; i++) {
             su3_mat_c temp, res;
-            su3matxsu3mat      (&temp, &h_u[i], &h_v[i]);
-            su3matdagxsu3matdag(&res,  &h_w[i], &h_x[i]);
+            su3matxsu3mat      (&temp, &u_fld[0*VOLUME+i], &u_fld[1*VOLUME+i]);
+            su3matdagxsu3matdag(&res,  &u_fld[2*VOLUME+i], &u_fld[3*VOLUME+i]);
             h_res[i] = su3matxsu3mat_retrace(&temp, &res);
         }
     }
@@ -74,8 +68,8 @@ int main(int argc, char *argv[])
         #pragma omp target teams distribute parallel for
         for (size_t i = 0; i < VOLUME; i++) {
             su3_mat_c temp, res;
-            su3matxsu3mat      (&temp, &h_u[i], &h_v[i]);
-            su3matdagxsu3matdag(&res,  &h_w[i], &h_x[i]);
+            su3matxsu3mat      (&temp, &u_fld[0*VOLUME+i], &u_fld[1*VOLUME+i]);
+            su3matdagxsu3matdag(&res,  &u_fld[2*VOLUME+i], &u_fld[3*VOLUME+i]);
             h_res[i] = su3matxsu3mat_retrace(&temp, &res);
         }
         total_s += omp_get_wtime() - t0;
@@ -104,8 +98,8 @@ int main(int argc, char *argv[])
     #pragma omp target exit data map(release: flush_buf[0:FLUSH_NELEMS])
     free(flush_buf);
 
-    #pragma omp target exit data map(release: h_u[0:VOLUME], h_v[0:VOLUME], h_w[0:VOLUME], h_x[0:VOLUME], h_res[0:VOLUME])
-    free(h_u); free(h_v); free(h_w); free(h_x); free(h_res);
+    #pragma omp target exit data map(release: u_fld[0:4*VOLUME], h_res[0:VOLUME])
+    free(u_fld); free(h_res);
 
     return 0;
 }

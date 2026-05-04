@@ -102,64 +102,64 @@ DEVICE_KEYWORD double su3matdxsu3matd_retrace(const su3_mat_dble *u, const su3_m
 PRAGMA_OMP_END
 
 PRAGMA_OMP_BEGIN
-DEVICE_KEYWORD void fsu3matxsu3mat(su3_mat_dble *res, const su3_mat_field *u, const su3_mat_field *v, const size_t i)
+DEVICE_KEYWORD void fsu3matxsu3mat(su3_mat_dble *res, const su3_mat_field *u, const size_t i0, const size_t i1)
 {
-    res->c1.c1re = u->c1.c1re[i] * v->c1.c1re[i] - u->c1.c1im[i] * v->c1.c1im[i] +
-                   u->c1.c2re[i] * v->c1.c2re[i] - u->c1.c2im[i] * v->c1.c2im[i] +
-                   u->c1.c3re[i] * v->c1.c3re[i] - u->c1.c3im[i] * v->c1.c3im[i];
-    res->c1.c1im = u->c1.c1re[i] * v->c1.c1im[i] + u->c1.c1im[i] * v->c1.c1re[i] +
-                   u->c1.c2re[i] * v->c1.c2im[i] + u->c1.c2im[i] * v->c1.c2re[i] +
-                   u->c1.c3re[i] * v->c1.c3im[i] + u->c1.c3im[i] * v->c1.c3re[i];
-    res->c1.c2re = u->c2.c1re[i] * v->c1.c1re[i] - u->c2.c1im[i] * v->c1.c1im[i] +
-                   u->c2.c2re[i] * v->c1.c2re[i] - u->c2.c2im[i] * v->c1.c2im[i] +
-                   u->c2.c3re[i] * v->c1.c3re[i] - u->c2.c3im[i] * v->c1.c3im[i];
-    res->c1.c2im = u->c2.c1re[i] * v->c1.c1im[i] + u->c2.c1im[i] * v->c1.c1re[i] +
-                   u->c2.c2re[i] * v->c1.c2im[i] + u->c2.c2im[i] * v->c1.c2re[i] +
-                   u->c2.c3re[i] * v->c1.c3im[i] + u->c2.c3im[i] * v->c1.c3re[i];
-    res->c1.c3re = u->c3.c1re[i] * v->c1.c1re[i] - u->c3.c1im[i] * v->c1.c1im[i] +
-                   u->c3.c2re[i] * v->c1.c2re[i] - u->c3.c2im[i] * v->c1.c2im[i] +
-                   u->c3.c3re[i] * v->c1.c3re[i] - u->c3.c3im[i] * v->c1.c3im[i];
-    res->c1.c3im = u->c3.c1re[i] * v->c1.c1im[i] + u->c3.c1im[i] * v->c1.c1re[i] +
-                   u->c3.c2re[i] * v->c1.c2im[i] + u->c3.c2im[i] * v->c1.c2re[i] +
-                   u->c3.c3re[i] * v->c1.c3im[i] + u->c3.c3im[i] * v->c1.c3re[i];
+    res->c1.c1re = u->c1.c1re[i0] * u->c1.c1re[i1] - u->c1.c1im[i0] * u->c1.c1im[i1] +
+                   u->c1.c2re[i0] * u->c1.c2re[i1] - u->c1.c2im[i0] * u->c1.c2im[i1] +
+                   u->c1.c3re[i0] * u->c1.c3re[i1] - u->c1.c3im[i0] * u->c1.c3im[i1];
+    res->c1.c1im = u->c1.c1re[i0] * u->c1.c1im[i1] + u->c1.c1im[i0] * u->c1.c1re[i1] +
+                   u->c1.c2re[i0] * u->c1.c2im[i1] + u->c1.c2im[i0] * u->c1.c2re[i1] +
+                   u->c1.c3re[i0] * u->c1.c3im[i1] + u->c1.c3im[i0] * u->c1.c3re[i1];
+    res->c1.c2re = u->c2.c1re[i0] * u->c1.c1re[i1] - u->c2.c1im[i0] * u->c1.c1im[i1] +
+                   u->c2.c2re[i0] * u->c1.c2re[i1] - u->c2.c2im[i0] * u->c1.c2im[i1] +
+                   u->c2.c3re[i0] * u->c1.c3re[i1] - u->c2.c3im[i0] * u->c1.c3im[i1];
+    res->c1.c2im = u->c2.c1re[i0] * u->c1.c1im[i1] + u->c2.c1im[i0] * u->c1.c1re[i1] +
+                   u->c2.c2re[i0] * u->c1.c2im[i1] + u->c2.c2im[i0] * u->c1.c2re[i1] +
+                   u->c2.c3re[i0] * u->c1.c3im[i1] + u->c2.c3im[i0] * u->c1.c3re[i1];
+    res->c1.c3re = u->c3.c1re[i0] * u->c1.c1re[i1] - u->c3.c1im[i0] * u->c1.c1im[i1] +
+                   u->c3.c2re[i0] * u->c1.c2re[i1] - u->c3.c2im[i0] * u->c1.c2im[i1] +
+                   u->c3.c3re[i0] * u->c1.c3re[i1] - u->c3.c3im[i0] * u->c1.c3im[i1];
+    res->c1.c3im = u->c3.c1re[i0] * u->c1.c1im[i1] + u->c3.c1im[i0] * u->c1.c1re[i1] +
+                   u->c3.c2re[i0] * u->c1.c2im[i1] + u->c3.c2im[i0] * u->c1.c2re[i1] +
+                   u->c3.c3re[i0] * u->c1.c3im[i1] + u->c3.c3im[i0] * u->c1.c3re[i1];
 
-    res->c2.c1re = u->c1.c1re[i] * v->c2.c1re[i] - u->c1.c1im[i] * v->c2.c1im[i] +
-                   u->c1.c2re[i] * v->c2.c2re[i] - u->c1.c2im[i] * v->c2.c2im[i] +
-                   u->c1.c3re[i] * v->c2.c3re[i] - u->c1.c3im[i] * v->c2.c3im[i];
-    res->c2.c1im = u->c1.c1re[i] * v->c2.c1im[i] + u->c1.c1im[i] * v->c2.c1re[i] +
-                   u->c1.c2re[i] * v->c2.c2im[i] + u->c1.c2im[i] * v->c2.c2re[i] +
-                   u->c1.c3re[i] * v->c2.c3im[i] + u->c1.c3im[i] * v->c2.c3re[i];
-    res->c2.c2re = u->c2.c1re[i] * v->c2.c1re[i] - u->c2.c1im[i] * v->c2.c1im[i] +
-                   u->c2.c2re[i] * v->c2.c2re[i] - u->c2.c2im[i] * v->c2.c2im[i] +
-                   u->c2.c3re[i] * v->c2.c3re[i] - u->c2.c3im[i] * v->c2.c3im[i];
-    res->c2.c2im = u->c2.c1re[i] * v->c2.c1im[i] + u->c2.c1im[i] * v->c2.c1re[i] +
-                   u->c2.c2re[i] * v->c2.c2im[i] + u->c2.c2im[i] * v->c2.c2re[i] +
-                   u->c2.c3re[i] * v->c2.c3im[i] + u->c2.c3im[i] * v->c2.c3re[i];
-    res->c2.c3re = u->c3.c1re[i] * v->c2.c1re[i] - u->c3.c1im[i] * v->c2.c1im[i] +
-                   u->c3.c2re[i] * v->c2.c2re[i] - u->c3.c2im[i] * v->c2.c2im[i] +
-                   u->c3.c3re[i] * v->c2.c3re[i] - u->c3.c3im[i] * v->c2.c3im[i];
-    res->c2.c3im = u->c3.c1re[i] * v->c2.c1im[i] + u->c3.c1im[i] * v->c2.c1re[i] +
-                   u->c3.c2re[i] * v->c2.c2im[i] + u->c3.c2im[i] * v->c2.c2re[i] +
-                   u->c3.c3re[i] * v->c2.c3im[i] + u->c3.c3im[i] * v->c2.c3re[i];
+    res->c2.c1re = u->c1.c1re[i0] * u->c2.c1re[i1] - u->c1.c1im[i0] * u->c2.c1im[i1] +
+                   u->c1.c2re[i0] * u->c2.c2re[i1] - u->c1.c2im[i0] * u->c2.c2im[i1] +
+                   u->c1.c3re[i0] * u->c2.c3re[i1] - u->c1.c3im[i0] * u->c2.c3im[i1];
+    res->c2.c1im = u->c1.c1re[i0] * u->c2.c1im[i1] + u->c1.c1im[i0] * u->c2.c1re[i1] +
+                   u->c1.c2re[i0] * u->c2.c2im[i1] + u->c1.c2im[i0] * u->c2.c2re[i1] +
+                   u->c1.c3re[i0] * u->c2.c3im[i1] + u->c1.c3im[i0] * u->c2.c3re[i1];
+    res->c2.c2re = u->c2.c1re[i0] * u->c2.c1re[i1] - u->c2.c1im[i0] * u->c2.c1im[i1] +
+                   u->c2.c2re[i0] * u->c2.c2re[i1] - u->c2.c2im[i0] * u->c2.c2im[i1] +
+                   u->c2.c3re[i0] * u->c2.c3re[i1] - u->c2.c3im[i0] * u->c2.c3im[i1];
+    res->c2.c2im = u->c2.c1re[i0] * u->c2.c1im[i1] + u->c2.c1im[i0] * u->c2.c1re[i1] +
+                   u->c2.c2re[i0] * u->c2.c2im[i1] + u->c2.c2im[i0] * u->c2.c2re[i1] +
+                   u->c2.c3re[i0] * u->c2.c3im[i1] + u->c2.c3im[i0] * u->c2.c3re[i1];
+    res->c2.c3re = u->c3.c1re[i0] * u->c2.c1re[i1] - u->c3.c1im[i0] * u->c2.c1im[i1] +
+                   u->c3.c2re[i0] * u->c2.c2re[i1] - u->c3.c2im[i0] * u->c2.c2im[i1] +
+                   u->c3.c3re[i0] * u->c2.c3re[i1] - u->c3.c3im[i0] * u->c2.c3im[i1];
+    res->c2.c3im = u->c3.c1re[i0] * u->c2.c1im[i1] + u->c3.c1im[i0] * u->c2.c1re[i1] +
+                   u->c3.c2re[i0] * u->c2.c2im[i1] + u->c3.c2im[i0] * u->c2.c2re[i1] +
+                   u->c3.c3re[i0] * u->c2.c3im[i1] + u->c3.c3im[i0] * u->c2.c3re[i1];
 
-    res->c3.c1re = u->c1.c1re[i] * v->c3.c1re[i] - u->c1.c1im[i] * v->c3.c1im[i] +
-                   u->c1.c2re[i] * v->c3.c2re[i] - u->c1.c2im[i] * v->c3.c2im[i] +
-                   u->c1.c3re[i] * v->c3.c3re[i] - u->c1.c3im[i] * v->c3.c3im[i];
-    res->c3.c1im = u->c1.c1re[i] * v->c3.c1im[i] + u->c1.c1im[i] * v->c3.c1re[i] +
-                   u->c1.c2re[i] * v->c3.c2im[i] + u->c1.c2im[i] * v->c3.c2re[i] +
-                   u->c1.c3re[i] * v->c3.c3im[i] + u->c1.c3im[i] * v->c3.c3re[i];
-    res->c3.c2re = u->c2.c1re[i] * v->c3.c1re[i] - u->c2.c1im[i] * v->c3.c1im[i] +
-                   u->c2.c2re[i] * v->c3.c2re[i] - u->c2.c2im[i] * v->c3.c2im[i] +
-                   u->c2.c3re[i] * v->c3.c3re[i] - u->c2.c3im[i] * v->c3.c3im[i];
-    res->c3.c2im = u->c2.c1re[i] * v->c3.c1im[i] + u->c2.c1im[i] * v->c3.c1re[i] +
-                   u->c2.c2re[i] * v->c3.c2im[i] + u->c2.c2im[i] * v->c3.c2re[i] +
-                   u->c2.c3re[i] * v->c3.c3im[i] + u->c2.c3im[i] * v->c3.c3re[i];
-    res->c3.c3re = u->c3.c1re[i] * v->c3.c1re[i] - u->c3.c1im[i] * v->c3.c1im[i] +
-                   u->c3.c2re[i] * v->c3.c2re[i] - u->c3.c2im[i] * v->c3.c2im[i] +
-                   u->c3.c3re[i] * v->c3.c3re[i] - u->c3.c3im[i] * v->c3.c3im[i];
-    res->c3.c3im = u->c3.c1re[i] * v->c3.c1im[i] + u->c3.c1im[i] * v->c3.c1re[i] +
-                   u->c3.c2re[i] * v->c3.c2im[i] + u->c3.c2im[i] * v->c3.c2re[i] +
-                   u->c3.c3re[i] * v->c3.c3im[i] + u->c3.c3im[i] * v->c3.c3re[i];
+    res->c3.c1re = u->c1.c1re[i0] * u->c3.c1re[i1] - u->c1.c1im[i0] * u->c3.c1im[i1] +
+                   u->c1.c2re[i0] * u->c3.c2re[i1] - u->c1.c2im[i0] * u->c3.c2im[i1] +
+                   u->c1.c3re[i0] * u->c3.c3re[i1] - u->c1.c3im[i0] * u->c3.c3im[i1];
+    res->c3.c1im = u->c1.c1re[i0] * u->c3.c1im[i1] + u->c1.c1im[i0] * u->c3.c1re[i1] +
+                   u->c1.c2re[i0] * u->c3.c2im[i1] + u->c1.c2im[i0] * u->c3.c2re[i1] +
+                   u->c1.c3re[i0] * u->c3.c3im[i1] + u->c1.c3im[i0] * u->c3.c3re[i1];
+    res->c3.c2re = u->c2.c1re[i0] * u->c3.c1re[i1] - u->c2.c1im[i0] * u->c3.c1im[i1] +
+                   u->c2.c2re[i0] * u->c3.c2re[i1] - u->c2.c2im[i0] * u->c3.c2im[i1] +
+                   u->c2.c3re[i0] * u->c3.c3re[i1] - u->c2.c3im[i0] * u->c3.c3im[i1];
+    res->c3.c2im = u->c2.c1re[i0] * u->c3.c1im[i1] + u->c2.c1im[i0] * u->c3.c1re[i1] +
+                   u->c2.c2re[i0] * u->c3.c2im[i1] + u->c2.c2im[i0] * u->c3.c2re[i1] +
+                   u->c2.c3re[i0] * u->c3.c3im[i1] + u->c2.c3im[i0] * u->c3.c3re[i1];
+    res->c3.c3re = u->c3.c1re[i0] * u->c3.c1re[i1] - u->c3.c1im[i0] * u->c3.c1im[i1] +
+                   u->c3.c2re[i0] * u->c3.c2re[i1] - u->c3.c2im[i0] * u->c3.c2im[i1] +
+                   u->c3.c3re[i0] * u->c3.c3re[i1] - u->c3.c3im[i0] * u->c3.c3im[i1];
+    res->c3.c3im = u->c3.c1re[i0] * u->c3.c1im[i1] + u->c3.c1im[i0] * u->c3.c1re[i1] +
+                   u->c3.c2re[i0] * u->c3.c2im[i1] + u->c3.c2im[i0] * u->c3.c2re[i1] +
+                   u->c3.c3re[i0] * u->c3.c3im[i1] + u->c3.c3im[i0] * u->c3.c3re[i1];
 }
 PRAGMA_OMP_END
 
@@ -167,64 +167,64 @@ PRAGMA_OMP_END
  * Computes w=u^dag*v^dag assuming that w is different from u and v.
  */
 PRAGMA_OMP_BEGIN
-DEVICE_KEYWORD void fsu3matdagxsu3matdag(su3_mat_dble *w, const su3_mat_field *u, const su3_mat_field *v, const size_t i)
+DEVICE_KEYWORD void fsu3matdagxsu3matdag(su3_mat_dble *w, const su3_mat_field *u, const size_t i0, const size_t i1)
 {
-    w->c1.c1re = u->c1.c1re[i] * v->c1.c1re[i] + u->c1.c1im[i] * -v->c1.c1im[i] +
-                 u->c2.c1re[i] * v->c1.c2re[i] + u->c2.c1im[i] * -v->c1.c2im[i] +
-                 u->c3.c1re[i] * v->c1.c3re[i] + u->c3.c1im[i] * -v->c1.c3im[i];
-    w->c1.c1im = u->c1.c1re[i] * -v->c1.c1im[i] - u->c1.c1im[i] * v->c1.c1re[i] +
-                 u->c2.c1re[i] * -v->c1.c2im[i] - u->c2.c1im[i] * v->c1.c2re[i] +
-                 u->c3.c1re[i] * -v->c1.c3im[i] - u->c3.c1im[i] * v->c1.c3re[i];
-    w->c2.c1re = u->c1.c2re[i] * v->c1.c1re[i] + u->c1.c2im[i] * -v->c1.c1im[i] +
-                 u->c2.c2re[i] * v->c1.c2re[i] + u->c2.c2im[i] * -v->c1.c2im[i] +
-                 u->c3.c2re[i] * v->c1.c3re[i] + u->c3.c2im[i] * -v->c1.c3im[i];
-    w->c2.c1im = u->c1.c2re[i] * -v->c1.c1im[i] - u->c1.c2im[i] * v->c1.c1re[i] +
-                 u->c2.c2re[i] * -v->c1.c2im[i] - u->c2.c2im[i] * v->c1.c2re[i] +
-                 u->c3.c2re[i] * -v->c1.c3im[i] - u->c3.c2im[i] * v->c1.c3re[i];
-    w->c3.c1re = u->c1.c3re[i] * v->c1.c1re[i] + u->c1.c3im[i] * -v->c1.c1im[i] +
-                 u->c2.c3re[i] * v->c1.c2re[i] + u->c2.c3im[i] * -v->c1.c2im[i] +
-                 u->c3.c3re[i] * v->c1.c3re[i] + u->c3.c3im[i] * -v->c1.c3im[i];
-    w->c3.c1im = u->c1.c3re[i] * -v->c1.c1im[i] - u->c1.c3im[i] * v->c1.c1re[i] +
-                 u->c2.c3re[i] * -v->c1.c2im[i] - u->c2.c3im[i] * v->c1.c2re[i] +
-                 u->c3.c3re[i] * -v->c1.c3im[i] - u->c3.c3im[i] * v->c1.c3re[i];
+    w->c1.c1re = u->c1.c1re[i0] * u->c1.c1re[i1] - u->c1.c1im[i0] * u->c1.c1im[i1]
+               + u->c2.c1re[i0] * u->c1.c2re[i1] - u->c2.c1im[i0] * u->c1.c2im[i1]
+               + u->c3.c1re[i0] * u->c1.c3re[i1] - u->c3.c1im[i0] * u->c1.c3im[i1];
+    w->c1.c1im = u->c1.c1re[i0] * -u->c1.c1im[i1] - u->c1.c1im[i0] * u->c1.c1re[i1]
+               + u->c2.c1re[i0] * -u->c1.c2im[i1] - u->c2.c1im[i0] * u->c1.c2re[i1]
+               + u->c3.c1re[i0] * -u->c1.c3im[i1] - u->c3.c1im[i0] * u->c1.c3re[i1];
+    w->c2.c1re = u->c1.c2re[i0] * u->c1.c1re[i1] - u->c1.c2im[i0] * u->c1.c1im[i1]
+               + u->c2.c2re[i0] * u->c1.c2re[i1] - u->c2.c2im[i0] * u->c1.c2im[i1]
+               + u->c3.c2re[i0] * u->c1.c3re[i1] - u->c3.c2im[i0] * u->c1.c3im[i1];
+    w->c2.c1im = u->c1.c2re[i0] * -u->c1.c1im[i1] - u->c1.c2im[i0] * u->c1.c1re[i1]
+               + u->c2.c2re[i0] * -u->c1.c2im[i1] - u->c2.c2im[i0] * u->c1.c2re[i1]
+               + u->c3.c2re[i0] * -u->c1.c3im[i1] - u->c3.c2im[i0] * u->c1.c3re[i1];
+    w->c3.c1re = u->c1.c3re[i0] * u->c1.c1re[i1] - u->c1.c3im[i0] * u->c1.c1im[i1]
+               + u->c2.c3re[i0] * u->c1.c2re[i1] - u->c2.c3im[i0] * u->c1.c2im[i1] 
+               + u->c3.c3re[i0] * u->c1.c3re[i1] - u->c3.c3im[i0] * u->c1.c3im[i1];
+    w->c3.c1im = u->c1.c3re[i0] * -u->c1.c1im[i1] - u->c1.c3im[i0] * u->c1.c1re[i1]
+               + u->c2.c3re[i0] * -u->c1.c2im[i1] - u->c2.c3im[i0] * u->c1.c2re[i1] 
+               + u->c3.c3re[i0] * -u->c1.c3im[i1] - u->c3.c3im[i0] * u->c1.c3re[i1];
 
-    w->c1.c2re = u->c1.c1re[i] * v->c2.c1re[i] + u->c1.c1im[i] * -v->c2.c1im[i] +
-                 u->c2.c1re[i] * v->c2.c2re[i] + u->c2.c1im[i] * -v->c2.c2im[i] +
-                 u->c3.c1re[i] * v->c2.c3re[i] + u->c3.c1im[i] * -v->c2.c3im[i];
-    w->c1.c2im = u->c1.c1re[i] * -v->c2.c1im[i] - u->c1.c1im[i] * v->c2.c1re[i] +
-                 u->c2.c1re[i] * -v->c2.c2im[i] - u->c2.c1im[i] * v->c2.c2re[i] +
-                 u->c3.c1re[i] * -v->c2.c3im[i] - u->c3.c1im[i] * v->c2.c3re[i];
-    w->c2.c2re = u->c1.c2re[i] * v->c2.c1re[i] + u->c1.c2im[i] * -v->c2.c1im[i] +
-                 u->c2.c2re[i] * v->c2.c2re[i] + u->c2.c2im[i] * -v->c2.c2im[i] +
-                 u->c3.c2re[i] * v->c2.c3re[i] + u->c3.c2im[i] * -v->c2.c3im[i];
-    w->c2.c2im = u->c1.c2re[i] * -v->c2.c1im[i] - u->c1.c2im[i] * v->c2.c1re[i] +
-                 u->c2.c2re[i] * -v->c2.c2im[i] - u->c2.c2im[i] * v->c2.c2re[i] +
-                 u->c3.c2re[i] * -v->c2.c3im[i] - u->c3.c2im[i] * v->c2.c3re[i];
-    w->c3.c2re = u->c1.c3re[i] * v->c2.c1re[i] + u->c1.c3im[i] * -v->c2.c1im[i] +
-                 u->c2.c3re[i] * v->c2.c2re[i] + u->c2.c3im[i] * -v->c2.c2im[i] +
-                 u->c3.c3re[i] * v->c2.c3re[i] + u->c3.c3im[i] * -v->c2.c3im[i];
-    w->c3.c2im = u->c1.c3re[i] * -v->c2.c1im[i] - u->c1.c3im[i] * v->c2.c1re[i] +
-                 u->c2.c3re[i] * -v->c2.c2im[i] - u->c2.c3im[i] * v->c2.c2re[i] +
-                 u->c3.c3re[i] * -v->c2.c3im[i] - u->c3.c3im[i] * v->c2.c3re[i];
+    w->c1.c2re = u->c1.c1re[i0] * u->c2.c1re[i1] - u->c1.c1im[i0] * u->c2.c1im[i1]
+               + u->c2.c1re[i0] * u->c2.c2re[i1] - u->c2.c1im[i0] * u->c2.c2im[i1]
+               + u->c3.c1re[i0] * u->c2.c3re[i1] - u->c3.c1im[i0] * u->c2.c3im[i1];
+    w->c1.c2im = u->c1.c1re[i0] * -u->c2.c1im[i1] - u->c1.c1im[i0] * u->c2.c1re[i1]
+               + u->c2.c1re[i0] * -u->c2.c2im[i1] - u->c2.c1im[i0] * u->c2.c2re[i1]
+               + u->c3.c1re[i0] * -u->c2.c3im[i1] - u->c3.c1im[i0] * u->c2.c3re[i1];
+    w->c2.c2re = u->c1.c2re[i0] * u->c2.c1re[i1] - u->c1.c2im[i0] * u->c2.c1im[i1]
+               + u->c2.c2re[i0] * u->c2.c2re[i1] - u->c2.c2im[i0] * u->c2.c2im[i1]
+               + u->c3.c2re[i0] * u->c2.c3re[i1] - u->c3.c2im[i0] * u->c2.c3im[i1];
+    w->c2.c2im = u->c1.c2re[i0] * -u->c2.c1im[i1] - u->c1.c2im[i0] * u->c2.c1re[i1]
+               + u->c2.c2re[i0] * -u->c2.c2im[i1] - u->c2.c2im[i0] * u->c2.c2re[i1]
+               + u->c3.c2re[i0] * -u->c2.c3im[i1] - u->c3.c2im[i0] * u->c2.c3re[i1];
+    w->c3.c2re = u->c1.c3re[i0] * u->c2.c1re[i1] - u->c1.c3im[i0] * u->c2.c1im[i1]
+               + u->c2.c3re[i0] * u->c2.c2re[i1] - u->c2.c3im[i0] * u->c2.c2im[i1]
+               + u->c3.c3re[i0] * u->c2.c3re[i1] - u->c3.c3im[i0] * u->c2.c3im[i1];
+    w->c3.c2im = u->c1.c3re[i0] * -u->c2.c1im[i1] - u->c1.c3im[i0] * u->c2.c1re[i1]
+               + u->c2.c3re[i0] * -u->c2.c2im[i1] - u->c2.c3im[i0] * u->c2.c2re[i1]
+               + u->c3.c3re[i0] * -u->c2.c3im[i1] - u->c3.c3im[i0] * u->c2.c3re[i1];
 
-    w->c1.c3re = u->c1.c1re[i] * v->c3.c1re[i] + u->c1.c1im[i] * -v->c3.c1im[i] +
-                 u->c2.c1re[i] * v->c3.c2re[i] + u->c2.c1im[i] * -v->c3.c2im[i] +
-                 u->c3.c1re[i] * v->c3.c3re[i] + u->c3.c1im[i] * -v->c3.c3im[i];
-    w->c1.c3im = u->c1.c1re[i] * -v->c3.c1im[i] - u->c1.c1im[i] * v->c3.c1re[i] +
-                 u->c2.c1re[i] * -v->c3.c2im[i] - u->c2.c1im[i] * v->c3.c2re[i] +
-                 u->c3.c1re[i] * -v->c3.c3im[i] - u->c3.c1im[i] * v->c3.c3re[i];
-    w->c2.c3re = u->c1.c2re[i] * v->c3.c1re[i] + u->c1.c2im[i] * -v->c3.c1im[i] +
-                 u->c2.c2re[i] * v->c3.c2re[i] + u->c2.c2im[i] * -v->c3.c2im[i] +
-                 u->c3.c2re[i] * v->c3.c3re[i] + u->c3.c2im[i] * -v->c3.c3im[i];
-    w->c2.c3im = u->c1.c2re[i] * -v->c3.c1im[i] - u->c1.c2im[i] * v->c3.c1re[i] +
-                 u->c2.c2re[i] * -v->c3.c2im[i] - u->c2.c2im[i] * v->c3.c2re[i] +
-                 u->c3.c2re[i] * -v->c3.c3im[i] - u->c3.c2im[i] * v->c3.c3re[i];
-    w->c3.c3re = u->c1.c3re[i] * v->c3.c1re[i] + u->c1.c3im[i] * -v->c3.c1im[i] +
-                 u->c2.c3re[i] * v->c3.c2re[i] + u->c2.c3im[i] * -v->c3.c2im[i] +
-                 u->c3.c3re[i] * v->c3.c3re[i] + u->c3.c3im[i] * -v->c3.c3im[i];
-    w->c3.c3im = u->c1.c3re[i] * -v->c3.c1im[i] - u->c1.c3im[i] * v->c3.c1re[i] +
-                 u->c2.c3re[i] * -v->c3.c2im[i] - u->c2.c3im[i] * v->c3.c2re[i] +
-                 u->c3.c3re[i] * -v->c3.c3im[i] - u->c3.c3im[i] * v->c3.c3re[i];
+    w->c1.c3re = u->c1.c1re[i0] * u->c3.c1re[i1] - u->c1.c1im[i0] * u->c3.c1im[i1]
+               + u->c2.c1re[i0] * u->c3.c2re[i1] - u->c2.c1im[i0] * u->c3.c2im[i1]
+               + u->c3.c1re[i0] * u->c3.c3re[i1] - u->c3.c1im[i0] * u->c3.c3im[i1];
+    w->c1.c3im = u->c1.c1re[i0] * -u->c3.c1im[i1] - u->c1.c1im[i0] * u->c3.c1re[i1]
+               + u->c2.c1re[i0] * -u->c3.c2im[i1] - u->c2.c1im[i0] * u->c3.c2re[i1]
+               + u->c3.c1re[i0] * -u->c3.c3im[i1] - u->c3.c1im[i0] * u->c3.c3re[i1];
+    w->c2.c3re = u->c1.c2re[i0] * u->c3.c1re[i1] - u->c1.c2im[i0] * u->c3.c1im[i1]
+               + u->c2.c2re[i0] * u->c3.c2re[i1] - u->c2.c2im[i0] * u->c3.c2im[i1]
+               + u->c3.c2re[i0] * u->c3.c3re[i1] - u->c3.c2im[i0] * u->c3.c3im[i1];
+    w->c2.c3im = u->c1.c2re[i0] * -u->c3.c1im[i1] - u->c1.c2im[i0] * u->c3.c1re[i1]
+               + u->c2.c2re[i0] * -u->c3.c2im[i1] - u->c2.c2im[i0] * u->c3.c2re[i1]
+               + u->c3.c2re[i0] * -u->c3.c3im[i1] - u->c3.c2im[i0] * u->c3.c3re[i1];
+    w->c3.c3re = u->c1.c3re[i0] * u->c3.c1re[i1] - u->c1.c3im[i0] * u->c3.c1im[i1]
+               + u->c2.c3re[i0] * u->c3.c2re[i1] - u->c2.c3im[i0] * u->c3.c2im[i1]
+               + u->c3.c3re[i0] * u->c3.c3re[i1] - u->c3.c3im[i0] * u->c3.c3im[i1];
+    w->c3.c3im = u->c1.c3re[i0] * -u->c3.c1im[i1] - u->c1.c3im[i0] * u->c3.c1re[i1]
+               + u->c2.c3re[i0] * -u->c3.c2im[i1] - u->c2.c3im[i0] * u->c3.c2re[i1]
+               + u->c3.c3re[i0] * -u->c3.c3im[i1] - u->c3.c3im[i0] * u->c3.c3re[i1];
 }
 PRAGMA_OMP_END
 

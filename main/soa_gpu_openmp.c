@@ -22,27 +22,18 @@ int main(int argc, char *argv[])
     // -----------------------------------------------------------------------
     // Host fields
     // -----------------------------------------------------------------------
-    su3_mat_field h_u, h_v, h_w, h_x;
+    su3_mat_field u_fld;
     doublev       h_res;
 
-    su3_mat_field_init(&h_u, VOLUME);
-    su3_mat_field_init(&h_v, VOLUME);
-    su3_mat_field_init(&h_w, VOLUME);
-    su3_mat_field_init(&h_x, VOLUME);
+    su3_mat_field_init(&u_fld, 4*VOLUME);
     doublev_init(&h_res, VOLUME);
 
-    random_su3mat_field(&h_u);
-    random_su3mat_field(&h_v);
-    random_su3mat_field(&h_w);
-    random_su3mat_field(&h_x);
+    random_su3mat_field(&u_fld);
 
     // -----------------------------------------------------------------------
     // Map data to device
     // -----------------------------------------------------------------------
-    enter_su3_mat_field(&h_u);
-    enter_su3_mat_field(&h_v);
-    enter_su3_mat_field(&h_w);
-    enter_su3_mat_field(&h_x);
+    enter_su3_mat_field(&u_fld);
     enter_double_field(&h_res);
 
     double *flush_buf = (double *)malloc(FLUSH_NELEMS * sizeof(double));
@@ -55,8 +46,8 @@ int main(int argc, char *argv[])
         #pragma omp target teams distribute parallel for
         for (size_t i = 0; i < VOLUME; i++) {
             su3_mat_dble temp, res;
-            fsu3matxsu3mat      (&temp, &h_u, &h_v, i);
-            fsu3matdagxsu3matdag(&res,  &h_w, &h_x, i);
+            fsu3matxsu3mat      (&temp, &u_fld, 0*VOLUME+i, 1*VOLUME+i);
+            fsu3matdagxsu3matdag(&res,  &u_fld, 2*VOLUME+i, 3*VOLUME+i);
             h_res.base[i] = su3matdxsu3matd_retrace(&temp, &res);
         }
     }
@@ -75,8 +66,8 @@ int main(int argc, char *argv[])
         #pragma omp target teams distribute parallel for
         for (size_t i = 0; i < VOLUME; i++) {
             su3_mat_dble temp, res;
-            fsu3matxsu3mat      (&temp, &h_u, &h_v, i);
-            fsu3matdagxsu3matdag(&res,  &h_w, &h_x, i);
+            fsu3matxsu3mat      (&temp, &u_fld, 0*VOLUME+i, 1*VOLUME+i);
+            fsu3matdagxsu3matdag(&res,  &u_fld, 2*VOLUME+i, 3*VOLUME+i);
             h_res.base[i] = su3matdxsu3matd_retrace(&temp, &res);
         }
         total_s += omp_get_wtime() - t0;
@@ -105,10 +96,7 @@ int main(int argc, char *argv[])
     #pragma omp target exit data map(release: flush_buf[0:FLUSH_NELEMS])
     free(flush_buf);
 
-    su3_mat_field_free(&h_u);
-    su3_mat_field_free(&h_v);
-    su3_mat_field_free(&h_w);
-    su3_mat_field_free(&h_x);
+    su3_mat_field_free(u_fld);
     free(h_res.base);
 
     return 0;

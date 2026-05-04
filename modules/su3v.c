@@ -6,17 +6,10 @@
 #include <stdio.h>
 #include <string.h>
 #include "su3v.h"
+#include "su3.h"
 #include "global.h"
 
 
-void random_su3vec_field(su3_vec_field *su3vf)
-{
-    size_t n = 6 * su3vf->volume;
-    double *d = su3vf->base;
-
-    for (size_t i = 0; i < n; i++)
-        d[i] = (double)rand() / (double)RAND_MAX;
-}
 
 void unit_su3vec_field(su3_vec_field *su3vf)
 {
@@ -29,9 +22,25 @@ void unit_su3vec_field(su3_vec_field *su3vf)
 
 void random_su3mat_field(su3_mat_field *su3mf)
 {
-    random_su3vec_field(&su3mf->c1);
-    random_su3vec_field(&su3mf->c2);
-    random_su3vec_field(&su3mf->c3);
+    size_t volume = su3mf->c1.volume;
+    uint64_t state = 12345678ULL;
+    su3_mat_c tmp;
+
+    for (size_t i = 0; i < volume; i++) {
+        random_su3mat(&tmp, &state);
+
+        su3mf->c1.c1re[i] = tmp.c11.re;  su3mf->c1.c1im[i] = tmp.c11.im;
+        su3mf->c1.c2re[i] = tmp.c21.re;  su3mf->c1.c2im[i] = tmp.c21.im;
+        su3mf->c1.c3re[i] = tmp.c31.re;  su3mf->c1.c3im[i] = tmp.c31.im;
+
+        su3mf->c2.c1re[i] = tmp.c12.re;  su3mf->c2.c1im[i] = tmp.c12.im;
+        su3mf->c2.c2re[i] = tmp.c22.re;  su3mf->c2.c2im[i] = tmp.c22.im;
+        su3mf->c2.c3re[i] = tmp.c32.re;  su3mf->c2.c3im[i] = tmp.c32.im;
+
+        su3mf->c3.c1re[i] = tmp.c13.re;  su3mf->c3.c1im[i] = tmp.c13.im;
+        su3mf->c3.c2re[i] = tmp.c23.re;  su3mf->c3.c2im[i] = tmp.c23.im;
+        su3mf->c3.c3re[i] = tmp.c33.re;  su3mf->c3.c3im[i] = tmp.c33.im;
+    }
 }
 
 void unit_su3mat_field(su3_mat_field *su3mf)
