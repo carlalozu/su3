@@ -19,6 +19,10 @@
 extern void set_iupdn(void);
 #endif
 
+#ifndef UTILS_H
+#include "utils.h"
+#endif
+
 /* GEOMETRY_C */
 extern void geometry(void);
 #pragma omp declare target

@@ -53,6 +53,7 @@
 #pragma omp declare target
 int *ipt=NULL;
 int (*iup)[4]=NULL;
+int (*idn)[4]=NULL;
 int (*iupT)[VOLUME]=NULL;
 #pragma omp end declare target
 
@@ -61,6 +62,7 @@ int (*iupT)[VOLUME]=NULL;
 #pragma omp declare target
 extern int *ipt;
 extern int (*iup)[4];
+extern int (*idn)[4];
 extern int (*iupT)[VOLUME];
 #pragma omp end declare target
 

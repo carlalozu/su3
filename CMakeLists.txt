@@ -13,6 +13,11 @@ add_library(su3lib
     modules/su3.c
     modules/su3prod.c
     modules/su3v.c
+    modules/geometry.c
+    modules/geogen.c
+    modules/uidx.c
+    modules/uflds.c
+    modules/plaq_sum.c
 )
 target_include_directories(su3lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 

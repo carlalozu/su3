@@ -1,6 +1,7 @@
 #define UFLDS_C
 
 #include "lattice.h"
+#include "utils.h"
 #include "uflds.h"
 #include "global.h"
 

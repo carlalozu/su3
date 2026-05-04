@@ -2,26 +2,25 @@
 #define PLAQ_SUM_C
 
 #include "lattice.h"
+#include "su3prod.h"
 #include "uflds.h"
+#include "utils.h"
 #include "global.h"
 
 static su3_dble *udb;
 
 #pragma omp declare target
-static double plaq_dble(su3_dble *udb, int mu, int nu,int ix)
+static double plaq_dble(su3_dble *udb, int mu, int nu, int ix)
 {
    int ip[4];
-   double sm;
-   su3_dble wd1 ALIGNED16;
-   su3_dble wd2 ALIGNED16;
+   su3_dble wd1, wd2;
 
-   plaq_uidx(mu,nu,ix,ip);
+   plaq_uidx(mu, nu, ix, ip);
 
-   su3xsu3(udb+ip[0],udb+ip[1],&wd1);
-   su3dagxsu3dag(udb+ip[3],udb+ip[2],&wd2);
-   cm3x3_retr(&wd1,&wd2,&sm);
+   su3xsu3     (&wd1, udb+ip[0], udb+ip[1]);
+   su3dagxsu3dag(&wd2, udb+ip[3], udb+ip[2]);
 
-   return sm;
+   return cm3x3_retr(&wd1, &wd2);
 }
 #pragma omp end declare target
 
@@ -80,4 +79,19 @@ static qflt local_plaq_sum_dble(int iw)
    prof_end(&compute);
    acc_qflt(pa,rqsm.q);
    return rqsm;
+}
+
+/*
+ * plaq_sum_dble(icom)
+ *
+ * Returns the sum of Re Tr[plaquette] over all sites and orientations.
+ * icom is ignored (no MPI); present for openQCD API compatibility.
+ */
+double plaq_sum_dble(int icom)
+{
+   qflt rqsm;
+
+   prof_begin(&compute);
+   rqsm=local_plaq_sum_dble(0);
+   return rqsm.q[0]+rqsm.q[1];
 }

@@ -2,6 +2,8 @@
 #define UTILS_H
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
 #include "global.h"
 #include "su3v.h"
 
@@ -68,6 +70,48 @@ void acc_qflt(double u,double *qr)
    qr[1]=c-(d-a);
 }
 #pragma omp end declare target
+
+/* Modular arithmetic safe for negative numerators. */
+static inline int safe_mod(int a, int b)
+{
+   return ((a % b) + b) % b;
+}
+
+/* Boundary condition type: 3 = fully periodic (no open/SF boundaries). */
+static inline int bc_type(void) { return 3; }
+
+/* Aligned memory allocation (POSIX). */
+static inline void *amalloc(size_t n, int align)
+{
+   void *ptr = NULL;
+   if (posix_memalign(&ptr, (size_t)align, n) != 0)
+      ptr = NULL;
+   return ptr;
+}
+
+/* Error handlers — print message and abort. */
+static inline void error(int cond, int no, const char *name, const char *fmt, ...)
+{
+   if (cond) {
+      fprintf(stderr, "Error in %s [code %d]: ", name, no);
+      va_list ap; va_start(ap, fmt); vfprintf(stderr, fmt, ap); va_end(ap);
+      fprintf(stderr, "\n");
+      exit(EXIT_FAILURE);
+   }
+}
+
+static inline void error_root(int cond, int no, const char *name, const char *fmt, ...)
+{
+   if (cond) {
+      fprintf(stderr, "Error in %s [code %d]: ", name, no);
+      va_list ap; va_start(ap, fmt); vfprintf(stderr, fmt, ap); va_end(ap);
+      fprintf(stderr, "\n");
+      exit(EXIT_FAILURE);
+   }
+}
+
+/* set_bc: no-op for periodic boundary conditions. */
+static inline void set_bc(void) {}
 
 
 #endif

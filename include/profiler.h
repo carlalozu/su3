@@ -29,6 +29,8 @@ static inline void prof_end(prof_section *s) {
   s->count += 1;
 }
 
+static inline void prof_reset(prof_section *s) { s->total = 0.0; s->count = 0; s->t0 = 0.0; }
+
 static inline void prof_report(const prof_section *s) {
   double avg = (s->count > 0) ? (s->total / (double)s->count) : 0.0;
   printf("%-24s total=%0.6f s | avg=%0.6f s | n=%lld | vol=%i | cache=%i | threads=%i \n",
