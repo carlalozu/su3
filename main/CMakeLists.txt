@@ -13,8 +13,6 @@ endmacro()
 if(ENABLE_GPU_OFFLOAD)
     add_su3_executable(soa_gpu_openmp soa_gpu_openmp.c)
     add_su3_executable(aos_gpu_openmp aos_gpu_openmp.c)
-    add_su3_executable(time_gpu time_gpu.c)
-    add_su3_executable(aos_cpu aos_cpu.c)
 endif()
 
 if(ENABLE_CUDA)
