@@ -50,4 +50,24 @@ void print_parallel_info()
 
 #endif
 
+#pragma omp declare target
+void acc_qflt(double u,double *qr)
+{
+   double a,b,qp,up;
+   double c,d;
+
+   a=qr[0]+u;
+   qp=a-u;
+   up=a-qp;
+   b=(qr[0]-qp)+(u-up);
+
+   c=qr[1]+b;
+   d=a+c;
+
+   qr[0]=d;
+   qr[1]=c-(d-a);
+}
+#pragma omp end declare target
+
+
 #endif

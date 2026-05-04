@@ -48,9 +48,9 @@ int main(int argc, char *argv[])
         #pragma omp target teams distribute parallel for
         for (size_t i = 0; i < VOLUME; i++) {
             su3_mat_c temp, res;
-            su3matxsu3mat      (&temp, &u_fld[0*VOLUME+i], &u_fld[1*VOLUME+i]);
-            su3matdagxsu3matdag(&res,  &u_fld[2*VOLUME+i], &u_fld[3*VOLUME+i]);
-            h_res[i] = su3matxsu3mat_retrace(&temp, &res);
+            su3xsu3      (&temp, &u_fld[0*VOLUME+i], &u_fld[1*VOLUME+i]);
+            su3dagxsu3dag(&res,  &u_fld[2*VOLUME+i], &u_fld[3*VOLUME+i]);
+            h_res[i] = cm3x3_retr(&temp, &res);
         }
     }
 
@@ -68,9 +68,9 @@ int main(int argc, char *argv[])
         #pragma omp target teams distribute parallel for
         for (size_t i = 0; i < VOLUME; i++) {
             su3_mat_c temp, res;
-            su3matxsu3mat      (&temp, &u_fld[0*VOLUME+i], &u_fld[1*VOLUME+i]);
-            su3matdagxsu3matdag(&res,  &u_fld[2*VOLUME+i], &u_fld[3*VOLUME+i]);
-            h_res[i] = su3matxsu3mat_retrace(&temp, &res);
+            su3xsu3      (&temp, &u_fld[0*VOLUME+i], &u_fld[1*VOLUME+i]);
+            su3dagxsu3dag(&res,  &u_fld[2*VOLUME+i], &u_fld[3*VOLUME+i]);
+            h_res[i] = cm3x3_retr(&temp, &res);
         }
         total_s += omp_get_wtime() - t0;
     }

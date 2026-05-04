@@ -15,9 +15,9 @@ __global__ static void plaq_dble(
     if (i >= volume) return;
 
     su3_mat_c tmp_a, temp_b;
-    su3matxsu3mat      (&tmp_a,  &d_fld[0*volume+i], &d_fld[1*volume+i]);
-    su3matdagxsu3matdag(&temp_b, &d_fld[2*volume+i], &d_fld[3*volume+i]);
-    res[i] = su3matxsu3mat_retrace(&tmp_a, &temp_b);
+    su3xsu3      (&tmp_a,  &d_fld[0*volume+i], &d_fld[1*volume+i]);
+    su3dagxsu3dag(&temp_b, &d_fld[2*volume+i], &d_fld[3*volume+i]);
+    res[i] = cm3x3_retr(&tmp_a, &temp_b);
 }
 
 int main(int argc, char *argv[])

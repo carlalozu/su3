@@ -19,9 +19,9 @@ void launch_plaq_aos_kokkos(
 
     Kokkos::parallel_for("plaq_aos", volume, KOKKOS_LAMBDA(const size_t i) {
         su3_mat_c tmp_a, tmp_b;
-        su3matxsu3mat      (&tmp_a, &fld[0*volume+i], &fld[1*volume+i]);
-        su3matdagxsu3matdag(&tmp_b, &fld[2*volume+i], &fld[3*volume+i]);
-        res[i] = su3matxsu3mat_retrace(&tmp_a, &tmp_b);
+        su3xsu3      (&tmp_a, &fld[0*volume+i], &fld[1*volume+i]);
+        su3dagxsu3dag(&tmp_b, &fld[2*volume+i], &fld[3*volume+i]);
+        res[i] = cm3x3_retr(&tmp_a, &tmp_b);
     });
     Kokkos::fence();
 }

@@ -41,7 +41,7 @@ PRAGMA_OMP_END
 // ---------------------------------------------------------------------------
 
 PRAGMA_OMP_BEGIN
-DEVICE_KEYWORD double su3matxsu3mat_retrace(const su3_mat_c *u, const su3_mat_c *v)
+DEVICE_KEYWORD double cm3x3_retr(const su3_mat_c *u, const su3_mat_c *v)
 {
     double tr_1 = u->c11.re * v->c11.re - u->c11.im * v->c11.im
                 + u->c12.re * v->c21.re - u->c12.im * v->c21.im
@@ -57,7 +57,7 @@ DEVICE_KEYWORD double su3matxsu3mat_retrace(const su3_mat_c *u, const su3_mat_c 
 PRAGMA_OMP_END
 
 PRAGMA_OMP_BEGIN
-DEVICE_KEYWORD void su3matxsu3mat(su3_mat_c *res, const su3_mat_c *u, const su3_mat_c *v)
+DEVICE_KEYWORD void su3xsu3(su3_mat_c *res, const su3_mat_c *u, const su3_mat_c *v)
 {
     // --- Column 1 ---
     res->c11.re = u->c11.re * v->c11.re - u->c11.im * v->c11.im +
@@ -128,7 +128,7 @@ DEVICE_KEYWORD void su3matxsu3mat(su3_mat_c *res, const su3_mat_c *u, const su3_
 PRAGMA_OMP_END
 
 PRAGMA_OMP_BEGIN
-DEVICE_KEYWORD void su3matdagxsu3matdag(su3_mat_c *w, const su3_mat_c *u, const su3_mat_c *v)
+DEVICE_KEYWORD void su3dagxsu3dag(su3_mat_c *w, const su3_mat_c *u, const su3_mat_c *v)
 {
     w->c11.re = u->c11.re * v->c11.re + u->c11.im * -v->c11.im +
                 u->c21.re * v->c12.re + u->c21.im * -v->c12.im +

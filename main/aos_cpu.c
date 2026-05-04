@@ -66,9 +66,9 @@ int main(int argc, char *argv[])
 
         su3_mat_c temp_field;
         su3_mat_c res_field; 
-        su3matxsu3mat(&temp_field, &u_field[i], &v_field[i]);
-        su3matdagxsu3matdag(&res_field, &w_field[i], &x_field[i]);
-        res_aos[i] = su3matxsu3mat_retrace(&temp_field, &res_field);
+        su3xsu3(&temp_field, &u_field[i], &v_field[i]);
+        su3dagxsu3dag(&res_field, &w_field[i], &x_field[i]);
+        res_aos[i] = cm3x3_retr(&temp_field, &res_field);
     }
 
     for (int r = 0; r < reps; r++) 
@@ -81,9 +81,9 @@ int main(int argc, char *argv[])
         {
             su3_mat_c temp_field; 
             su3_mat_c res_field;  
-            su3matxsu3mat(&temp_field, &u_field[i], &v_field[i]);
-            su3matdagxsu3matdag(&res_field, &w_field[i], &x_field[i]);
-            res_aos[i] += su3matxsu3mat_retrace(&temp_field, &res_field);
+            su3xsu3(&temp_field, &u_field[i], &v_field[i]);
+            su3dagxsu3dag(&res_field, &w_field[i], &x_field[i]);
+            res_aos[i] += cm3x3_retr(&temp_field, &res_field);
         }
         prof_end(&comp_AoS);
     }
