@@ -69,9 +69,7 @@ extern "C" {
 #endif
 
 #pragma omp declare target
-void unit_su3mat(su3_dble *su3_mat);
 void random_su3_dble(su3_dble *su3_mat);
-void unit_su3vec(su3_vec_c *su3_vec);
 #pragma omp end declare target
 
 #ifdef __cplusplus

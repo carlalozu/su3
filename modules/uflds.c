@@ -2,6 +2,7 @@
 
 #include "lattice.h"
 #include "utils.h"
+#include "su3.h"
 #include "uflds.h"
 #include "global.h"
 
