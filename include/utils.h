@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdarg.h>
 #include "global.h"
 #include "su3v.h"
@@ -84,10 +85,17 @@ static inline int bc_type(void) { return 3; }
    (openQCD convention: amalloc(n, 6) gives 64-byte alignment). */
 static inline void *amalloc(size_t n, int align)
 {
-   void *ptr = NULL;
-   if (posix_memalign(&ptr, (size_t)1 << align, n) != 0)
-      ptr = NULL;
-   return ptr;
+   size_t alignment = (size_t)1 << align;
+   void *raw = malloc(n + alignment + sizeof(void *));
+   if (raw == NULL) return NULL;
+   uintptr_t addr = ((uintptr_t)raw + sizeof(void *) + alignment - 1) & ~(alignment - 1);
+   ((void **)addr)[-1] = raw;
+   return (void *)addr;
+}
+
+static inline void afree(void *ptr)
+{
+   if (ptr) free(((void **)ptr)[-1]);
 }
 
 /* Error handlers — print message and abort. */
@@ -113,11 +121,6 @@ static inline void error_root(int cond, int no, const char *name, const char *fm
 
 /* set_bc: no-op for periodic boundary conditions. */
 static inline void set_bc(void) {}
-
-static void afree(void *addr)
-{
-   free(addr);
-}
 
 static void error_loc(int test,int no,char *name,char *format,...)
 {

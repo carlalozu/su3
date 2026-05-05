@@ -42,6 +42,8 @@ static qflt local_plaq_sum_dble(int iw)
    rqsm.q[1]=0.0;
    udb=udfld();
    // #pragma omp parallel private(k,ix,t,n,pa) reduction(sum_qflt : rqsm)
+      
+   prof_begin(&compute);
    #pragma omp target teams distribute parallel for reduction(+:pa)
    for (int ix=0;ix<VOLUME;ix++){
       for (int mu = 0; mu < 4; mu++) {
@@ -91,7 +93,6 @@ double plaq_sum_dble(int icom)
 {
    qflt rqsm;
 
-   prof_begin(&compute);
    rqsm=local_plaq_sum_dble(0);
-   return rqsm.q[0]+rqsm.q[1];
+   return rqsm.q[0];
 }
