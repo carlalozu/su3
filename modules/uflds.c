@@ -48,7 +48,7 @@ void random_ud(void)
    ub=udfld();
    bc=bc_type();
 
-#pragma omp parallel private(k,ix,t,ifc,mu)
+#pragma omp parallel num_threads(NTHREAD) private(k,ix,t,ifc,mu)
    {
       k=omp_get_thread_num();
       for (ix=k*VOLUME_TRD;ix<(k+1)*VOLUME_TRD;ix++)

@@ -54,7 +54,7 @@ static void set_tms(void)
 
    alloc_tms();
 
-#pragma omp parallel private(k,ix,iy,x0)
+#pragma omp parallel num_threads(NTHREAD) private(k,ix,iy,x0)
    {
       k=omp_get_thread_num();
 

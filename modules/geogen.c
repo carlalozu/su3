@@ -37,7 +37,7 @@ void set_iupdn(void)
             "Index array ipt[VOLUME] is not allocated");
       alloc_iupdn();
 
-#pragma omp parallel private(k,x0,x1,x2,x3,ix,iy,iz)
+#pragma omp parallel num_threads(NTHREAD) private(k,x0,x1,x2,x3,ix,iy,iz)
       {
          k=omp_get_thread_num();
 
