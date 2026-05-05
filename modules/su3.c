@@ -17,9 +17,63 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdint.h>
+#include "random.h"
+#include <math.h>
 
 static const double twopi=6.2831853071795865;
 
+void gauss_dble(double *r,int n)
+{
+   double rho,r1,*rm;
+
+   ranlxd(r,n);
+   rm=r+n-(n&0x1);
+
+   for (;r<rm;r+=2)
+   {
+      rho=-log(1.0-r[0]);
+      rho=sqrt(rho);
+      r[1]=twopi*(r[1]-0.5);
+      r[0]=rho*sin(r[1]);
+      r[1]=rho*cos(r[1]);
+   }
+
+   if (n&0x1)
+   {
+      rho=-log(1.0-r[0]);
+      rho=sqrt(rho);
+      ranlxd(&r1,1);
+      r[0]=rho*sin(twopi*(r1-0.5));
+   }
+}
+
+#pragma omp declare target
+static void random_su3_vector_dble(su3_vector_dble *v)
+{
+   double norm,fact,*r;
+   vector_dble_t *w;
+
+   w=(vector_dble_t*)(v);
+   r=(*w).r;
+   norm=0.0;
+
+   while (norm<=0.1)
+   {
+      gauss_dble(r,6);
+      norm=r[0]*r[0]+r[1]*r[1]+r[2]*r[2]+
+           r[3]*r[3]+r[4]*r[4]+r[5]*r[5];
+   }
+
+   fact=1.0/sqrt(norm);
+
+   r[0]*=fact;
+   r[1]*=fact;
+   r[2]*=fact;
+   r[3]*=fact;
+   r[4]*=fact;
+   r[5]*=fact;
+}
+#pragma omp end declare target
 
 void random_su3_dble(su3_dble *u)
 {
@@ -52,55 +106,4 @@ void random_su3_dble(su3_dble *u)
    _vector_cross_prod(v[1],v[2],v[0]);
 }
 
-
-static void random_su3_vector_dble(su3_vector_dble *v)
-{
-   double norm,fact,*r;
-   vector_dble_t *w;
-
-   w=(vector_dble_t*)(v);
-   r=(*w).r;
-   norm=0.0;
-
-   while (norm<=0.1)
-   {
-      gauss_dble(r,6);
-      norm=r[0]*r[0]+r[1]*r[1]+r[2]*r[2]+
-           r[3]*r[3]+r[4]*r[4]+r[5]*r[5];
-   }
-
-   fact=1.0/sqrt(norm);
-
-   r[0]*=fact;
-   r[1]*=fact;
-   r[2]*=fact;
-   r[3]*=fact;
-   r[4]*=fact;
-   r[5]*=fact;
-}
-
-void gauss_dble(double *r,int n)
-{
-   double rho,r1,*rm;
-
-   ranlxd(r,n);
-   rm=r+n-(n&0x1);
-
-   for (;r<rm;r+=2)
-   {
-      rho=-log(1.0-r[0]);
-      rho=sqrt(rho);
-      r[1]=twopi*(r[1]-0.5);
-      r[0]=rho*sin(r[1]);
-      r[1]=rho*cos(r[1]);
-   }
-
-   if (n&0x1)
-   {
-      rho=-log(1.0-r[0]);
-      rho=sqrt(rho);
-      ranlxd(&r1,1);
-      r[0]=rho*sin(twopi*(r1-0.5));
-   }
-}
 #endif // SU3_C

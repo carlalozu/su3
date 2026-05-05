@@ -23,7 +23,6 @@ void unit_su3vec_field(su3_vec_field *su3vf)
 void random_su3_dble_field(su3_mat_field *su3mf)
 {
     size_t volume = su3mf->c1.volume;
-    uint64_t state = 12345678ULL;
     su3_dble tmp;
 
     for (size_t i = 0; i < volume; i++) {

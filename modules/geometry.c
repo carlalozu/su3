@@ -4,16 +4,6 @@
 #include "lattice.h"
 
 
-void geometry(void)
-{
-   if (ipt==NULL)
-   {
-      set_ipt();
-      set_iupdn();
-      set_tms();
-   }
-}
-
 static void alloc_ipt(void)
 {
    ipt=malloc(VOLUME*sizeof(*ipt));
@@ -84,3 +74,14 @@ int global_time(int ix)
       return NPROC0*L0;
 }
 #pragma omp end declare target
+
+
+void geometry(void)
+{
+   if (ipt==NULL)
+   {
+      set_ipt();
+      set_iupdn();
+      set_tms();
+   }
+}

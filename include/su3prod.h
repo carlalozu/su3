@@ -22,11 +22,11 @@
 extern "C" {
 #endif
 
-complex add(const complex a, const complex b);
+complex_dble add(const complex_dble a, const complex_dble b);
 void vec_add(su3_vec_c *res, const su3_vec_c *u, const su3_vec_c *v);
 
 PRAGMA_OMP_BEGIN
-complex su3mat_trace(const su3_dble *u);
+complex_dble su3mat_trace(const su3_dble *u);
 void su3matxsu3vec(su3_vec_c *res, const su3_dble *u, const su3_vec_c *v);
 void su3matdagxsu3vec(su3_vec_c *r, const su3_dble *u, const su3_vec_c *s);
 PRAGMA_OMP_END

@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
     #pragma omp target exit data map(release: flush_buf[0:FLUSH_NELEMS])
     free(flush_buf);
 
-    su3_mat_field_free(u_fld);
+    su3_mat_field_free(&u_fld);
     free(h_res.base);
 
     return 0;

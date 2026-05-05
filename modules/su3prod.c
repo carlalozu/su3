@@ -14,9 +14,9 @@
 
 #include "su3prod.h"
 
-complex add(const complex a, const complex b)
+complex_dble add(const complex_dble a, const complex_dble b)
 {
-    return (complex){a.re + b.re, a.im + b.im};
+    return (complex_dble){a.re + b.re, a.im + b.im};
 }
 
 /*
@@ -98,9 +98,9 @@ void su3matdagxsu3vec(su3_vec_c *r, const su3_dble *u, const su3_vec_c *s)
  *
  * tr = trace(u)
  */
-complex su3mat_trace(const su3_dble *u)
+complex_dble su3mat_trace(const su3_dble *u)
 {
-    complex tr;
+    complex_dble tr;
     tr.re = u->c11.re + u->c22.re + u->c33.re;
     tr.im = u->c11.im + u->c22.im + u->c33.im;
     return tr;

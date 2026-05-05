@@ -8,15 +8,6 @@
 
 static su3_dble *udb=NULL;
 
-su3_dble *udfld(void)
-{
-   if (udb==NULL)
-      alloc_ud();
-
-   return udb;
-}
-
-
 static void alloc_ud(void)
 {
    int bc;
@@ -38,6 +29,16 @@ static void alloc_ud(void)
    #pragma omp target enter data map(to: udb[:n])
 }
 
+
+su3_dble *udfld(void)
+{
+   if (udb==NULL)
+      alloc_ud();
+
+   return udb;
+}
+
+
 void random_ud(void)
 {
    int bc;
@@ -54,7 +55,7 @@ void random_ud(void)
       {
          t=global_time(ix);
 
-         // if ((t==(N0-1))&&(bc!=0))
+         if ((t==(N0-1))&&(bc!=0))
          {
             ifc=offset(ix,0);
             random_su3_dble(ub+ifc);
@@ -68,6 +69,5 @@ void random_ud(void)
       }
    }
 
-   set_bc();
    #pragma omp target update to(udb[:4*VOLUME])
 }

@@ -52,7 +52,7 @@ void print_parallel_info()
 
 #endif
 
-#pragma omp declare target
+
 void acc_qflt(double u,double *qr)
 {
    double a,b,qp,up;
@@ -69,7 +69,7 @@ void acc_qflt(double u,double *qr)
    qr[0]=d;
    qr[1]=c-(d-a);
 }
-#pragma omp end declare target
+
 
 /* Modular arithmetic safe for negative numerators. */
 static inline int safe_mod(int a, int b)
