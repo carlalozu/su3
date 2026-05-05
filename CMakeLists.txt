@@ -48,6 +48,16 @@ if(ENABLE_GPU_OFFLOAD)
     target_compile_options(su3openmp PUBLIC ${OMP_OFFLOAD_FLAGS})
     target_link_options(su3openmp PUBLIC ${OMP_OFFLOAD_FLAGS})
 
+    # set(OMP_OFFLOAD_FLAGS
+    #     -fopenmp
+    #     -fopenmp-targets=nvptx64-nvidia-cuda
+    #     -Xopenmp-target=nvptx64-nvidia-cuda --offload-arch=sm_90
+    # )
+    # target_compile_options(su3lib PUBLIC ${OMP_OFFLOAD_FLAGS})
+    # target_link_options(su3lib PUBLIC ${OMP_OFFLOAD_FLAGS} -lmpi_gtl_cuda)
+    # target_compile_options(su3openmp PUBLIC ${OMP_OFFLOAD_FLAGS})
+    # target_link_options(su3openmp PUBLIC ${OMP_OFFLOAD_FLAGS} -lmpi_gtl_cuda)
+
     message(STATUS "GPU OpenMP Offloading Enabled (SM_90)")
 else()
     message(STATUS "GPU OpenMP Offloading NOT Enabled")

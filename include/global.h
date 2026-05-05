@@ -13,20 +13,20 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#define L0 18
-#define L1 18
-#define L2 16
-#define L3 8
+#define L0 32
+#define L1 32
+#define L2 32
+#define L3 32
 
 #define NPROC0 1
 #define NPROC1 1
 #define NPROC2 1
 #define NPROC3 1
 
-#define L0_TRD 6
-#define L1_TRD 6
-#define L2_TRD 4
-#define L3_TRD 4
+#define L0_TRD 32
+#define L1_TRD 32
+#define L2_TRD 32
+#define L3_TRD 32
 
 
 #define VOLUME (L0*L1*L2*L3)

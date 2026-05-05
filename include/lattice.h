@@ -25,7 +25,13 @@ extern void set_iupdn(void);
 #include "global.h"
 
 /* GEOMETRY_C */
+#ifdef __cplusplus
+extern "C" {
+#endif
 extern void geometry(void);
+#ifdef __cplusplus
+}
+#endif
 #pragma omp declare target
 extern int global_time(int ix);
 extern int *tms;

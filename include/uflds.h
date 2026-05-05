@@ -23,8 +23,14 @@
 extern double plaq_sum_dble(int icom);
 
 /* UFLDS_C */
+#ifdef __cplusplus
+extern "C" {
+#endif
 extern su3_dble *udfld(void);
 extern void random_ud(void);
+#ifdef __cplusplus
+}
+#endif
 extern prof_section compute;
 
 #endif

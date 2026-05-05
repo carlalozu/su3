@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "global.h"
+#include "lattice.h"
+#include "uflds.h"
+#include "random.h"
 #include "su3.h"
 #include "su3prod.h"
 #include "su3v_cuda.cuh"
@@ -23,53 +26,29 @@ __global__ static void plaq_sum_kernel(
     int             volume)
 {
     int ix = (int)(blockIdx.x * blockDim.x + threadIdx.x);
-    if (ix >= volume) return;
 
     double pa = 0.0;
+    if (ix < volume) {
+        for (int mu = 0; mu < 4; mu++) {
+            for (int nu = mu + 1; nu < 4; nu++) {
+                int iup_mu = d_iupT[mu * volume + ix];
+                int iup_nu = d_iupT[nu * volume + ix];
 
-    for (int mu = 0; mu < 4; mu++) {
-        for (int nu = mu + 1; nu < 4; nu++) {
-            /* plaq_uidx inlined:
-             *   ip[0] = offset(ix,     mu) = mu*volume + ix
-             *   ip[1] = offset(iup_mu, nu) = nu*volume + iupT[mu][ix]
-             *   ip[2] = offset(ix,     nu) = nu*volume + ix
-             *   ip[3] = offset(iup_nu, mu) = mu*volume + iupT[nu][ix]   */
-            int iup_mu = d_iupT[mu * volume + ix];
-            int iup_nu = d_iupT[nu * volume + ix];
-
-            int ip0 = mu * volume + ix;
-            int ip1 = nu * volume + iup_mu;
-            int ip2 = nu * volume + ix;
-            int ip3 = mu * volume + iup_nu;
-
-            su3_dble wd1, wd2;
-            su3xsu3     (&wd1, (su3_dble *)udb + ip0, (su3_dble *)udb + ip1);
-            su3dagxsu3dag(&wd2, (su3_dble *)udb + ip3, (su3_dble *)udb + ip2);
-            pa += cm3x3_retr(&wd1, &wd2);
+                su3_dble wd1, wd2;
+                su3xsu3     (&wd1, (su3_dble *)udb + mu*volume+ix,     (su3_dble *)udb + nu*volume+iup_mu);
+                su3dagxsu3dag(&wd2, (su3_dble *)udb + mu*volume+iup_nu, (su3_dble *)udb + nu*volume+ix);
+                pa += cm3x3_retr(&wd1, &wd2);
+            }
         }
     }
 
-    atomicAdd(total, pa);
+    for (int offset = 16; offset > 0; offset >>= 1)
+        pa += __shfl_down_sync(0xffffffff, pa, offset);
+
+    if ((threadIdx.x & 31) == 0)
+        atomicAdd(total, pa);
 }
 
-/* Build the flat iupT[4*VOLUME] neighbor table on the host.
- * Sites are lexicographically ordered: ix = y3 + y2*L3 + y1*L2*L3 + y0*L1*L2*L3.
- * Periodic boundary conditions are applied in all directions. */
-static void build_iupT(int *iupT_flat)
-{
-    for (int ix = 0; ix < VOLUME; ix++) {
-        int tmp = ix;
-        int y3  = tmp % L3; tmp /= L3;
-        int y2  = tmp % L2; tmp /= L2;
-        int y1  = tmp % L1; tmp /= L1;
-        int y0  = tmp;
-
-        iupT_flat[0 * VOLUME + ix] = y3 +  y2       *L3 +  y1       *L2*L3 + ((y0+1)%L0)*L1*L2*L3;
-        iupT_flat[1 * VOLUME + ix] = y3 +  y2       *L3 + ((y1+1)%L1)*L2*L3 +  y0       *L1*L2*L3;
-        iupT_flat[2 * VOLUME + ix] = y3 + ((y2+1)%L2)*L3 +  y1       *L2*L3 +  y0       *L1*L2*L3;
-        iupT_flat[3 * VOLUME + ix] = ((y3+1)%L3) + y2*L3 + y1*L2*L3 + y0*L1*L2*L3;
-    }
-}
 
 int main(int argc, char *argv[])
 {
@@ -84,13 +63,11 @@ int main(int argc, char *argv[])
     // -----------------------------------------------------------------------
     // Host: geometry and gauge field
     // -----------------------------------------------------------------------
-    int *h_iupT = (int *)malloc(4 * VOLUME * sizeof(int));
-    build_iupT(h_iupT);
-
-    su3_dble *h_udb = (su3_dble *)malloc(4 * VOLUME * sizeof(su3_dble));
-    rlxd_init(1, 1, 1, 1);
-    for (int i = 0; i < 4 * VOLUME; i++)
-        random_su3_dble(&h_udb[i]);
+    start_ranlux(0, 12345);
+    geometry();
+    random_ud();
+    su3_dble *h_udb  = udfld();
+    int      *h_iupT = (int *)iupT;
 
     // -----------------------------------------------------------------------
     // Device: allocate and upload
@@ -177,8 +154,6 @@ int main(int argc, char *argv[])
     CUDA_CHECK(cudaFree(d_iupT));
     CUDA_CHECK(cudaFree(d_udb));
 
-    free(h_udb);
-    free(h_iupT);
 
     return 0;
 }
