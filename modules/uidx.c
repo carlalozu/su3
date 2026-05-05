@@ -1,7 +1,8 @@
+#define UIDX_C
+
 #include "global.h"
 #include "lattice.h"
 
-#define UIDX_C
 
 #pragma omp declare target
 int offset(int ix, int mu)

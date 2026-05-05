@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include "random.h"
+#include "global.h"
 
 typedef struct
 {

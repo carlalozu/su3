@@ -18,11 +18,11 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "random.h"
+#include "lattice.h"
 #include <math.h>
 
-static const double twopi=6.2831853071795865;
 
-#pragma omp declare target
+
 static void random_su3_vector_dble(su3_vector_dble *v)
 {
    double norm,fact,*r;
@@ -48,7 +48,7 @@ static void random_su3_vector_dble(su3_vector_dble *v)
    r[4]*=fact;
    r[5]*=fact;
 }
-#pragma omp end declare target
+
 
 void random_su3_dble(su3_dble *u)
 {

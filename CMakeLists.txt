@@ -18,6 +18,8 @@ add_library(su3lib
     modules/uidx.c
     modules/uflds.c
     modules/plaq_sum.c
+    modules/ranlxd.c
+    modules/ranlux_common.c
 )
 target_include_directories(su3lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 

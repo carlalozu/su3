@@ -113,5 +113,32 @@ static inline void error_root(int cond, int no, const char *name, const char *fm
 /* set_bc: no-op for periodic boundary conditions. */
 static inline void set_bc(void) {}
 
+static void afree(void *addr)
+{
+   char *true_addr;
+   unsigned int isize,*iaddr;
+
+   isize=(unsigned int)(sizeof(unsigned int));
+   iaddr=(unsigned int*)((char*)(addr)-isize);
+   true_addr=(char*)(addr)-(*iaddr);
+
+   free(true_addr);
+}
+
+static void error_loc(int test,int no,char *name,char *format,...)
+{
+   va_list args;
+
+   if (test!=0)
+   {
+      printf("\nError in %s:\n",name);
+      va_start(args,format);
+      vprintf(format,args);
+      va_end(args);
+      printf("\nProgram aborted\n\n");
+      exit(no);
+   }
+}
+
 
 #endif

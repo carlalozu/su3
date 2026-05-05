@@ -16,14 +16,13 @@
 #if ((defined RANLUX_C)||(defined RANLXS_C)||(defined RANLXD_C)|| \
      (defined RANLUX_COMMON_C))
 
-#ifndef UTILS_H
-#include "utils.h"
-#endif
+#include <stdint.h>
+
 
 typedef struct
 {
    int pr,ir;
-   stdlong_t (*state)[4];
+   uint64_t (*state)[4];
 } rlx_state_t;
 
 /* RANLUX_COMMON_C */
@@ -39,7 +38,6 @@ extern void rlx_convertd(rlx_state_t *s,double *rd);
 #endif
 
 /* GAUSS_C */
-extern void gauss(float *r,int n);
 extern void gauss_dble(double *r,int n);
 
 /* RANLXD_C */

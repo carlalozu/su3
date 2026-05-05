@@ -32,7 +32,6 @@ int main(int argc, char *argv[])
     #pragma omp target enter data map(alloc: u_fld[0:4*VOLUME])
     #pragma omp target enter data map(alloc: h_res[0:VOLUME])
 
-    #pragma omp target teams distribute parallel for
     for (size_t i = 0; i <4*VOLUME; i++) {
         random_su3_dble(&u_fld[i]);
     }
