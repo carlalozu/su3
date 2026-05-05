@@ -10,7 +10,7 @@
 #ifdef _OPENMP
 #include <omp.h>
 
-void _is_gpu()
+static void _is_gpu()
 {
     int th_id = omp_get_team_num();
     int te_id = omp_get_thread_num();
@@ -32,7 +32,7 @@ void _is_gpu()
     }
 }
 
-void print_parallel_info()
+static void print_parallel_info()
 {
     printf("OpenMP is enabled\n");
     int n_threads = omp_get_max_threads();
@@ -40,12 +40,12 @@ void print_parallel_info()
     printf("Number of size per thread: %d\n", VOLUME / n_threads);
 }
 #else
-void _is_gpu()
+static void _is_gpu()
 {
     printf("Running on host\n");
 }
 
-void print_parallel_info()
+static void print_parallel_info()
 {
     printf("OpenMP is not enabled\n");
 }
@@ -53,7 +53,7 @@ void print_parallel_info()
 #endif
 
 
-void acc_qflt(double u,double *qr)
+static inline void acc_qflt(double u,double *qr)
 {
    double a,b,qp,up;
    double c,d;
