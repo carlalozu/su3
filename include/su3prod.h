@@ -40,21 +40,21 @@ PRAGMA_OMP_END
 // Matrix operations — inline on all backends
 // ---------------------------------------------------------------------------
 
-#pragma omp declare target
-static void su3xsu3vec(su3_dble *u,su3_vector_dble *psi,
+PRAGMA_OMP_BEGIN
+DEVICE_KEYWORD void su3xsu3vec(su3_dble *u,su3_vector_dble *psi,
                        su3_vector_dble *chi)
 {
    _su3_multiply(*chi,*u,*psi);
 }
-#pragma omp end declare target
+PRAGMA_OMP_END
 
-#pragma omp declare target
-static void su3dagxsu3vec(su3_dble *u,su3_vector_dble *psi,
+PRAGMA_OMP_BEGIN
+DEVICE_KEYWORD void su3dagxsu3vec(su3_dble *u,su3_vector_dble *psi,
                           su3_vector_dble *chi)
 {
    _su3_inverse_multiply(*chi,*u,*psi);
 }
-#pragma omp end declare target
+PRAGMA_OMP_END
 
 PRAGMA_OMP_BEGIN
 DEVICE_KEYWORD double cm3x3_retr(const su3_dble *u, const su3_dble *v)

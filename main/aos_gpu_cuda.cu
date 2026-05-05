@@ -3,12 +3,13 @@
 #include "global.h"
 #include "su3.h"
 #include "su3v_cuda.cuh"
+#include "lattice.h"
 
 static const size_t FLUSH_NELEMS = 15728640UL;
 
 __global__ static void plaq_dble(
     double *res,
-    const su3_dble *d_fld,
+    su3_dble *d_fld,
     size_t volume)
 {
     size_t i = blockIdx.x * blockDim.x + threadIdx.x;
