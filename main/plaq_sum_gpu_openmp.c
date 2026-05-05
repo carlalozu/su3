@@ -1,4 +1,3 @@
-#define MAIN_PROGRAM
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,3 +1,4 @@
+#ifndef GEOGEN_C
 #define GEOGEN_C
 
 #include "global.h"
@@ -97,3 +98,5 @@ void set_iupdn(void)
       #pragma omp target enter data map(to: iup[:VOLUME], iupT[:4])
    }
 }
+
+#endif

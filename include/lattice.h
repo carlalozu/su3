@@ -22,6 +22,7 @@ extern void set_iupdn(void);
 #ifndef UTILS_H
 #include "utils.h"
 #endif
+#include "global.h"
 
 /* GEOMETRY_C */
 extern void geometry(void);

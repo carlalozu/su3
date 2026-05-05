@@ -48,24 +48,12 @@
 
 #define N0 (NPROC0*L0)
 
-#if defined MAIN_PROGRAM
-
 #pragma omp declare target
-int *ipt=NULL;
-int (*iup)[4]=NULL;
-int (*idn)[4]=NULL;
-int (*iupT)[VOLUME]=NULL;
+static int *ipt=NULL;
+static int (*iup)[4]=NULL;
+static int (*idn)[4]=NULL;
+static int (*iupT)[VOLUME]=NULL;
 #pragma omp end declare target
 
-#else
-
-#pragma omp declare target
-extern int *ipt;
-extern int (*iup)[4];
-extern int (*idn)[4];
-extern int (*iupT)[VOLUME];
-#pragma omp end declare target
-
-#endif
 
 #endif

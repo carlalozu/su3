@@ -26,7 +26,7 @@ static void alloc_ud(void)
          "Unable to allocate memory space for the gauge field");
 
    set_bc();
-   #pragma omp target enter data map(to: udb[:n])
+   #pragma omp target enter data map(to: udb[:4*VOLUME])
 }
 
 

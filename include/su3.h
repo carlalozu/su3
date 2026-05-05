@@ -70,9 +70,7 @@ typedef union
 extern "C" {
 #endif
 
-#pragma omp declare target
 extern void random_su3_dble(su3_dble *su3_mat);
-#pragma omp end declare target
 
 #ifdef __cplusplus
 }
