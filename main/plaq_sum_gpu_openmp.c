@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
     /* geometry() builds ipt/iup/iupT and maps them to the device.
      * random_ud() allocates the gauge field via udfld(), fills it with
      * random SU(3) matrices on the host, and uploads it to the device. */
+    rlxd_init(1, 1, 1, 1);
     geometry();
     random_ud();
 

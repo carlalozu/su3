@@ -50,6 +50,7 @@ int main(int argc, char *argv[])
         su3_mat_field_init(&h_fld, 4*VOLUME);
         doublev_init(&h_res, VOLUME);
 
+        rlxd_init(1, 1, 1, 1);
         random_su3_dble_field(&h_fld);
 
         // -------------------------------------------------------------------

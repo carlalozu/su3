@@ -45,6 +45,7 @@ int main(int argc, char *argv[])
         su3_dble *h_fld = (su3_dble *)malloc(4*VOLUME * sizeof(su3_dble));
         double    *h_res = (double    *)malloc(VOLUME * sizeof(double));
 
+        rlxd_init(1, 1, 1, 1);
         for (size_t i = 0; i < 4*(size_t)VOLUME; i++) {
             random_su3_dble(&h_fld[i]);
         }
