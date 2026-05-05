@@ -29,12 +29,14 @@ int main(int argc, char *argv[])
     // -----------------------------------------------------------------------
     // Map data to device
     // -----------------------------------------------------------------------
-    #pragma omp target enter data map(alloc: u_fld[0:4*VOLUME])
     #pragma omp target enter data map(alloc: h_res[0:VOLUME])
-
+    #pragma omp target enter data map(alloc: u_fld[0:4*VOLUME])
+    
+    rlxd_init(1, 1, 1, 1);
     for (size_t i = 0; i <4*VOLUME; i++) {
         random_su3_dble(&u_fld[i]);
     }
+    #pragma omp target update to(u_fld[0:4*VOLUME])
 
     double *flush_buf = (double *)malloc(FLUSH_NELEMS * sizeof(double));
     #pragma omp target enter data map(alloc: flush_buf[0:FLUSH_NELEMS])

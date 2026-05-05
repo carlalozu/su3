@@ -21,7 +21,7 @@ static void alloc_ud(void)
    bc=bc_type();
    n=4*VOLUME;
 
-   udb=amalloc(n*sizeof(*udb),ALIGN);
+   udb=amalloc(n*sizeof(*udb),6);
    error(udb==NULL,1,"alloc_ud [uflds.c]",
          "Unable to allocate memory space for the gauge field");
 

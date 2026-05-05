@@ -80,11 +80,12 @@ static inline int safe_mod(int a, int b)
 /* Boundary condition type: 3 = fully periodic (no open/SF boundaries). */
 static inline int bc_type(void) { return 3; }
 
-/* Aligned memory allocation (POSIX). */
+/* Aligned memory allocation. align is the log2 of the desired alignment
+   (openQCD convention: amalloc(n, 6) gives 64-byte alignment). */
 static inline void *amalloc(size_t n, int align)
 {
    void *ptr = NULL;
-   if (posix_memalign(&ptr, (size_t)align, n) != 0)
+   if (posix_memalign(&ptr, (size_t)1 << align, n) != 0)
       ptr = NULL;
    return ptr;
 }
@@ -115,14 +116,7 @@ static inline void set_bc(void) {}
 
 static void afree(void *addr)
 {
-   char *true_addr;
-   unsigned int isize,*iaddr;
-
-   isize=(unsigned int)(sizeof(unsigned int));
-   iaddr=(unsigned int*)((char*)(addr)-isize);
-   true_addr=(char*)(addr)-(*iaddr);
-
-   free(true_addr);
+   free(addr);
 }
 
 static void error_loc(int test,int no,char *name,char *format,...)

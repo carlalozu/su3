@@ -43,7 +43,6 @@ int main(int argc, char *argv[])
     #pragma omp parallel for schedule(static)
     for (size_t i = 0; i < VOLUME; i++)
     {
-        uint64_t thread_state = 12345ULL + omp_get_thread_num();
         random_su3_dble(&u_field[i]);
         random_su3_dble(&v_field[i]);
         random_su3_dble(&w_field[i]);
