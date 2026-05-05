@@ -40,6 +40,22 @@ PRAGMA_OMP_END
 // Matrix operations — inline on all backends
 // ---------------------------------------------------------------------------
 
+#pragma omp declare target
+static void su3xsu3vec(su3_dble *u,su3_vector_dble *psi,
+                       su3_vector_dble *chi)
+{
+   _su3_multiply(*chi,*u,*psi);
+}
+#pragma omp end declare target
+
+#pragma omp declare target
+static void su3dagxsu3vec(su3_dble *u,su3_vector_dble *psi,
+                          su3_vector_dble *chi)
+{
+   _su3_inverse_multiply(*chi,*u,*psi);
+}
+#pragma omp end declare target
+
 PRAGMA_OMP_BEGIN
 DEVICE_KEYWORD double cm3x3_retr(const su3_dble *u, const su3_dble *v)
 {
@@ -57,135 +73,73 @@ DEVICE_KEYWORD double cm3x3_retr(const su3_dble *u, const su3_dble *v)
 PRAGMA_OMP_END
 
 PRAGMA_OMP_BEGIN
-DEVICE_KEYWORD void su3xsu3(su3_dble *res, const su3_dble *u, const su3_dble *v)
+DEVICE_KEYWORD void su3xsu3(su3_dble *w,su3_dble *u,su3_dble *v)
 {
-    // --- Column 1 ---
-    res->c11.re = u->c11.re * v->c11.re - u->c11.im * v->c11.im +
-                  u->c12.re * v->c21.re - u->c12.im * v->c21.im +
-                  u->c13.re * v->c31.re - u->c13.im * v->c31.im;
-    res->c11.im = u->c11.re * v->c11.im + u->c11.im * v->c11.re +
-                  u->c12.re * v->c21.im + u->c12.im * v->c21.re +
-                  u->c13.re * v->c31.im + u->c13.im * v->c31.re;
+   su3_vector_dble psi,chi;
 
-    res->c21.re = u->c21.re * v->c11.re - u->c21.im * v->c11.im +
-                  u->c22.re * v->c21.re - u->c22.im * v->c21.im +
-                  u->c23.re * v->c31.re - u->c23.im * v->c31.im;
-    res->c21.im = u->c21.re * v->c11.im + u->c21.im * v->c11.re +
-                  u->c22.re * v->c21.im + u->c22.im * v->c21.re +
-                  u->c23.re * v->c31.im + u->c23.im * v->c31.re;
+   psi.c1=(*v).c11;
+   psi.c2=(*v).c21;
+   psi.c3=(*v).c31;
+   su3xsu3vec(u,&psi,&chi);
+   (*w).c11=chi.c1;
+   (*w).c21=chi.c2;
+   (*w).c31=chi.c3;
 
-    res->c31.re = u->c31.re * v->c11.re - u->c31.im * v->c11.im +
-                  u->c32.re * v->c21.re - u->c32.im * v->c21.im +
-                  u->c33.re * v->c31.re - u->c33.im * v->c31.im;
-    res->c31.im = u->c31.re * v->c11.im + u->c31.im * v->c11.re +
-                  u->c32.re * v->c21.im + u->c32.im * v->c21.re +
-                  u->c33.re * v->c31.im + u->c33.im * v->c31.re;
+   psi.c1=(*v).c12;
+   psi.c2=(*v).c22;
+   psi.c3=(*v).c32;
+   su3xsu3vec(u,&psi,&chi);
+   (*w).c12=chi.c1;
+   (*w).c22=chi.c2;
+   (*w).c32=chi.c3;
 
-    // --- Column 2 ---
-    res->c12.re = u->c11.re * v->c12.re - u->c11.im * v->c12.im +
-                  u->c12.re * v->c22.re - u->c12.im * v->c22.im +
-                  u->c13.re * v->c32.re - u->c13.im * v->c32.im;
-    res->c12.im = u->c11.re * v->c12.im + u->c11.im * v->c12.re +
-                  u->c12.re * v->c22.im + u->c12.im * v->c22.re +
-                  u->c13.re * v->c32.im + u->c13.im * v->c32.re;
-
-    res->c22.re = u->c21.re * v->c12.re - u->c21.im * v->c12.im +
-                  u->c22.re * v->c22.re - u->c22.im * v->c22.im +
-                  u->c23.re * v->c32.re - u->c23.im * v->c32.im;
-    res->c22.im = u->c21.re * v->c12.im + u->c21.im * v->c12.re +
-                  u->c22.re * v->c22.im + u->c22.im * v->c22.re +
-                  u->c23.re * v->c32.im + u->c23.im * v->c32.re;
-
-    res->c32.re = u->c31.re * v->c12.re - u->c31.im * v->c12.im +
-                  u->c32.re * v->c22.re - u->c32.im * v->c22.im +
-                  u->c33.re * v->c32.re - u->c33.im * v->c32.im;
-    res->c32.im = u->c31.re * v->c12.im + u->c31.im * v->c12.re +
-                  u->c32.re * v->c22.im + u->c32.im * v->c22.re +
-                  u->c33.re * v->c32.im + u->c33.im * v->c32.re;
-
-    // --- Column 3 ---
-    res->c13.re = u->c11.re * v->c13.re - u->c11.im * v->c13.im +
-                  u->c12.re * v->c23.re - u->c12.im * v->c23.im +
-                  u->c13.re * v->c33.re - u->c13.im * v->c33.im;
-    res->c13.im = u->c11.re * v->c13.im + u->c11.im * v->c13.re +
-                  u->c12.re * v->c23.im + u->c12.im * v->c23.re +
-                  u->c13.re * v->c33.im + u->c13.im * v->c33.re;
-
-    res->c23.re = u->c21.re * v->c13.re - u->c21.im * v->c13.im +
-                  u->c22.re * v->c23.re - u->c22.im * v->c23.im +
-                  u->c23.re * v->c33.re - u->c23.im * v->c33.im;
-    res->c23.im = u->c21.re * v->c13.im + u->c21.im * v->c13.re +
-                  u->c22.re * v->c23.im + u->c22.im * v->c23.re +
-                  u->c23.re * v->c33.im + u->c23.im * v->c33.re;
-
-    res->c33.re = u->c31.re * v->c13.re - u->c31.im * v->c13.im +
-                  u->c32.re * v->c23.re - u->c32.im * v->c23.im +
-                  u->c33.re * v->c33.re - u->c33.im * v->c33.im;
-    res->c33.im = u->c31.re * v->c13.im + u->c31.im * v->c13.re +
-                  u->c32.re * v->c23.im + u->c32.im * v->c23.re +
-                  u->c33.re * v->c33.im + u->c33.im * v->c33.re;
+   psi.c1=(*v).c13;
+   psi.c2=(*v).c23;
+   psi.c3=(*v).c33;
+   su3xsu3vec(u,&psi,&chi);
+   (*w).c13=chi.c1;
+   (*w).c23=chi.c2;
+   (*w).c33=chi.c3;
 }
 PRAGMA_OMP_END
 
 PRAGMA_OMP_BEGIN
-DEVICE_KEYWORD void su3dagxsu3dag(su3_dble *w, const su3_dble *u, const su3_dble *v)
+DEVICE_KEYWORD void su3dagxsu3dag(su3_dble *w, su3_dble *u, su3_dble *v)
 {
-    w->c11.re = u->c11.re * v->c11.re + u->c11.im * -v->c11.im +
-                u->c21.re * v->c12.re + u->c21.im * -v->c12.im +
-                u->c31.re * v->c13.re + u->c31.im * -v->c13.im;
-    w->c11.im = u->c11.re * -v->c11.im - u->c11.im * v->c11.re +
-                u->c21.re * -v->c12.im - u->c21.im * v->c12.re +
-                u->c31.re * -v->c13.im - u->c31.im * v->c13.re;
-    w->c21.re = u->c12.re * v->c11.re + u->c12.im * -v->c11.im +
-                u->c22.re * v->c12.re + u->c22.im * -v->c12.im +
-                u->c32.re * v->c13.re + u->c32.im * -v->c13.im;
-    w->c21.im = u->c12.re * -v->c11.im - u->c12.im * v->c11.re +
-                u->c22.re * -v->c12.im - u->c22.im * v->c12.re +
-                u->c32.re * -v->c13.im - u->c32.im * v->c13.re;
-    w->c31.re = u->c13.re * v->c11.re + u->c13.im * -v->c11.im +
-                u->c23.re * v->c12.re + u->c23.im * -v->c12.im +
-                u->c33.re * v->c13.re + u->c33.im * -v->c13.im;
-    w->c31.im = u->c13.re * -v->c11.im - u->c13.im * v->c11.re +
-                u->c23.re * -v->c12.im - u->c23.im * v->c12.re +
-                u->c33.re * -v->c13.im - u->c33.im * v->c13.re;
+   su3_vector_dble psi,chi;
 
-    w->c12.re = u->c11.re * v->c21.re + u->c11.im * -v->c21.im +
-                u->c21.re * v->c22.re + u->c21.im * -v->c22.im +
-                u->c31.re * v->c23.re + u->c31.im * -v->c23.im;
-    w->c12.im = u->c11.re * -v->c21.im - u->c11.im * v->c21.re +
-                u->c21.re * -v->c22.im - u->c21.im * v->c22.re +
-                u->c31.re * -v->c23.im - u->c31.im * v->c23.re;
-    w->c22.re = u->c12.re * v->c21.re + u->c12.im * -v->c21.im +
-                u->c22.re * v->c22.re + u->c22.im * -v->c22.im +
-                u->c32.re * v->c23.re + u->c32.im * -v->c23.im;
-    w->c22.im = u->c12.re * -v->c21.im - u->c12.im * v->c21.re +
-                u->c22.re * -v->c22.im - u->c22.im * v->c22.re +
-                u->c32.re * -v->c23.im - u->c32.im * v->c23.re;
-    w->c32.re = u->c13.re * v->c21.re + u->c13.im * -v->c21.im +
-                u->c23.re * v->c22.re + u->c23.im * -v->c22.im +
-                u->c33.re * v->c23.re + u->c33.im * -v->c23.im;
-    w->c32.im = u->c13.re * -v->c21.im - u->c13.im * v->c21.re +
-                u->c23.re * -v->c22.im - u->c23.im * v->c22.re +
-                u->c33.re * -v->c23.im - u->c33.im * v->c23.re;
+   psi.c1.re= (*v).c11.re;
+   psi.c1.im=-(*v).c11.im;
+   psi.c2.re= (*v).c12.re;
+   psi.c2.im=-(*v).c12.im;
+   psi.c3.re= (*v).c13.re;
+   psi.c3.im=-(*v).c13.im;
+   su3dagxsu3vec(u,&psi,&chi);
+   (*w).c11=chi.c1;
+   (*w).c21=chi.c2;
+   (*w).c31=chi.c3;
 
-    w->c13.re = u->c11.re * v->c31.re + u->c11.im * -v->c31.im +
-                u->c21.re * v->c32.re + u->c21.im * -v->c32.im +
-                u->c31.re * v->c33.re + u->c31.im * -v->c33.im;
-    w->c13.im = u->c11.re * -v->c31.im - u->c11.im * v->c31.re +
-                u->c21.re * -v->c32.im - u->c21.im * v->c32.re +
-                u->c31.re * -v->c33.im - u->c31.im * v->c33.re;
-    w->c23.re = u->c12.re * v->c31.re + u->c12.im * -v->c31.im +
-                u->c22.re * v->c32.re + u->c22.im * -v->c32.im +
-                u->c32.re * v->c33.re + u->c32.im * -v->c33.im;
-    w->c23.im = u->c12.re * -v->c31.im - u->c12.im * v->c31.re +
-                u->c22.re * -v->c32.im - u->c22.im * v->c32.re +
-                u->c32.re * -v->c33.im - u->c32.im * v->c33.re;
-    w->c33.re = u->c13.re * v->c31.re + u->c13.im * -v->c31.im +
-                u->c23.re * v->c32.re + u->c23.im * -v->c32.im +
-                u->c33.re * v->c33.re + u->c33.im * -v->c33.im;
-    w->c33.im = u->c13.re * -v->c31.im - u->c13.im * v->c31.re +
-                u->c23.re * -v->c32.im - u->c23.im * v->c32.re +
-                u->c33.re * -v->c33.im - u->c33.im * v->c33.re;
+   psi.c1.re= (*v).c21.re;
+   psi.c1.im=-(*v).c21.im;
+   psi.c2.re= (*v).c22.re;
+   psi.c2.im=-(*v).c22.im;
+   psi.c3.re= (*v).c23.re;
+   psi.c3.im=-(*v).c23.im;
+   su3dagxsu3vec(u,&psi,&chi);
+   (*w).c12=chi.c1;
+   (*w).c22=chi.c2;
+   (*w).c32=chi.c3;
+
+   psi.c1.re= (*v).c31.re;
+   psi.c1.im=-(*v).c31.im;
+   psi.c2.re= (*v).c32.re;
+   psi.c2.im=-(*v).c32.im;
+   psi.c3.re= (*v).c33.re;
+   psi.c3.im=-(*v).c33.im;
+   su3dagxsu3vec(u,&psi,&chi);
+   (*w).c13=chi.c1;
+   (*w).c23=chi.c2;
+   (*w).c33=chi.c3;
 }
 PRAGMA_OMP_END
 

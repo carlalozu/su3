@@ -88,4 +88,45 @@ extern void random_su3_dble(su3_dble *su3_mat);
              -(w).c1.re*(z).c2.im-(w).c1.im*(z).c2.re
 
 
+#define _su3_multiply(r,u,s) \
+   (r).c1.re= (u).c11.re*(s).c1.re-(u).c11.im*(s).c1.im  \
+             +(u).c12.re*(s).c2.re-(u).c12.im*(s).c2.im  \
+             +(u).c13.re*(s).c3.re-(u).c13.im*(s).c3.im; \
+   (r).c1.im= (u).c11.re*(s).c1.im+(u).c11.im*(s).c1.re  \
+             +(u).c12.re*(s).c2.im+(u).c12.im*(s).c2.re  \
+             +(u).c13.re*(s).c3.im+(u).c13.im*(s).c3.re; \
+   (r).c2.re= (u).c21.re*(s).c1.re-(u).c21.im*(s).c1.im  \
+             +(u).c22.re*(s).c2.re-(u).c22.im*(s).c2.im  \
+             +(u).c23.re*(s).c3.re-(u).c23.im*(s).c3.im; \
+   (r).c2.im= (u).c21.re*(s).c1.im+(u).c21.im*(s).c1.re  \
+             +(u).c22.re*(s).c2.im+(u).c22.im*(s).c2.re  \
+             +(u).c23.re*(s).c3.im+(u).c23.im*(s).c3.re; \
+   (r).c3.re= (u).c31.re*(s).c1.re-(u).c31.im*(s).c1.im  \
+             +(u).c32.re*(s).c2.re-(u).c32.im*(s).c2.im  \
+             +(u).c33.re*(s).c3.re-(u).c33.im*(s).c3.im; \
+   (r).c3.im= (u).c31.re*(s).c1.im+(u).c31.im*(s).c1.re  \
+             +(u).c32.re*(s).c2.im+(u).c32.im*(s).c2.re  \
+             +(u).c33.re*(s).c3.im+(u).c33.im*(s).c3.re
+
+
+#define _su3_inverse_multiply(r,u,s) \
+   (r).c1.re= (u).c11.re*(s).c1.re+(u).c11.im*(s).c1.im  \
+             +(u).c21.re*(s).c2.re+(u).c21.im*(s).c2.im  \
+             +(u).c31.re*(s).c3.re+(u).c31.im*(s).c3.im; \
+   (r).c1.im= (u).c11.re*(s).c1.im-(u).c11.im*(s).c1.re  \
+             +(u).c21.re*(s).c2.im-(u).c21.im*(s).c2.re  \
+             +(u).c31.re*(s).c3.im-(u).c31.im*(s).c3.re; \
+   (r).c2.re= (u).c12.re*(s).c1.re+(u).c12.im*(s).c1.im  \
+             +(u).c22.re*(s).c2.re+(u).c22.im*(s).c2.im  \
+             +(u).c32.re*(s).c3.re+(u).c32.im*(s).c3.im; \
+   (r).c2.im= (u).c12.re*(s).c1.im-(u).c12.im*(s).c1.re  \
+             +(u).c22.re*(s).c2.im-(u).c22.im*(s).c2.re  \
+             +(u).c32.re*(s).c3.im-(u).c32.im*(s).c3.re; \
+   (r).c3.re= (u).c13.re*(s).c1.re+(u).c13.im*(s).c1.im  \
+             +(u).c23.re*(s).c2.re+(u).c23.im*(s).c2.im  \
+             +(u).c33.re*(s).c3.re+(u).c33.im*(s).c3.im; \
+   (r).c3.im= (u).c13.re*(s).c1.im-(u).c13.im*(s).c1.re  \
+             +(u).c23.re*(s).c2.im-(u).c23.im*(s).c2.re  \
+             +(u).c33.re*(s).c3.im-(u).c33.im*(s).c3.re
+
 #endif // SU3_H
