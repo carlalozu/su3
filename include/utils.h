@@ -10,7 +10,7 @@
 #ifdef _OPENMP
 #include <omp.h>
 
-void is_gpu()
+void _is_gpu()
 {
     int th_id = omp_get_team_num();
     int te_id = omp_get_thread_num();
@@ -40,7 +40,7 @@ void print_parallel_info()
     printf("Number of size per thread: %d\n", VOLUME / n_threads);
 }
 #else
-void is_gpu()
+void _is_gpu()
 {
     printf("Running on host\n");
 }

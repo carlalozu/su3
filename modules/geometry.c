@@ -3,6 +3,7 @@
 #include "global.h"
 #include "lattice.h"
 
+int *tms=NULL;
 
 static void alloc_ipt(void)
 {

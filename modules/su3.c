@@ -22,31 +22,6 @@
 
 static const double twopi=6.2831853071795865;
 
-void gauss_dble(double *r,int n)
-{
-   double rho,r1,*rm;
-
-   ranlxd(r,n);
-   rm=r+n-(n&0x1);
-
-   for (;r<rm;r+=2)
-   {
-      rho=-log(1.0-r[0]);
-      rho=sqrt(rho);
-      r[1]=twopi*(r[1]-0.5);
-      r[0]=rho*sin(r[1]);
-      r[1]=rho*cos(r[1]);
-   }
-
-   if (n&0x1)
-   {
-      rho=-log(1.0-r[0]);
-      rho=sqrt(rho);
-      ranlxd(&r1,1);
-      r[0]=rho*sin(twopi*(r1-0.5));
-   }
-}
-
 #pragma omp declare target
 static void random_su3_vector_dble(su3_vector_dble *v)
 {
