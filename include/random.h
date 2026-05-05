@@ -45,6 +45,7 @@ extern "C" {
 extern void gauss_dble(double *r,int n);
 
 /* RANLXD_C */
+extern void start_ranlux(int level,int seed);
 extern void ranlxd(double *r,int n);
 extern void rlxd_init(int n,int level,int seed,int seed_shift);
 extern int rlxd_size(void);

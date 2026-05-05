@@ -6,6 +6,7 @@
 #include "lattice.h"
 #include "uflds.h"
 #include "profiler.h"
+#include "random.h"
 
 prof_section compute = {.name = "compute"};
 
@@ -24,7 +25,7 @@ int main(int argc, char *argv[])
     /* geometry() builds ipt/iup/iupT and maps them to the device.
      * random_ud() allocates the gauge field via udfld(), fills it with
      * random SU(3) matrices on the host, and uploads it to the device. */
-    rlxd_init(NTHREAD, 1, 1, 1);
+    start_ranlux(0, 12345);
     geometry();
     random_ud();
 

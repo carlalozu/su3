@@ -20,6 +20,11 @@
 *     Computes the next n double-precision random numbers and assigns
 *     them to r[0],...,r[n-1].
 *
+*   void start_ranlux(int level,int seed)
+*     Initializes NTHREAD copies of ranlxd without MPI. Admissible levels
+*     are 0 and 1 (passed as level+1 to rlxd_init). seed must satisfy
+*     1<=seed<=INT_MAX/NTHREAD.
+*
 *   void rlxd_init(int n,int level,int seed,int seed_shift)
 *     Allocation and initialization of the states of n copies of the
 *     ranlxd generator at the specified luxury level. The seed for the
@@ -58,9 +63,11 @@
 #define RANLXD_C
 
 #include <stdlib.h>
+#include <limits.h>
 #if (defined _OPENMP)
 #include <omp.h>
 #endif
+#include "global.h"
 #include "random.h"
 #include "utils.h"
 #include <math.h>
@@ -96,6 +103,19 @@ static void alloc_arrays(int n)
       rlx_alloc_state(n,state_all);
       init=n;
    }
+}
+
+
+void start_ranlux(int level,int seed)
+{
+   int max_seed;
+
+   max_seed=INT_MAX/NTHREAD;
+
+   error_loc((level<0)||(level>1)||(seed<1)||(seed>max_seed),1,
+             "start_ranlux [ranlxd.c]","Parameters are out of range");
+
+   rlxd_init(NTHREAD,level+1,seed,max_seed);
 }
 
 
