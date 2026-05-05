@@ -57,18 +57,23 @@ DEVICE_KEYWORD void su3dagxsu3vec(su3_dble *u,su3_vector_dble *psi,
 PRAGMA_OMP_END
 
 PRAGMA_OMP_BEGIN
-DEVICE_KEYWORD double cm3x3_retr(const su3_dble *u, const su3_dble *v)
+DEVICE_KEYWORD double cm3x3_retr(su3_dble *u,su3_dble *v)
 {
-    double tr_1 = u->c11.re * v->c11.re - u->c11.im * v->c11.im
-                + u->c12.re * v->c21.re - u->c12.im * v->c21.im
-                + u->c13.re * v->c31.re - u->c13.im * v->c31.im;
-    double tr_2 = u->c21.re * v->c12.re - u->c21.im * v->c12.im
-                + u->c22.re * v->c22.re - u->c22.im * v->c22.im
-                + u->c23.re * v->c32.re - u->c23.im * v->c32.im;
-    double tr_3 = u->c31.re * v->c13.re - u->c31.im * v->c13.im
-                + u->c32.re * v->c23.re - u->c32.im * v->c23.im
-                + u->c33.re * v->c33.re - u->c33.im * v->c33.im;
-    return tr_1 + tr_2 + tr_3;
+   double r;
+
+   r =(*u).c11.re*(*v).c11.re-(*u).c11.im*(*v).c11.im;
+   r+=(*u).c12.re*(*v).c21.re-(*u).c12.im*(*v).c21.im;
+   r+=(*u).c13.re*(*v).c31.re-(*u).c13.im*(*v).c31.im;
+
+   r+=(*u).c21.re*(*v).c12.re-(*u).c21.im*(*v).c12.im;
+   r+=(*u).c22.re*(*v).c22.re-(*u).c22.im*(*v).c22.im;
+   r+=(*u).c23.re*(*v).c32.re-(*u).c23.im*(*v).c32.im;
+
+   r+=(*u).c31.re*(*v).c13.re-(*u).c31.im*(*v).c13.im;
+   r+=(*u).c32.re*(*v).c23.re-(*u).c32.im*(*v).c23.im;
+   r+=(*u).c33.re*(*v).c33.re-(*u).c33.im*(*v).c33.im;
+
+   return r;
 }
 PRAGMA_OMP_END
 
