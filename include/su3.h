@@ -66,7 +66,13 @@ typedef union
    su3_vector_dble v[3];
 } matrix_dble_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 extern void random_su3_dble(su3_dble *su3_mat);
+#ifdef __cplusplus
+}
+#endif
 
 #define _vector_prod_re(r,s) \
    (r).c1.re*(s).c1.re+(r).c1.im*(s).c1.im+ \

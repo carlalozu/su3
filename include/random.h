@@ -37,6 +37,10 @@ extern void rlx_convertd(rlx_state_t *s,double *rd);
 
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* GAUSS_C */
 extern void gauss_dble(double *r,int n);
 
@@ -46,5 +50,9 @@ extern void rlxd_init(int n,int level,int seed,int seed_shift);
 extern int rlxd_size(void);
 extern void rlxd_get(int *state);
 extern void rlxd_reset(int *state);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
