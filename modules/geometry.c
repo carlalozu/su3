@@ -4,6 +4,10 @@
 #include "lattice.h"
 
 int *tms=NULL;
+int *ipt=NULL;
+int (*iup)[4]=NULL;
+int (*idn)[4]=NULL;
+int (*iupT)[VOLUME]=NULL;
 
 static void alloc_ipt(void)
 {

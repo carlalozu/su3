@@ -247,7 +247,8 @@ void rlx_set_state(int *is,rlx_state_t *s)
 void rlx_update(rlx_state_t *s)
 {
    int pr,ir,k;
-   uint64_t d[4],(*pmin)[4],(*pmax)[4],(*pi)[4],(*pj)[4];
+   int64_t d[4];
+   uint64_t (*pmin)[4],(*pmax)[4],(*pi)[4],(*pj)[4];
 
    pr=(*s).pr;
    ir=(*s).ir;

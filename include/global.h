@@ -49,10 +49,10 @@
 #define N0 (NPROC0*L0)
 
 #pragma omp declare target
-static int *ipt=NULL;
-static int (*iup)[4]=NULL;
-static int (*idn)[4]=NULL;
-static int (*iupT)[VOLUME]=NULL;
+extern int *ipt;
+extern int (*iup)[4];
+extern int (*idn)[4];
+extern int (*iupT)[VOLUME];
 #pragma omp end declare target
 
 
