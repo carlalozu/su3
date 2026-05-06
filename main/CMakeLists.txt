@@ -14,6 +14,7 @@ if(ENABLE_GPU_OFFLOAD)
     add_su3_executable(soa_gpu_openmp soa_gpu_openmp.c)
     add_su3_executable(aos_gpu_openmp aos_gpu_openmp.c)
     add_su3_executable(plaq_sum_gpu_openmp plaq_sum_gpu_openmp.c)
+    add_su3_executable(plaq_sum_soa_gpu_openmp plaq_sum_soa_gpu_openmp.c)
 endif()
 
 if(ENABLE_CUDA)

@@ -17,10 +17,15 @@
 #include "su3.h"
 #endif
 
+#ifndef SU3V_H
+#include "su3v.h"
+#endif
+
 #include "profiler.h"
 
 /* PLAQ_SUM_C */
 extern double plaq_sum_dble(int icom);
+extern double plaq_sum_dblev(su3_mat_field *u_fld, int icom);
 
 /* UFLDS_C */
 #ifdef __cplusplus
