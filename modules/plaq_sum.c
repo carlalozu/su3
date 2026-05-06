@@ -4,7 +4,6 @@
 #include "lattice.h"
 #include "su3prod.h"
 #include "uflds.h"
-#include "ufields.h"
 #include "utils.h"
 #include "global.h"
 #include "su3v.h"
@@ -36,7 +35,7 @@ static double plaq_dblev(su3_mat_field *u_fld, int mu, int nu, int ix)
 
    fsu3matxsu3mat      (&wd1, u_fld, ip[0], ip[1]);
    fsu3matdagxsu3matdag(&wd2, u_fld, ip[3], ip[2]);
-   return cm3x3_retr(&wd1, &wd2);
+   return su3matdxsu3matd_retrace(&wd1, &wd2);
 }
 #pragma omp end declare target
 

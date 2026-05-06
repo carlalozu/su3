@@ -5,7 +5,7 @@
 #include "su3prod.h"
 #include "su3v.h"
 #include "su3v_openmp.h"
-#include "ufields.h"
+#include "uflds.h"
 
 static const size_t FLUSH_NELEMS = 15728640UL;
 
