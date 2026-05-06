@@ -59,6 +59,10 @@ int main(int argc, char *argv[])
     printf("------------------------------------\n");
     printf("Volume:      %d\n", VOLUME);
     printf("Repetitions: %d\n\n", reps);
+    printf("OpenMP threads: %d\n\n", NTHREAD);
+    printf("Data structure: AoS\n\n");
+    printf("Lattice geometry: %ix%ix%ix%i\n\n", L0,L1,L2,L3);
+    printf("Local Lattice geometry: %ix%ix%ix%i\n\n", L0_TRD,L1_TRD,L2_TRD,L3_TRD);
 
     // -----------------------------------------------------------------------
     // Host: geometry and gauge field

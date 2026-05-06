@@ -22,6 +22,10 @@ int main(int argc, char *argv[])
     printf("Volume:      %d\n", VOLUME);
     printf("Repetitions: %d\n\n", reps);
     printf("OpenMP threads: %d\n\n", NTHREAD);
+    printf("Data structure: AoS\n\n");
+    printf("Lattice geometry: %ix%ix%ix%i\n\n", L0,L1,L2,L3);
+    printf("Local Lattice geometry: %ix%ix%ix%i\n\n", L0_TRD,L1_TRD,L2_TRD,L3_TRD);
+
     /* geometry() builds ipt/iup/iupT and maps them to the device.
      * random_ud() allocates the gauge field via udfld(), fills it with
      * random SU(3) matrices on the host, and uploads it to the device. */
