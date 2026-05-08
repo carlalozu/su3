@@ -3,6 +3,8 @@
 #include "global.h"
 #include "su3v.h"
 #include "su3v_cuda.cuh"
+#include "random.h"
+#include "lattice.h"
 
 static const size_t FLUSH_NELEMS = 15728640UL;
 
@@ -14,10 +16,10 @@ __global__ static void plaq_dblev(
     size_t i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i >= volume) return;
 
-    su3_mat_dble temp_a, temp_b;
+    su3_dble temp_a, temp_b;
     fsu3matxsu3mat      (&temp_a, &d_fld, 0*volume+i, 1*volume+i);
     fsu3matdagxsu3matdag(&temp_b, &d_fld, 2*volume+i, 3*volume+i);
-    res[i] = su3matdxsu3matd_retrace(&temp_a, &temp_b);
+    res[i] = cm3x3_retr(&temp_a, &temp_b);
 }
 
 int main(int argc, char *argv[])
@@ -39,8 +41,10 @@ int main(int argc, char *argv[])
 
     su3_mat_field_init(&h_fld, 4*VOLUME);
     doublev_init(&h_res, VOLUME);
-
-    random_su3_dble_field(&h_fld);
+    
+    start_ranlux(0, 12345);
+    geometry();
+    random_udv(&h_fld);
 
     // -----------------------------------------------------------------------
     // Device fields

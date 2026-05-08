@@ -28,8 +28,9 @@ int main(int argc, char *argv[])
     su3_mat_field_init(&u_fld, 4*VOLUME);
     doublev_init(&h_res, VOLUME);
 
-    rlxd_init(1, 1, 1, 1);
-    random_su3_dble_field(&u_fld);
+    start_ranlux(0, 12345);
+    geometry();
+    random_udv(&h_fld);
 
     // -----------------------------------------------------------------------
     // Map data to device
@@ -46,10 +47,10 @@ int main(int argc, char *argv[])
     for (int r = 0; r < 3; r++) {
         #pragma omp target teams distribute parallel for
         for (size_t i = 0; i < VOLUME; i++) {
-            su3_mat_dble temp, res;
+            su3_dble temp, res;
             fsu3matxsu3mat      (&temp, &u_fld, 0*VOLUME+i, 1*VOLUME+i);
             fsu3matdagxsu3matdag(&res,  &u_fld, 2*VOLUME+i, 3*VOLUME+i);
-            h_res.base[i] = su3matdxsu3matd_retrace(&temp, &res);
+            h_res.base[i] = cm3x3_retr(&temp, &res);
         }
     }
 
@@ -69,7 +70,7 @@ int main(int argc, char *argv[])
             su3_mat_dble temp, res;
             fsu3matxsu3mat      (&temp, &u_fld, 0*VOLUME+i, 1*VOLUME+i);
             fsu3matdagxsu3matdag(&res,  &u_fld, 2*VOLUME+i, 3*VOLUME+i);
-            h_res.base[i] = su3matdxsu3matd_retrace(&temp, &res);
+            h_res.base[i] = cm3x3_retr(&temp, &res);
         }
         total_s += omp_get_wtime() - t0;
     }

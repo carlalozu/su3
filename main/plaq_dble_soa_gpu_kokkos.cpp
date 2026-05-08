@@ -20,10 +20,10 @@ void launch_plaq_dble_kokkos(
     double       *res_base = d_res->data.data();
 
     Kokkos::parallel_for("plaq_dble", volume, KOKKOS_LAMBDA(const size_t i) {
-        su3_mat_dble temp, res;
+        su3_dble temp, res;
         fsu3matxsu3mat      (&temp, &fld, 0*volume+i, 1*volume+i);
         fsu3matdagxsu3matdag(&res,  &fld, 2*volume+i, 3*volume+i);
-        res_base[i] = su3matdxsu3matd_retrace(&temp, &res);
+        res_base[i] = cm3x3_retr(&temp, &res);
     });
     Kokkos::fence();
 }
@@ -50,9 +50,9 @@ int main(int argc, char *argv[])
         su3_mat_field_init(&h_fld, 4*VOLUME);
         doublev_init(&h_res, VOLUME);
 
-        rlxd_init(1, 1, 1, 1);
-        random_su3_dble_field(&h_fld);
-
+        start_ranlux(0, 12345);
+        geometry();
+        random_udv(&h_fld);
         // -------------------------------------------------------------------
         // Device fields
         // -------------------------------------------------------------------
