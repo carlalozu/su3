@@ -20,22 +20,22 @@ void unit_su3vec_field(su3_vec_field *su3vf)
         d[i] = 1.0;
 }
 
-void random_su3_dble_field(su3_mat_field *su3mf, int i)
+void random_su3_dble_field(su3_mat_field *uv, int ix)
 {
     su3_dble tmp;
     random_su3_dble(&tmp);
 
-    su3mf->c1.c1re[i] = tmp.c11.re;  su3mf->c1.c1im[i] = tmp.c11.im;
-    su3mf->c1.c2re[i] = tmp.c21.re;  su3mf->c1.c2im[i] = tmp.c21.im;
-    su3mf->c1.c3re[i] = tmp.c31.re;  su3mf->c1.c3im[i] = tmp.c31.im;
+    uv->c1.c1re[ix]=u.c11.re; uv->c1.c1im[ix]=u.c11.im;
+    uv->c1.c2re[ix]=u.c12.re; uv->c1.c2im[ix]=u.c12.im;
+    uv->c1.c3re[ix]=u.c13.re; uv->c1.c3im[ix]=u.c13.im;
 
-    su3mf->c2.c1re[i] = tmp.c12.re;  su3mf->c2.c1im[i] = tmp.c12.im;
-    su3mf->c2.c2re[i] = tmp.c22.re;  su3mf->c2.c2im[i] = tmp.c22.im;
-    su3mf->c2.c3re[i] = tmp.c32.re;  su3mf->c2.c3im[i] = tmp.c32.im;
+    uv->c2.c1re[ix]=u.c21.re; uv->c2.c1im[ix]=u.c21.im;
+    uv->c2.c2re[ix]=u.c22.re; uv->c2.c2im[ix]=u.c22.im;
+    uv->c2.c3re[ix]=u.c23.re; uv->c2.c3im[ix]=u.c23.im;
 
-    su3mf->c3.c1re[i] = tmp.c13.re;  su3mf->c3.c1im[i] = tmp.c13.im;
-    su3mf->c3.c2re[i] = tmp.c23.re;  su3mf->c3.c2im[i] = tmp.c23.im;
-    su3mf->c3.c3re[i] = tmp.c33.re;  su3mf->c3.c3im[i] = tmp.c33.im;
+    uv->c3.c1re[ix]=u.c31.re; uv->c3.c1im[ix]=u.c31.im;
+    uv->c3.c2re[ix]=u.c32.re; uv->c3.c2im[ix]=u.c32.im;
+    uv->c3.c3re[ix]=u.c33.re; uv->c3.c3im[ix]=u.c33.im;
 
 }
 
