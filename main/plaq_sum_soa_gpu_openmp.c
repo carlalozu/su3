@@ -28,14 +28,14 @@ int main(int argc, char *argv[])
     printf("Local lattice geometry: %ix%ix%ix%i\n\n", L0_TRD,L1_TRD,L2_TRD,L3_TRD);
 
     /* geometry() builds ipt/iup/iupT and maps them to the device.
-     * random_su3_dble_field() fills the SoA gauge field with random SU(3)
+     * random_udv() fills the SoA gauge field with random SU(3)
      * matrices; enter_su3_mat_field() uploads it to the device. */
     start_ranlux(0, 12345);
     geometry();
 
     su3_mat_field u_fld;
     su3_mat_field_init(&u_fld, 4*VOLUME);
-    random_su3_dble_field(&u_fld);
+    random_udv(&u_fld);
     enter_su3_mat_field(&u_fld);
 
     /* Cache-flush buffer */

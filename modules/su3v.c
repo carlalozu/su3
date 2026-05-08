@@ -22,8 +22,8 @@ void unit_su3vec_field(su3_vec_field *su3vf)
 
 void random_su3_dble_field(su3_mat_field *uv, int ix)
 {
-    su3_dble tmp;
-    random_su3_dble(&tmp);
+    su3_dble u;
+    random_su3_dble(&u);
 
     uv->c1.c1re[ix]=u.c11.re; uv->c1.c1im[ix]=u.c11.im;
     uv->c1.c2re[ix]=u.c12.re; uv->c1.c2im[ix]=u.c12.im;
