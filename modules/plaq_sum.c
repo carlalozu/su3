@@ -30,12 +30,12 @@ static double plaq_dble(su3_dble *udb, int mu, int nu, int ix)
 static double plaq_dblev(su3_mat_field *u_fld, int mu, int nu, int ix)
 {
    int ip[4];
-   su3_mat_dble wd1, wd2;
+   su3_dble wd1, wd2;
    plaq_uidx(mu, nu, ix, ip);
 
    fsu3matxsu3mat      (&wd1, u_fld, ip[0], ip[1]);
    fsu3matdagxsu3matdag(&wd2, u_fld, ip[3], ip[2]);
-   return su3matdxsu3matd_retrace(&wd1, &wd2);
+   return cm3x3_retr(&wd1, &wd2);
 }
 #pragma omp end declare target
 

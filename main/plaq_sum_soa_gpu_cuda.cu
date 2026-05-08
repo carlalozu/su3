@@ -34,10 +34,10 @@ __global__ static void plaq_sum_kernel(
                 int iup_mu = d_iupT[mu * volume + ix];
                 int iup_nu = d_iupT[nu * volume + ix];
 
-                su3_mat_dble wd1, wd2;
+                su3_dble wd1, wd2;
                 fsu3matxsu3mat      (&wd1, &d_fld, mu*volume+ix,     nu*volume+iup_mu);
                 fsu3matdagxsu3matdag(&wd2, &d_fld, mu*volume+iup_nu, nu*volume+ix);
-                pa += su3matdxsu3matd_retrace(&wd1, &wd2);
+                pa += cm3x3_retr(&wd1, &wd2);
             }
         }
     }
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 
     su3_mat_field h_fld;
     su3_mat_field_init(&h_fld, 4*VOLUME);
-    random_su3_dble_field(&h_fld);
+    random_udv(&h_fld);
 
     int *h_iupT = (int *)iupT;
 
