@@ -35,6 +35,7 @@ extern "C"
 #endif
   extern su3_dble *udfld(void);
   extern void random_ud(void);
+  extern void random_udv(su3_mat_field *su3mf);
 #ifdef __cplusplus
 }
 #endif
@@ -119,7 +120,7 @@ PRAGMA_OMP_END
 
 // SoA operations
 PRAGMA_OMP_BEGIN
-DEVICE_KEYWORD fsu3matxsu3vec(const su3_mat_field *u, const su3_vec_field *v, su3_vector_dble *res, int ip0, int ip1)
+DEVICE_KEYWORD void fsu3matxsu3vec(const su3_mat_field *u, const su3_vec_field *v, su3_vector_dble *res, int ip0, int ip1)
 {
   res->c1.re = u->c1.c1re[ip0] * v->c1re[ip1] - u->c1.c1im[ip0] * v->c1im[ip1] +
                u->c1.c2re[ip0] * v->c2re[ip1] - u->c1.c2im[ip0] * v->c2im[ip1] +

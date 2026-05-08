@@ -71,3 +71,32 @@ void random_ud(void)
 
    #pragma omp target update to(udb[:4*VOLUME])
 }
+
+void random_udv(su3_mat_field *su3mf)
+{
+   int bc;
+   int k,t,ifc,mu,ix;
+
+   bc=bc_type();
+
+#pragma omp parallel num_threads(NTHREAD) private(k,ix,t,ifc,mu)
+   {
+      k=omp_get_thread_num();
+      for (ix=k*VOLUME_TRD;ix<(k+1)*VOLUME_TRD;ix++)
+      {
+         t=global_time(ix);
+
+         // if ((t==(N0-1))&&(bc!=0))
+         {
+            ifc=offset(ix,0);
+            random_su3_dble_field(su3mf, ifc);
+         }
+
+         for (mu=1;mu<4;mu++)
+         {
+            ifc=offset(ix,mu);
+            random_su3_dble_field(su3mf, ifc);
+         }
+      }
+   }
+}

@@ -20,26 +20,23 @@ void unit_su3vec_field(su3_vec_field *su3vf)
         d[i] = 1.0;
 }
 
-void random_su3_dble_field(su3_mat_field *su3mf)
+void random_su3_dble_field(su3_mat_field *su3mf, int i)
 {
-    size_t volume = su3mf->c1.volume;
     su3_dble tmp;
+    random_su3_dble(&tmp);
 
-    for (size_t i = 0; i < volume; i++) {
-        random_su3_dble(&tmp);
+    su3mf->c1.c1re[i] = tmp.c11.re;  su3mf->c1.c1im[i] = tmp.c11.im;
+    su3mf->c1.c2re[i] = tmp.c21.re;  su3mf->c1.c2im[i] = tmp.c21.im;
+    su3mf->c1.c3re[i] = tmp.c31.re;  su3mf->c1.c3im[i] = tmp.c31.im;
 
-        su3mf->c1.c1re[i] = tmp.c11.re;  su3mf->c1.c1im[i] = tmp.c11.im;
-        su3mf->c1.c2re[i] = tmp.c21.re;  su3mf->c1.c2im[i] = tmp.c21.im;
-        su3mf->c1.c3re[i] = tmp.c31.re;  su3mf->c1.c3im[i] = tmp.c31.im;
+    su3mf->c2.c1re[i] = tmp.c12.re;  su3mf->c2.c1im[i] = tmp.c12.im;
+    su3mf->c2.c2re[i] = tmp.c22.re;  su3mf->c2.c2im[i] = tmp.c22.im;
+    su3mf->c2.c3re[i] = tmp.c32.re;  su3mf->c2.c3im[i] = tmp.c32.im;
 
-        su3mf->c2.c1re[i] = tmp.c12.re;  su3mf->c2.c1im[i] = tmp.c12.im;
-        su3mf->c2.c2re[i] = tmp.c22.re;  su3mf->c2.c2im[i] = tmp.c22.im;
-        su3mf->c2.c3re[i] = tmp.c32.re;  su3mf->c2.c3im[i] = tmp.c32.im;
+    su3mf->c3.c1re[i] = tmp.c13.re;  su3mf->c3.c1im[i] = tmp.c13.im;
+    su3mf->c3.c2re[i] = tmp.c23.re;  su3mf->c3.c2im[i] = tmp.c23.im;
+    su3mf->c3.c3re[i] = tmp.c33.re;  su3mf->c3.c3im[i] = tmp.c33.im;
 
-        su3mf->c3.c1re[i] = tmp.c13.re;  su3mf->c3.c1im[i] = tmp.c13.im;
-        su3mf->c3.c2re[i] = tmp.c23.re;  su3mf->c3.c2im[i] = tmp.c23.im;
-        su3mf->c3.c3re[i] = tmp.c33.re;  su3mf->c3.c3im[i] = tmp.c33.im;
-    }
 }
 
 void unit_su3mat_field(su3_mat_field *su3mf)
