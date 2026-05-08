@@ -1,14 +1,14 @@
 
 /*******************************************************************************
-*
-* File uflds.h
-*
-* Copyright (C) 2011, 2012, 2013 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-*******************************************************************************/
+ *
+ * File uflds.h
+ *
+ * Copyright (C) 2011, 2012, 2013 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ *******************************************************************************/
 
 #ifndef UFLDS_H
 #define UFLDS_H
@@ -30,228 +30,160 @@ extern double plaq_sum_dblev(su3_mat_field *u_fld, int icom);
 
 /* UFLDS_C */
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
-extern su3_dble *udfld(void);
-extern void random_ud(void);
+  extern su3_dble *udfld(void);
+  extern void random_ud(void);
 #ifdef __cplusplus
 }
 #endif
 extern prof_section compute;
 
-
 #if defined(KOKKOS_CORE_HPP)
-  #define DEVICE_KEYWORD    KOKKOS_INLINE_FUNCTION
+  #define DEVICE_KEYWORD KOKKOS_INLINE_FUNCTION
   #define PRAGMA_OMP_BEGIN
   #define PRAGMA_OMP_END
 #elif defined(__CUDACC__)
-  #define DEVICE_KEYWORD    __device__ static inline
+  #define DEVICE_KEYWORD __device__ static inline
   #define PRAGMA_OMP_BEGIN
   #define PRAGMA_OMP_END
 #else
   #define DEVICE_KEYWORD static inline
   #define PRAGMA_OMP_BEGIN _Pragma("omp declare target")
-  #define PRAGMA_OMP_END   _Pragma("omp end declare target")
+  #define PRAGMA_OMP_END _Pragma("omp end declare target")
 #endif
-
-// SoA operations
-PRAGMA_OMP_BEGIN
-DEVICE_KEYWORD void fsu3matxsu3vec(su3_vec_dble *res,const su3_mat_field *u,const su3_vec_field *v,const size_t i)
-{
-    res->c1re = u->c1.c1re[i] * v->c1re[i] - u->c1.c1im[i] * v->c1im[i] +
-                u->c1.c2re[i] * v->c2re[i] - u->c1.c2im[i] * v->c2im[i] +
-                u->c1.c3re[i] * v->c3re[i] - u->c1.c3im[i] * v->c3im[i];
-    res->c1im = u->c1.c1re[i] * v->c1im[i] + u->c1.c1im[i] * v->c1re[i] +
-                u->c1.c2re[i] * v->c2im[i] + u->c1.c2im[i] * v->c2re[i] +
-                u->c1.c3re[i] * v->c3im[i] + u->c1.c3im[i] * v->c3re[i];
-    res->c2re = u->c2.c1re[i] * v->c1re[i] - u->c2.c1im[i] * v->c1im[i] +
-                u->c2.c2re[i] * v->c2re[i] - u->c2.c2im[i] * v->c2im[i] +
-                u->c2.c3re[i] * v->c3re[i] - u->c2.c3im[i] * v->c3im[i];
-    res->c2im = u->c2.c1re[i] * v->c1im[i] + u->c2.c1im[i] * v->c1re[i] +
-                u->c2.c2re[i] * v->c2im[i] + u->c2.c2im[i] * v->c2re[i] +
-                u->c2.c3re[i] * v->c3im[i] + u->c2.c3im[i] * v->c3re[i];
-    res->c3re = u->c3.c1re[i] * v->c1re[i] - u->c3.c1im[i] * v->c1im[i] +
-                u->c3.c2re[i] * v->c2re[i] - u->c3.c2im[i] * v->c2im[i] +
-                u->c3.c3re[i] * v->c3re[i] - u->c3.c3im[i] * v->c3im[i];
-    res->c3im = u->c3.c1re[i] * v->c1im[i] + u->c3.c1im[i] * v->c1re[i] +
-                u->c3.c2re[i] * v->c2im[i] + u->c3.c2im[i] * v->c2re[i] +
-                u->c3.c3re[i] * v->c3im[i] + u->c3.c3im[i] * v->c3re[i];
-}
-PRAGMA_OMP_END
-
-/*
- * SU(3) matrix u^dagger times SU(3) vector s
- *
- * r.c1=(u^dagger*s).c1
- * r.c2=(u^dagger*s).c2
- * r.c3=(u^dagger*s).c3
- */
-PRAGMA_OMP_BEGIN
-DEVICE_KEYWORD void fsu3matdagxsu3vec(su3_vec_dble *r, const su3_mat_field *u, const su3_vec_field *s, const size_t i)
-{
-    r->c1re = u->c1.c1re[i] * s->c1re[i] + u->c1.c1im[i] * s->c1im[i] +
-              u->c2.c1re[i] * s->c2re[i] + u->c2.c1im[i] * s->c2im[i] +
-              u->c3.c1re[i] * s->c3re[i] + u->c3.c1im[i] * s->c3im[i];
-    r->c1im = u->c1.c1re[i] * s->c1im[i] - u->c1.c1im[i] * s->c1re[i] +
-              u->c2.c1re[i] * s->c2im[i] - u->c2.c1im[i] * s->c2re[i] +
-              u->c3.c1re[i] * s->c3im[i] - u->c3.c1im[i] * s->c3re[i];
-    r->c2re = u->c1.c2re[i] * s->c1re[i] + u->c1.c2im[i] * s->c1im[i] +
-              u->c2.c2re[i] * s->c2re[i] + u->c2.c2im[i] * s->c2im[i] +
-              u->c3.c2re[i] * s->c3re[i] + u->c3.c2im[i] * s->c3im[i];
-    r->c2im = u->c1.c2re[i] * s->c1im[i] - u->c1.c2im[i] * s->c1re[i] +
-              u->c2.c2re[i] * s->c2im[i] - u->c2.c2im[i] * s->c2re[i] +
-              u->c3.c2re[i] * s->c3im[i] - u->c3.c2im[i] * s->c3re[i];
-    r->c3re = u->c1.c3re[i] * s->c1re[i] + u->c1.c3im[i] * s->c1im[i] +
-              u->c2.c3re[i] * s->c2re[i] + u->c2.c3im[i] * s->c2im[i] +
-              u->c3.c3re[i] * s->c3re[i] + u->c3.c3im[i] * s->c3im[i];
-    r->c3im = u->c1.c3re[i] * s->c1im[i] - u->c1.c3im[i] * s->c1re[i] +
-              u->c2.c3re[i] * s->c2im[i] - u->c2.c3im[i] * s->c2re[i] +
-              u->c3.c3re[i] * s->c3im[i] - u->c3.c3im[i] * s->c3re[i];
-}
-PRAGMA_OMP_END
 
 PRAGMA_OMP_BEGIN
 DEVICE_KEYWORD double su3matdxsu3matd_retrace(const su3_mat_dble *u, const su3_mat_dble *v)
 {
-    double tr_1 = u->c1.c1re * v->c1.c1re - u->c1.c1im * v->c1.c1im 
-                + u->c1.c2re * v->c2.c1re - u->c1.c2im * v->c2.c1im 
-                + u->c1.c3re * v->c3.c1re - u->c1.c3im * v->c3.c1im;
-    double tr_2 = u->c2.c1re * v->c1.c2re - u->c2.c1im * v->c1.c2im 
-                + u->c2.c2re * v->c2.c2re - u->c2.c2im * v->c2.c2im 
-                + u->c2.c3re * v->c3.c2re - u->c2.c3im * v->c3.c2im;
-    double tr_3 = u->c3.c1re * v->c1.c3re - u->c3.c1im * v->c1.c3im 
-                + u->c3.c2re * v->c2.c3re - u->c3.c2im * v->c2.c3im 
-                + u->c3.c3re * v->c3.c3re - u->c3.c3im * v->c3.c3im;
-    return tr_1 + tr_2 + tr_3;
+  double tr_1 = u->c1.c1re * v->c1.c1re - u->c1.c1im * v->c1.c1im + u->c1.c2re * v->c2.c1re - u->c1.c2im * v->c2.c1im + u->c1.c3re * v->c3.c1re - u->c1.c3im * v->c3.c1im;
+  double tr_2 = u->c2.c1re * v->c1.c2re - u->c2.c1im * v->c1.c2im + u->c2.c2re * v->c2.c2re - u->c2.c2im * v->c2.c2im + u->c2.c3re * v->c3.c2re - u->c2.c3im * v->c3.c2im;
+  double tr_3 = u->c3.c1re * v->c1.c3re - u->c3.c1im * v->c1.c3im + u->c3.c2re * v->c2.c3re - u->c3.c2im * v->c2.c3im + u->c3.c3re * v->c3.c3re - u->c3.c3im * v->c3.c3im;
+  return tr_1 + tr_2 + tr_3;
 }
 PRAGMA_OMP_END
 
 PRAGMA_OMP_BEGIN
-DEVICE_KEYWORD void fsu3matxsu3mat(su3_mat_dble *res, const su3_mat_field *u, const int i0, const int i1)
+DEVICE_KEYWORD void _fsu3matconj_inverse_multiply(const su3_mat_field *u, const su3_vec_field *v, su3_vector_dble *res, int ip0, int ip1)
 {
-    res->c1.c1re = u->c1.c1re[i0] * u->c1.c1re[i1] - u->c1.c1im[i0] * u->c1.c1im[i1] +
-                   u->c1.c2re[i0] * u->c1.c2re[i1] - u->c1.c2im[i0] * u->c1.c2im[i1] +
-                   u->c1.c3re[i0] * u->c1.c3re[i1] - u->c1.c3im[i0] * u->c1.c3im[i1];
-    res->c1.c1im = u->c1.c1re[i0] * u->c1.c1im[i1] + u->c1.c1im[i0] * u->c1.c1re[i1] +
-                   u->c1.c2re[i0] * u->c1.c2im[i1] + u->c1.c2im[i0] * u->c1.c2re[i1] +
-                   u->c1.c3re[i0] * u->c1.c3im[i1] + u->c1.c3im[i0] * u->c1.c3re[i1];
-    res->c1.c2re = u->c2.c1re[i0] * u->c1.c1re[i1] - u->c2.c1im[i0] * u->c1.c1im[i1] +
-                   u->c2.c2re[i0] * u->c1.c2re[i1] - u->c2.c2im[i0] * u->c1.c2im[i1] +
-                   u->c2.c3re[i0] * u->c1.c3re[i1] - u->c2.c3im[i0] * u->c1.c3im[i1];
-    res->c1.c2im = u->c2.c1re[i0] * u->c1.c1im[i1] + u->c2.c1im[i0] * u->c1.c1re[i1] +
-                   u->c2.c2re[i0] * u->c1.c2im[i1] + u->c2.c2im[i0] * u->c1.c2re[i1] +
-                   u->c2.c3re[i0] * u->c1.c3im[i1] + u->c2.c3im[i0] * u->c1.c3re[i1];
-    res->c1.c3re = u->c3.c1re[i0] * u->c1.c1re[i1] - u->c3.c1im[i0] * u->c1.c1im[i1] +
-                   u->c3.c2re[i0] * u->c1.c2re[i1] - u->c3.c2im[i0] * u->c1.c2im[i1] +
-                   u->c3.c3re[i0] * u->c1.c3re[i1] - u->c3.c3im[i0] * u->c1.c3im[i1];
-    res->c1.c3im = u->c3.c1re[i0] * u->c1.c1im[i1] + u->c3.c1im[i0] * u->c1.c1re[i1] +
-                   u->c3.c2re[i0] * u->c1.c2im[i1] + u->c3.c2im[i0] * u->c1.c2re[i1] +
-                   u->c3.c3re[i0] * u->c1.c3im[i1] + u->c3.c3im[i0] * u->c1.c3re[i1];
-
-    res->c2.c1re = u->c1.c1re[i0] * u->c2.c1re[i1] - u->c1.c1im[i0] * u->c2.c1im[i1] +
-                   u->c1.c2re[i0] * u->c2.c2re[i1] - u->c1.c2im[i0] * u->c2.c2im[i1] +
-                   u->c1.c3re[i0] * u->c2.c3re[i1] - u->c1.c3im[i0] * u->c2.c3im[i1];
-    res->c2.c1im = u->c1.c1re[i0] * u->c2.c1im[i1] + u->c1.c1im[i0] * u->c2.c1re[i1] +
-                   u->c1.c2re[i0] * u->c2.c2im[i1] + u->c1.c2im[i0] * u->c2.c2re[i1] +
-                   u->c1.c3re[i0] * u->c2.c3im[i1] + u->c1.c3im[i0] * u->c2.c3re[i1];
-    res->c2.c2re = u->c2.c1re[i0] * u->c2.c1re[i1] - u->c2.c1im[i0] * u->c2.c1im[i1] +
-                   u->c2.c2re[i0] * u->c2.c2re[i1] - u->c2.c2im[i0] * u->c2.c2im[i1] +
-                   u->c2.c3re[i0] * u->c2.c3re[i1] - u->c2.c3im[i0] * u->c2.c3im[i1];
-    res->c2.c2im = u->c2.c1re[i0] * u->c2.c1im[i1] + u->c2.c1im[i0] * u->c2.c1re[i1] +
-                   u->c2.c2re[i0] * u->c2.c2im[i1] + u->c2.c2im[i0] * u->c2.c2re[i1] +
-                   u->c2.c3re[i0] * u->c2.c3im[i1] + u->c2.c3im[i0] * u->c2.c3re[i1];
-    res->c2.c3re = u->c3.c1re[i0] * u->c2.c1re[i1] - u->c3.c1im[i0] * u->c2.c1im[i1] +
-                   u->c3.c2re[i0] * u->c2.c2re[i1] - u->c3.c2im[i0] * u->c2.c2im[i1] +
-                   u->c3.c3re[i0] * u->c2.c3re[i1] - u->c3.c3im[i0] * u->c2.c3im[i1];
-    res->c2.c3im = u->c3.c1re[i0] * u->c2.c1im[i1] + u->c3.c1im[i0] * u->c2.c1re[i1] +
-                   u->c3.c2re[i0] * u->c2.c2im[i1] + u->c3.c2im[i0] * u->c2.c2re[i1] +
-                   u->c3.c3re[i0] * u->c2.c3im[i1] + u->c3.c3im[i0] * u->c2.c3re[i1];
-
-    res->c3.c1re = u->c1.c1re[i0] * u->c3.c1re[i1] - u->c1.c1im[i0] * u->c3.c1im[i1] +
-                   u->c1.c2re[i0] * u->c3.c2re[i1] - u->c1.c2im[i0] * u->c3.c2im[i1] +
-                   u->c1.c3re[i0] * u->c3.c3re[i1] - u->c1.c3im[i0] * u->c3.c3im[i1];
-    res->c3.c1im = u->c1.c1re[i0] * u->c3.c1im[i1] + u->c1.c1im[i0] * u->c3.c1re[i1] +
-                   u->c1.c2re[i0] * u->c3.c2im[i1] + u->c1.c2im[i0] * u->c3.c2re[i1] +
-                   u->c1.c3re[i0] * u->c3.c3im[i1] + u->c1.c3im[i0] * u->c3.c3re[i1];
-    res->c3.c2re = u->c2.c1re[i0] * u->c3.c1re[i1] - u->c2.c1im[i0] * u->c3.c1im[i1] +
-                   u->c2.c2re[i0] * u->c3.c2re[i1] - u->c2.c2im[i0] * u->c3.c2im[i1] +
-                   u->c2.c3re[i0] * u->c3.c3re[i1] - u->c2.c3im[i0] * u->c3.c3im[i1];
-    res->c3.c2im = u->c2.c1re[i0] * u->c3.c1im[i1] + u->c2.c1im[i0] * u->c3.c1re[i1] +
-                   u->c2.c2re[i0] * u->c3.c2im[i1] + u->c2.c2im[i0] * u->c3.c2re[i1] +
-                   u->c2.c3re[i0] * u->c3.c3im[i1] + u->c2.c3im[i0] * u->c3.c3re[i1];
-    res->c3.c3re = u->c3.c1re[i0] * u->c3.c1re[i1] - u->c3.c1im[i0] * u->c3.c1im[i1] +
-                   u->c3.c2re[i0] * u->c3.c2re[i1] - u->c3.c2im[i0] * u->c3.c2im[i1] +
-                   u->c3.c3re[i0] * u->c3.c3re[i1] - u->c3.c3im[i0] * u->c3.c3im[i1];
-    res->c3.c3im = u->c3.c1re[i0] * u->c3.c1im[i1] + u->c3.c1im[i0] * u->c3.c1re[i1] +
-                   u->c3.c2re[i0] * u->c3.c2im[i1] + u->c3.c2im[i0] * u->c3.c2re[i1] +
-                   u->c3.c3re[i0] * u->c3.c3im[i1] + u->c3.c3im[i0] * u->c3.c3re[i1];
+  res->c1.re = u->c1.c1re[ip0] * v->c1re[ip1] - u->c1.c1im[ip0] * v->c1im[ip1] +
+               u->c2.c1re[ip0] * v->c2re[ip1] - u->c2.c1im[ip0] * v->c2im[ip1] +
+               u->c3.c1re[ip0] * v->c3re[ip1] - u->c3.c1im[ip0] * v->c3im[ip1];
+  res->c1.im = -u->c1.c1re[ip0] * v->c1im[ip1] - u->c1.c1im[ip0] * v->c1re[ip1] +
+               -u->c2.c1re[ip0] * v->c2im[ip1] - u->c2.c1im[ip0] * v->c2re[ip1] +
+               -u->c3.c1re[ip0] * v->c3im[ip1] - u->c3.c1im[ip0] * v->c3re[ip1];
+  res->c2.re = u->c1.c2re[ip0] * v->c1re[ip1] - u->c1.c2im[ip0] * v->c1im[ip1] +
+               u->c2.c2re[ip0] * v->c2re[ip1] - u->c2.c2im[ip0] * v->c2im[ip1] +
+               u->c3.c2re[ip0] * v->c3re[ip1] - u->c3.c2im[ip0] * v->c3im[ip1];
+  res->c2.im = -u->c1.c2re[ip0] * v->c1im[ip1] - u->c1.c2im[ip0] * v->c1re[ip1] +
+               -u->c2.c2re[ip0] * v->c2im[ip1] - u->c2.c2im[ip0] * v->c2re[ip1] +
+               -u->c3.c2re[ip0] * v->c3im[ip1] - u->c3.c2im[ip0] * v->c3re[ip1];
+  res->c3.re = u->c1.c3re[ip0] * v->c1re[ip1] - u->c1.c3im[ip0] * v->c1im[ip1] +
+               u->c2.c3re[ip0] * v->c2re[ip1] - u->c2.c3im[ip0] * v->c2im[ip1] +
+               u->c3.c3re[ip0] * v->c3re[ip1] - u->c3.c3im[ip0] * v->c3im[ip1];
+  res->c3.im = -u->c1.c3re[ip0] * v->c1im[ip1] - u->c1.c3im[ip0] * v->c1re[ip1] +
+               -u->c2.c3re[ip0] * v->c2im[ip1] - u->c2.c3im[ip0] * v->c2re[ip1] +
+               -u->c3.c3re[ip0] * v->c3im[ip1] - u->c3.c3im[ip0] * v->c3re[ip1];
 }
 PRAGMA_OMP_END
-
 /*
  * Computes w=u^dag*v^dag assuming that w is different from u and v.
  */
 PRAGMA_OMP_BEGIN
-DEVICE_KEYWORD void fsu3matdagxsu3matdag(su3_mat_dble *w, const su3_mat_field *u, const int i0, const int i1)
+DEVICE_KEYWORD void fsu3matdagxsu3matdag(
+    su3_dble *res, const su3_mat_field *u, int ip0, int ip1)
 {
-    w->c1.c1re = u->c1.c1re[i0] * u->c1.c1re[i1] - u->c1.c1im[i0] * u->c1.c1im[i1]
-               + u->c2.c1re[i0] * u->c1.c2re[i1] - u->c2.c1im[i0] * u->c1.c2im[i1]
-               + u->c3.c1re[i0] * u->c1.c3re[i1] - u->c3.c1im[i0] * u->c1.c3im[i1];
-    w->c1.c1im = u->c1.c1re[i0] * -u->c1.c1im[i1] - u->c1.c1im[i0] * u->c1.c1re[i1]
-               + u->c2.c1re[i0] * -u->c1.c2im[i1] - u->c2.c1im[i0] * u->c1.c2re[i1]
-               + u->c3.c1re[i0] * -u->c1.c3im[i1] - u->c3.c1im[i0] * u->c1.c3re[i1];
-    w->c2.c1re = u->c1.c2re[i0] * u->c1.c1re[i1] - u->c1.c2im[i0] * u->c1.c1im[i1]
-               + u->c2.c2re[i0] * u->c1.c2re[i1] - u->c2.c2im[i0] * u->c1.c2im[i1]
-               + u->c3.c2re[i0] * u->c1.c3re[i1] - u->c3.c2im[i0] * u->c1.c3im[i1];
-    w->c2.c1im = u->c1.c2re[i0] * -u->c1.c1im[i1] - u->c1.c2im[i0] * u->c1.c1re[i1]
-               + u->c2.c2re[i0] * -u->c1.c2im[i1] - u->c2.c2im[i0] * u->c1.c2re[i1]
-               + u->c3.c2re[i0] * -u->c1.c3im[i1] - u->c3.c2im[i0] * u->c1.c3re[i1];
-    w->c3.c1re = u->c1.c3re[i0] * u->c1.c1re[i1] - u->c1.c3im[i0] * u->c1.c1im[i1]
-               + u->c2.c3re[i0] * u->c1.c2re[i1] - u->c2.c3im[i0] * u->c1.c2im[i1] 
-               + u->c3.c3re[i0] * u->c1.c3re[i1] - u->c3.c3im[i0] * u->c1.c3im[i1];
-    w->c3.c1im = u->c1.c3re[i0] * -u->c1.c1im[i1] - u->c1.c3im[i0] * u->c1.c1re[i1]
-               + u->c2.c3re[i0] * -u->c1.c2im[i1] - u->c2.c3im[i0] * u->c1.c2re[i1] 
-               + u->c3.c3re[i0] * -u->c1.c3im[i1] - u->c3.c3im[i0] * u->c1.c3re[i1];
+  su3_vec_field psi;
+  su3_vector_dble chi;
 
-    w->c1.c2re = u->c1.c1re[i0] * u->c2.c1re[i1] - u->c1.c1im[i0] * u->c2.c1im[i1]
-               + u->c2.c1re[i0] * u->c2.c2re[i1] - u->c2.c1im[i0] * u->c2.c2im[i1]
-               + u->c3.c1re[i0] * u->c2.c3re[i1] - u->c3.c1im[i0] * u->c2.c3im[i1];
-    w->c1.c2im = u->c1.c1re[i0] * -u->c2.c1im[i1] - u->c1.c1im[i0] * u->c2.c1re[i1]
-               + u->c2.c1re[i0] * -u->c2.c2im[i1] - u->c2.c1im[i0] * u->c2.c2re[i1]
-               + u->c3.c1re[i0] * -u->c2.c3im[i1] - u->c3.c1im[i0] * u->c2.c3re[i1];
-    w->c2.c2re = u->c1.c2re[i0] * u->c2.c1re[i1] - u->c1.c2im[i0] * u->c2.c1im[i1]
-               + u->c2.c2re[i0] * u->c2.c2re[i1] - u->c2.c2im[i0] * u->c2.c2im[i1]
-               + u->c3.c2re[i0] * u->c2.c3re[i1] - u->c3.c2im[i0] * u->c2.c3im[i1];
-    w->c2.c2im = u->c1.c2re[i0] * -u->c2.c1im[i1] - u->c1.c2im[i0] * u->c2.c1re[i1]
-               + u->c2.c2re[i0] * -u->c2.c2im[i1] - u->c2.c2im[i0] * u->c2.c2re[i1]
-               + u->c3.c2re[i0] * -u->c2.c3im[i1] - u->c3.c2im[i0] * u->c2.c3re[i1];
-    w->c3.c2re = u->c1.c3re[i0] * u->c2.c1re[i1] - u->c1.c3im[i0] * u->c2.c1im[i1]
-               + u->c2.c3re[i0] * u->c2.c2re[i1] - u->c2.c3im[i0] * u->c2.c2im[i1]
-               + u->c3.c3re[i0] * u->c2.c3re[i1] - u->c3.c3im[i0] * u->c2.c3im[i1];
-    w->c3.c2im = u->c1.c3re[i0] * -u->c2.c1im[i1] - u->c1.c3im[i0] * u->c2.c1re[i1]
-               + u->c2.c3re[i0] * -u->c2.c2im[i1] - u->c2.c3im[i0] * u->c2.c2re[i1]
-               + u->c3.c3re[i0] * -u->c2.c3im[i1] - u->c3.c3im[i0] * u->c2.c3re[i1];
+  psi = (*u).c1;
+  _fsu3matconj_inverse_multiply(u, &psi, &chi, ip0, ip1);
+  (*res).c11 = chi.c1;
+  (*res).c21 = chi.c2;
+  (*res).c31 = chi.c3;
 
-    w->c1.c3re = u->c1.c1re[i0] * u->c3.c1re[i1] - u->c1.c1im[i0] * u->c3.c1im[i1]
-               + u->c2.c1re[i0] * u->c3.c2re[i1] - u->c2.c1im[i0] * u->c3.c2im[i1]
-               + u->c3.c1re[i0] * u->c3.c3re[i1] - u->c3.c1im[i0] * u->c3.c3im[i1];
-    w->c1.c3im = u->c1.c1re[i0] * -u->c3.c1im[i1] - u->c1.c1im[i0] * u->c3.c1re[i1]
-               + u->c2.c1re[i0] * -u->c3.c2im[i1] - u->c2.c1im[i0] * u->c3.c2re[i1]
-               + u->c3.c1re[i0] * -u->c3.c3im[i1] - u->c3.c1im[i0] * u->c3.c3re[i1];
-    w->c2.c3re = u->c1.c2re[i0] * u->c3.c1re[i1] - u->c1.c2im[i0] * u->c3.c1im[i1]
-               + u->c2.c2re[i0] * u->c3.c2re[i1] - u->c2.c2im[i0] * u->c3.c2im[i1]
-               + u->c3.c2re[i0] * u->c3.c3re[i1] - u->c3.c2im[i0] * u->c3.c3im[i1];
-    w->c2.c3im = u->c1.c2re[i0] * -u->c3.c1im[i1] - u->c1.c2im[i0] * u->c3.c1re[i1]
-               + u->c2.c2re[i0] * -u->c3.c2im[i1] - u->c2.c2im[i0] * u->c3.c2re[i1]
-               + u->c3.c2re[i0] * -u->c3.c3im[i1] - u->c3.c2im[i0] * u->c3.c3re[i1];
-    w->c3.c3re = u->c1.c3re[i0] * u->c3.c1re[i1] - u->c1.c3im[i0] * u->c3.c1im[i1]
-               + u->c2.c3re[i0] * u->c3.c2re[i1] - u->c2.c3im[i0] * u->c3.c2im[i1]
-               + u->c3.c3re[i0] * u->c3.c3re[i1] - u->c3.c3im[i0] * u->c3.c3im[i1];
-    w->c3.c3im = u->c1.c3re[i0] * -u->c3.c1im[i1] - u->c1.c3im[i0] * u->c3.c1re[i1]
-               + u->c2.c3re[i0] * -u->c3.c2im[i1] - u->c2.c3im[i0] * u->c3.c2re[i1]
-               + u->c3.c3re[i0] * -u->c3.c3im[i1] - u->c3.c3im[i0] * u->c3.c3re[i1];
+  psi = (*u).c2;
+  _fsu3matconj_inverse_multiply(u, &psi, &chi, ip0, ip1);
+  (*res).c12 = chi.c1;
+  (*res).c22 = chi.c2;
+  (*res).c32 = chi.c3;
+
+  psi = (*u).c3;
+  _fsu3matconj_inverse_multiply(u, &psi, &chi, ip0, ip1);
+  (*res).c13 = chi.c1;
+  (*res).c23 = chi.c2;
+  (*res).c33 = chi.c3;
+}
+PRAGMA_OMP_END
+
+// SoA operations
+PRAGMA_OMP_BEGIN
+DEVICE_KEYWORD fsu3matxsu3vec(const su3_mat_field *u, const su3_vec_field *v, su3_vector_dble *res, int ip0, int ip1)
+{
+  res->c1.re = u->c1.c1re[ip0] * v->c1re[ip1] - u->c1.c1im[ip0] * v->c1im[ip1] +
+               u->c1.c2re[ip0] * v->c2re[ip1] - u->c1.c2im[ip0] * v->c2im[ip1] +
+               u->c1.c3re[ip0] * v->c3re[ip1] - u->c1.c3im[ip0] * v->c3im[ip1];
+  res->c1.im = u->c1.c1re[ip0] * v->c1im[ip1] + u->c1.c1im[ip0] * v->c1re[ip1] +
+               u->c1.c2re[ip0] * v->c2im[ip1] + u->c1.c2im[ip0] * v->c2re[ip1] +
+               u->c1.c3re[ip0] * v->c3im[ip1] + u->c1.c3im[ip0] * v->c3re[ip1];
+  res->c2.re = u->c2.c1re[ip0] * v->c1re[ip1] - u->c2.c1im[ip0] * v->c1im[ip1] +
+               u->c2.c2re[ip0] * v->c2re[ip1] - u->c2.c2im[ip0] * v->c2im[ip1] +
+               u->c2.c3re[ip0] * v->c3re[ip1] - u->c2.c3im[ip0] * v->c3im[ip1];
+  res->c2.im = u->c2.c1re[ip0] * v->c1im[ip1] + u->c2.c1im[ip0] * v->c1re[ip1] +
+               u->c2.c2re[ip0] * v->c2im[ip1] + u->c2.c2im[ip0] * v->c2re[ip1] +
+               u->c2.c3re[ip0] * v->c3im[ip1] + u->c2.c3im[ip0] * v->c3re[ip1];
+  res->c3.re = u->c3.c1re[ip0] * v->c1re[ip1] - u->c3.c1im[ip0] * v->c1im[ip1] +
+               u->c3.c2re[ip0] * v->c2re[ip1] - u->c3.c2im[ip0] * v->c2im[ip1] +
+               u->c3.c3re[ip0] * v->c3re[ip1] - u->c3.c3im[ip0] * v->c3im[ip1];
+  res->c3.im = u->c3.c1re[ip0] * v->c1im[ip1] + u->c3.c1im[ip0] * v->c1re[ip1] +
+               u->c3.c2re[ip0] * v->c2im[ip1] + u->c3.c2im[ip0] * v->c2re[ip1] +
+               u->c3.c3re[ip0] * v->c3im[ip1] + u->c3.c3im[ip0] * v->c3re[ip1];
+}
+PRAGMA_OMP_END
+
+PRAGMA_OMP_BEGIN
+DEVICE_KEYWORD void fsu3matxsu3mat(
+    su3_dble *res, const su3_mat_field *u, int ip0, int ip1)
+{
+  // printf("n: %i, ix: %i, ip: (%i, %i) \n", n, i, ip2, ip3);
+
+  su3_vec_field psi;
+  su3_vector_dble chi;
+
+  psi.c1re = (*u).c1.c1re;
+  psi.c1im = (*u).c1.c1im;
+  psi.c2re = (*u).c2.c1re;
+  psi.c2im = (*u).c2.c1im;
+  psi.c3re = (*u).c3.c1re;
+  psi.c3im = (*u).c3.c1im;
+  fsu3matxsu3vec(u, &psi, &chi, ip0, ip1);
+  (*res).c11 = chi.c1;
+  (*res).c21 = chi.c2;
+  (*res).c31 = chi.c3;
+
+  psi.c1re = (*u).c1.c2re;
+  psi.c1im = (*u).c1.c2im;
+  psi.c2re = (*u).c2.c2re;
+  psi.c2im = (*u).c2.c2im;
+  psi.c3re = (*u).c3.c2re;
+  psi.c3im = (*u).c3.c2im;
+  fsu3matxsu3vec(u, &psi, &chi, ip0, ip1);
+  (*res).c12 = chi.c1;
+  (*res).c22 = chi.c2;
+  (*res).c32 = chi.c3;
+
+  psi.c1re = (*u).c1.c3re;
+  psi.c1im = (*u).c1.c3im;
+  psi.c2re = (*u).c2.c3re;
+  psi.c2im = (*u).c2.c3im;
+  psi.c3re = (*u).c3.c3re;
+  psi.c3im = (*u).c3.c3im;
+  fsu3matxsu3vec(u, &psi, &chi, ip0, ip1);
+  (*res).c13 = chi.c1;
+  (*res).c23 = chi.c2;
+  (*res).c33 = chi.c3;
 }
 PRAGMA_OMP_END
 
 #endif // UFLDS_H
-
