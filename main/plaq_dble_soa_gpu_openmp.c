@@ -3,8 +3,10 @@
 #include <omp.h>
 #include "global.h"
 #include "su3v.h"
+#include "su3prod.h"
 #include "su3v_openmp.h"
 #include "uflds.h"
+#include "lattice.h"
 
 static const size_t FLUSH_NELEMS = 15728640UL;
 
@@ -30,7 +32,7 @@ int main(int argc, char *argv[])
 
     start_ranlux(0, 12345);
     geometry();
-    random_udv(&h_fld);
+    random_udv(&u_fld);
 
     // -----------------------------------------------------------------------
     // Map data to device
@@ -67,7 +69,7 @@ int main(int argc, char *argv[])
         double t0 = omp_get_wtime();
         #pragma omp target teams distribute parallel for
         for (size_t i = 0; i < VOLUME; i++) {
-            su3_mat_dble temp, res;
+            su3_dble temp, res;
             fsu3matxsu3mat      (&temp, &u_fld, 0*VOLUME+i, 1*VOLUME+i);
             fsu3matdagxsu3matdag(&res,  &u_fld, 2*VOLUME+i, 3*VOLUME+i);
             h_res.base[i] = cm3x3_retr(&temp, &res);
