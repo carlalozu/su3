@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include "su3prod.h"
 #include "su3v.h"
-#include "ufields.h"
+#include "uflds.h"
 
 #define CUDA_CHECK(call)                                                       \
     do {                                                                       \
