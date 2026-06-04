@@ -35,28 +35,32 @@ option(ENABLE_GPU_OFFLOAD "Enable OpenMP GPU Offloading" OFF)
 if(ENABLE_GPU_OFFLOAD)
     target_compile_definitions(su3lib PUBLIC SU3_USE_GPU_OFFLOAD)
 
-    add_library(su3openmp STATIC
-        modules/su3v_openmp.c
-    )
+    add_library(su3openmp STATIC modules/su3v_openmp.c)
     target_include_directories(su3openmp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
     target_link_libraries(su3openmp PUBLIC su3lib)
-    set(OMP_OFFLOAD_FLAGS
-        -mp=gpu -gpu=cc90
-    )
-    target_compile_options(su3lib PUBLIC ${OMP_OFFLOAD_FLAGS})
-    target_link_options(su3lib PUBLIC ${OMP_OFFLOAD_FLAGS})
-    target_compile_options(su3openmp PUBLIC ${OMP_OFFLOAD_FLAGS})
-    target_link_options(su3openmp PUBLIC ${OMP_OFFLOAD_FLAGS})
 
-    # set(OMP_OFFLOAD_FLAGS
-    #     -fopenmp
-    #     -fopenmp-targets=nvptx64-nvidia-cuda
-    #     -Xopenmp-target=nvptx64-nvidia-cuda --offload-arch=sm_90
-    # )
-    # target_compile_options(su3lib PUBLIC ${OMP_OFFLOAD_FLAGS})
-    # target_link_options(su3lib PUBLIC ${OMP_OFFLOAD_FLAGS} -lmpi_gtl_cuda)
-    # target_compile_options(su3openmp PUBLIC ${OMP_OFFLOAD_FLAGS})
-    # target_link_options(su3openmp PUBLIC ${OMP_OFFLOAD_FLAGS} -lmpi_gtl_cuda)
+    if (CMAKE_C_COMPILER_ID MATCHES "nvc")
+        message(STATUS "Setting OpenMP compiler flags for nvc")
+        set(OMP_OFFLOAD_FLAGS -mp=gpu -gpu=cc90)
+
+        target_compile_options(su3lib PUBLIC ${OMP_OFFLOAD_FLAGS})
+        target_link_options(su3lib PUBLIC ${OMP_OFFLOAD_FLAGS})
+        target_compile_options(su3openmp PUBLIC ${OMP_OFFLOAD_FLAGS})
+        target_link_options(su3openmp PUBLIC ${OMP_OFFLOAD_FLAGS})
+    endif()
+
+    if (CMAKE_C_COMPILER_ID MATCHES "CrayClang")
+        message(STATUS "Setting OpenMP compiler flags for CrayClang")
+        set(OMP_OFFLOAD_FLAGS
+            -fopenmp
+            -fopenmp-targets=nvptx64-nvidia-cuda
+            -Xopenmp-target=nvptx64-nvidia-cuda --offload-arch=sm_90
+        )
+        target_compile_options(su3lib PUBLIC ${OMP_OFFLOAD_FLAGS})
+        target_link_options(su3lib PUBLIC ${OMP_OFFLOAD_FLAGS} -lmpi_gtl_cuda)
+        target_compile_options(su3openmp PUBLIC ${OMP_OFFLOAD_FLAGS})
+        target_link_options(su3openmp PUBLIC ${OMP_OFFLOAD_FLAGS} -lmpi_gtl_cuda)
+    endif()
 
     message(STATUS "GPU OpenMP Offloading Enabled (SM_90)")
 else()
