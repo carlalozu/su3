@@ -28,10 +28,13 @@ int main(int argc, char *argv[])
     if (argc > 1) reps = atoi(argv[1]);
     if (argc > 2) idx  = atoi(argv[2]);
 
-    printf("\nAoS CUDA kernel benchmark\n");
+    omp_set_num_threads(NTHREAD);
+
+    printf("\nplaq_dble AoS CUDA kernel benchmark\n");
     printf("------------------------------------------\n");
     printf("Volume:      %d\n", VOLUME);
     printf("Repetitions: %d\n", reps);
+    printf("OpenMP threads: %d\n", NTHREAD);
     printf("Data structure: AoS\n");
     printf("Lattice geometry: %ix%ix%ix%i\n", L0,L1,L2,L3);
     printf("Local lattice geometry: %ix%ix%ix%i\n\n", L0_TRD,L1_TRD,L2_TRD,L3_TRD);
@@ -39,13 +42,12 @@ int main(int argc, char *argv[])
     // -----------------------------------------------------------------------
     // Host fields
     // -----------------------------------------------------------------------
-    su3_dble *h_fld = (su3_dble *)malloc(4*VOLUME * sizeof(su3_dble));
-    double    *h_res = (double    *)malloc(VOLUME * sizeof(double));
+    su3_dble  *h_fld = udfld();
+    double    *h_res = (double  *)malloc(VOLUME * sizeof(double));
 
-    rlxd_init(1, 1, 1, 1);
-    for (size_t i = 0; i < 4*(size_t)VOLUME; i++) {
-        random_su3_dble(&h_fld[i]);
-    }
+    start_ranlux(0, 12345);
+    geometry();
+    random_ud();
 
     // -----------------------------------------------------------------------
     // Device fields
@@ -127,7 +129,7 @@ int main(int argc, char *argv[])
     CUDA_CHECK(cudaFree(d_fld));
     CUDA_CHECK(cudaFree(d_res));
 
-    free(h_fld); free(h_res);
+    free(h_res);
 
     return 0;
 }

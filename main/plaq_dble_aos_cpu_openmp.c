@@ -3,6 +3,7 @@
 #include <omp.h>
 #include "global.h"
 #include "su3prod.h"
+#include "lattice.h"
 #include "su3v.h"
 #include "su3v_openmp.h"
 #include "uflds.h"
@@ -17,13 +18,12 @@ int main(int argc, char *argv[])
     if (argc > 2) idx  = atoi(argv[2]);
 
     omp_set_num_threads(NTHREAD);
-    int n_thrads = omp_get_num_threads();
     
-    printf("\nAoS OpenMP CPU benchmark\n");
+    printf("\nplaq_dble AoS OpenMP CPU benchmark\n");
     printf("------------------------------------------\n");
     printf("Volume:      %d\n", VOLUME);
     printf("Repetitions: %d\n", reps);
-    printf("Threads:     %d\n", n_thrads);
+    printf("OpenMP threads: %d\n", NTHREAD);
     printf("Data structure: AoS\n");
     printf("Lattice geometry: %ix%ix%ix%i\n", L0,L1,L2,L3);
     printf("Local lattice geometry: %ix%ix%ix%i\n\n", L0_TRD,L1_TRD,L2_TRD,L3_TRD);
@@ -31,13 +31,12 @@ int main(int argc, char *argv[])
     // -----------------------------------------------------------------------
     // Host fields
     // -----------------------------------------------------------------------
-    su3_dble *u_fld = (su3_dble *)malloc(4*VOLUME * sizeof(su3_dble));
-    double    *h_res = (double    *)malloc(VOLUME * sizeof(double));
-    
-    rlxd_init(1, 1, 1, 1);
-    for (size_t i = 0; i <4*VOLUME; i++) {
-        random_su3_dble(&u_fld[i]);
-    }
+    start_ranlux(0, 12345);
+    geometry();
+    random_ud();
+
+    double    *h_res = (double  *)malloc(VOLUME * sizeof(double));
+    su3_dble  *u_fld = udfld();    
 
     double *flush_buf = (double *)malloc(FLUSH_NELEMS * sizeof(double));
 
@@ -96,7 +95,7 @@ int main(int argc, char *argv[])
     // Cleanup
     // -----------------------------------------------------------------------
     free(flush_buf);
-    free(u_fld); free(h_res);
+    free(h_res);
 
     return 0;
 }

@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 
     Kokkos::initialize(argc, argv);
     {
-        printf("\nAoS Kokkos kernel benchmark\n");
+        printf("\nplaq_dble AoS Kokkos kernel benchmark\n");
         printf("------------------------------------------\n");
         printf("Volume:      %d\n", VOLUME);
         printf("Repetitions: %d\n", reps);
@@ -46,13 +46,12 @@ int main(int argc, char *argv[])
         // -------------------------------------------------------------------
         // Host fields
         // -------------------------------------------------------------------
-        su3_dble *h_fld = (su3_dble *)malloc(4*VOLUME * sizeof(su3_dble));
-        double    *h_res = (double    *)malloc(VOLUME * sizeof(double));
+        start_ranlux(0, 12345);
+        geometry();
+        random_ud();
+        su3_dble *h_fld = udfld();
+        double   *h_res = (double *)malloc(VOLUME * sizeof(double));
 
-        rlxd_init(1, 1, 1, 1);
-        for (size_t i = 0; i < 4*(size_t)VOLUME; i++) {
-            random_su3_dble(&h_fld[i]);
-        }
 
         // -------------------------------------------------------------------
         // Device fields
@@ -117,7 +116,7 @@ int main(int argc, char *argv[])
         doublev_kokkos_free(&d_res);
         doublev_kokkos_free(&d_flush);
 
-        free(h_fld); free(h_res);
+        free(h_res);
     }
     Kokkos::finalize();
     return 0;

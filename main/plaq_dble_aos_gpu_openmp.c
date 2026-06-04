@@ -5,6 +5,7 @@
 #include "su3prod.h"
 #include "su3v.h"
 #include "su3v_openmp.h"
+#include "lattice.h"
 #include "uflds.h"
 
 static const size_t FLUSH_NELEMS = 15728640UL;
@@ -16,10 +17,13 @@ int main(int argc, char *argv[])
     if (argc > 1) reps = atoi(argv[1]);
     if (argc > 2) idx  = atoi(argv[2]);
 
-    printf("\nAoS OpenMP offload benchmark\n");
+    omp_set_num_threads(NTHREAD);
+
+    printf("\nplaq_dble AoS OpenMP offload benchmark\n");
     printf("------------------------------------------\n");
     printf("Volume:      %d\n", VOLUME);
     printf("Repetitions: %d\n", reps);
+    printf("OpenMP threads: %d\n", NTHREAD);
     printf("Data structure: AoS\n");
     printf("Lattice geometry: %ix%ix%ix%i\n", L0,L1,L2,L3);
     printf("Local lattice geometry: %ix%ix%ix%i\n\n", L0_TRD,L1_TRD,L2_TRD,L3_TRD);
@@ -27,7 +31,10 @@ int main(int argc, char *argv[])
     // -----------------------------------------------------------------------
     // Host fields
     // -----------------------------------------------------------------------
-    su3_dble *u_fld = (su3_dble *)malloc(4*VOLUME * sizeof(su3_dble));
+    start_ranlux(0, 12345);
+    geometry();
+    random_ud();
+    su3_dble *u_fld = udfld();
     double    *h_res = (double    *)malloc(VOLUME * sizeof(double));
 
     // -----------------------------------------------------------------------
@@ -36,10 +43,6 @@ int main(int argc, char *argv[])
     #pragma omp target enter data map(alloc: h_res[0:VOLUME])
     #pragma omp target enter data map(alloc: u_fld[0:4*VOLUME])
     
-    rlxd_init(1, 1, 1, 1);
-    for (size_t i = 0; i <4*VOLUME; i++) {
-        random_su3_dble(&u_fld[i]);
-    }
     #pragma omp target update to(u_fld[0:4*VOLUME])
 
     double *flush_buf = (double *)malloc(FLUSH_NELEMS * sizeof(double));
@@ -103,8 +106,8 @@ int main(int argc, char *argv[])
     #pragma omp target exit data map(release: flush_buf[0:FLUSH_NELEMS])
     free(flush_buf);
 
-    #pragma omp target exit data map(release: u_fld[0:4*VOLUME], h_res[0:VOLUME])
-    free(u_fld); free(h_res);
+    #pragma omp target exit data map(release: u_fld[0:4*VOLUME], h_res[0:VOLUME]) 
+    free(h_res);
 
     return 0;
 }
