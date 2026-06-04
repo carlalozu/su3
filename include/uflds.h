@@ -26,6 +26,7 @@
 
 /* PLAQ_SUM_C */
 extern double plaq_sum_dble(int icom);
+extern double plaq_sum_dble_gpu(int icom);
 extern double plaq_sum_dblev(su3_mat_field *u_fld, int icom);
 
 /* UFLDS_C */
@@ -40,20 +41,6 @@ extern "C"
 }
 #endif
 extern prof_section compute;
-
-#if defined(KOKKOS_CORE_HPP)
-  #define DEVICE_KEYWORD KOKKOS_INLINE_FUNCTION
-  #define PRAGMA_OMP_BEGIN
-  #define PRAGMA_OMP_END
-#elif defined(__CUDACC__)
-  #define DEVICE_KEYWORD __device__ static inline
-  #define PRAGMA_OMP_BEGIN
-  #define PRAGMA_OMP_END
-#else
-  #define DEVICE_KEYWORD static inline
-  #define PRAGMA_OMP_BEGIN _Pragma("omp declare target")
-  #define PRAGMA_OMP_END _Pragma("omp end declare target")
-#endif
 
 PRAGMA_OMP_BEGIN
 DEVICE_KEYWORD double su3matdxsu3matd_retrace(const su3_mat_dble *u, const su3_mat_dble *v)
