@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
 {
     int reps = 100;
     if (argc > 1) reps = atoi(argv[1]);
+    omp_set_num_threads(NTHREAD);
 
     printf("Plaquette sum OpenMP GPU offload benchmark\n");
     printf("------------------------------------------\n");
@@ -60,7 +61,7 @@ int main(int argc, char *argv[])
             flush_buf[j] += 1.0;
 
         double t0 = omp_get_wtime();
-        last_sum = plaq_sum_dble(1);
+        last_sum = plaq_sum_dble_gpu(1);
         total_s += omp_get_wtime() - t0;
     }
 
@@ -68,6 +69,7 @@ int main(int argc, char *argv[])
     long long flops = 432LL * 6 * VOLUME; /* 432 flop/plaquette × 6 planes × V */
     double gflops = (double)flops / avg_s * 1e-9;
 
+    printf("\nResults\n");
     printf("Local gauge field size (KB): %d\n",
            (int)(72 * VOLUME * sizeof(double) / 1024));
     printf("Volume: %d\n", VOLUME);

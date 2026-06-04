@@ -17,6 +17,7 @@ int main(int argc, char *argv[])
 {
     int reps = 100;
     if (argc > 1) reps = atoi(argv[1]);
+    omp_set_num_threads(NTHREAD);
 
     printf("Plaquette sum OpenMP GPU offload benchmark\n");
     printf("------------------------------------------\n");

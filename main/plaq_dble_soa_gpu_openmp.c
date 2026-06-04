@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
     int idx  = 0;
     if (argc > 1) reps = atoi(argv[1]);
     if (argc > 2) idx  = atoi(argv[2]);
+    omp_set_num_threads(NTHREAD);
 
     printf("SoA OpenMP offload benchmark\n");
     printf("Volume:      %d\n", VOLUME);
