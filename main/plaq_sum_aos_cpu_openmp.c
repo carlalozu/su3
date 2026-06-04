@@ -16,9 +16,10 @@ int main(int argc, char *argv[])
 {
     int reps = 100;
     if (argc > 1) reps = atoi(argv[1]);
+
     omp_set_num_threads(NTHREAD);
 
-    printf("\nPlaquette sum OpenMP GPU offload benchmark\n");
+    printf("\nPlaquette sum OpenMP CPU benchmark\n");
     printf("------------------------------------------\n");
     printf("Volume:      %d\n", VOLUME);
     printf("Repetitions: %d\n", reps);

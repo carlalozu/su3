@@ -55,6 +55,8 @@ int main(int argc, char *argv[])
     int reps = 100;
     if (argc > 1) reps = atoi(argv[1]);
 
+    omp_set_num_threads(NTHREAD);
+
     printf("\nPlaquette sum CUDA kernel benchmark\n");
     printf("------------------------------------\n");
     printf("Volume:      %d\n", VOLUME);

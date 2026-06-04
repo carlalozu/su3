@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 
     Kokkos::initialize(argc, argv);
     {
-        printf("\nSoA Kokkos kernel benchmark\n");
+        printf("\nplaq_dble SoA Kokkos kernel benchmark\n");
         printf("------------------------------------------\n");
         printf("Volume:      %d\n", VOLUME);
         printf("Repetitions: %d\n", reps);
