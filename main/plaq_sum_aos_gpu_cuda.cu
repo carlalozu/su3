@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
     int reps = 100;
     if (argc > 1) reps = atoi(argv[1]);
 
-    printf("Plaquette sum CUDA kernel benchmark\n");
+    printf("\nPlaquette sum CUDA kernel benchmark\n");
     printf("------------------------------------\n");
     printf("Volume:      %d\n", VOLUME);
     printf("Repetitions: %d\n", reps);
@@ -137,12 +137,10 @@ int main(int argc, char *argv[])
     long long flops = 432LL * 6 * VOLUME;
     double gflops  = (double)flops / avg_s * 1e-9;
 
+    printf("\nResults\n");
     printf("Local gauge field size (KB): %d\n",
            (int)(72 * VOLUME * sizeof(double) / 1024));
-    printf("Volume: %d\n", VOLUME);
-    printf("Number of repetitions: %d\n", reps);
     printf("Average time for plaq_sum (ms):  %.6f\n", avg_ms);
-    printf("Average time for plaq_sum (sec): %.9f\n", avg_s);
     printf("Flops per call: %lld\n", flops);
     printf("Total performance (GFlop/s): %.2f\n", gflops);
     printf("Time per lattice point (sec): %.9f\n", avg_s / (double)VOLUME);

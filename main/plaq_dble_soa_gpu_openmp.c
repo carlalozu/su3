@@ -18,9 +18,13 @@ int main(int argc, char *argv[])
     if (argc > 2) idx  = atoi(argv[2]);
     omp_set_num_threads(NTHREAD);
 
-    printf("SoA OpenMP offload benchmark\n");
+    printf("\nSoA OpenMP offload benchmark\n");
+    printf("------------------------------------------\n");
     printf("Volume:      %d\n", VOLUME);
     printf("Repetitions: %d\n", reps);
+    printf("Data structure: SoA\n");
+    printf("Lattice geometry: %ix%ix%ix%i\n", L0,L1,L2,L3);
+    printf("Local lattice geometry: %ix%ix%ix%i\n\n", L0_TRD,L1_TRD,L2_TRD,L3_TRD);
 
     // -----------------------------------------------------------------------
     // Host fields
@@ -80,13 +84,13 @@ int main(int argc, char *argv[])
 
     double avg_s  = total_s / reps;
     double gflops = (double)VOLUME * 432.0 / avg_s * 1e-9;
-    double gbytes = (double)VOLUME * 1160.0;
 
     printf("\nResults\n");
+    printf("Local gauge field size (KB): %d\n",
+           (int)(72 * VOLUME * sizeof(double) / 1024));
     printf("  total  = %.6f s  (%d reps)\n", total_s, reps);
     printf("  avg    = %.6f s  (%.3f ms)\n", avg_s, avg_s * 1e3);
     printf("  GFLOP/s = %.2f\n", gflops);
-    printf("  GB     = %.2f\n", gbytes);
 
     // -----------------------------------------------------------------------
     // Verify one element
