@@ -1,0 +1,138 @@
+
+#ifndef SU3PROD_H
+#define SU3PROD_H
+
+#include "su3.h"
+#include "global.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+complex_dble add(const complex_dble a, const complex_dble b);
+void vec_add(su3_vec_c *res, const su3_vec_c *u, const su3_vec_c *v);
+
+PRAGMA_OMP_BEGIN
+complex_dble su3mat_trace(const su3_dble *u);
+void su3matxsu3vec(su3_vec_c *res, const su3_dble *u, const su3_vec_c *v);
+void su3matdagxsu3vec(su3_vec_c *r, const su3_dble *u, const su3_vec_c *s);
+PRAGMA_OMP_END
+
+#ifdef __cplusplus
+}
+#endif
+
+
+// ---------------------------------------------------------------------------
+// Matrix operations — inline on all backends
+// ---------------------------------------------------------------------------
+
+PRAGMA_OMP_BEGIN
+DEVICE_KEYWORD void su3xsu3vec(su3_dble *u,su3_vector_dble *psi,
+                       su3_vector_dble *chi)
+{
+   _su3_multiply(*chi,*u,*psi);
+}
+PRAGMA_OMP_END
+
+PRAGMA_OMP_BEGIN
+DEVICE_KEYWORD void su3dagxsu3vec(su3_dble *u,su3_vector_dble *psi,
+                          su3_vector_dble *chi)
+{
+   _su3_inverse_multiply(*chi,*u,*psi);
+}
+PRAGMA_OMP_END
+
+PRAGMA_OMP_BEGIN
+DEVICE_KEYWORD double cm3x3_retr(su3_dble *u,su3_dble *v)
+{
+   double r;
+
+   r =(*u).c11.re*(*v).c11.re-(*u).c11.im*(*v).c11.im;
+   r+=(*u).c12.re*(*v).c21.re-(*u).c12.im*(*v).c21.im;
+   r+=(*u).c13.re*(*v).c31.re-(*u).c13.im*(*v).c31.im;
+
+   r+=(*u).c21.re*(*v).c12.re-(*u).c21.im*(*v).c12.im;
+   r+=(*u).c22.re*(*v).c22.re-(*u).c22.im*(*v).c22.im;
+   r+=(*u).c23.re*(*v).c32.re-(*u).c23.im*(*v).c32.im;
+
+   r+=(*u).c31.re*(*v).c13.re-(*u).c31.im*(*v).c13.im;
+   r+=(*u).c32.re*(*v).c23.re-(*u).c32.im*(*v).c23.im;
+   r+=(*u).c33.re*(*v).c33.re-(*u).c33.im*(*v).c33.im;
+
+   return r;
+}
+PRAGMA_OMP_END
+
+PRAGMA_OMP_BEGIN
+DEVICE_KEYWORD void su3xsu3(su3_dble *w,su3_dble *u,su3_dble *v)
+{
+   su3_vector_dble psi,chi;
+
+   psi.c1=(*v).c11;
+   psi.c2=(*v).c21;
+   psi.c3=(*v).c31;
+   su3xsu3vec(u,&psi,&chi);
+   (*w).c11=chi.c1;
+   (*w).c21=chi.c2;
+   (*w).c31=chi.c3;
+
+   psi.c1=(*v).c12;
+   psi.c2=(*v).c22;
+   psi.c3=(*v).c32;
+   su3xsu3vec(u,&psi,&chi);
+   (*w).c12=chi.c1;
+   (*w).c22=chi.c2;
+   (*w).c32=chi.c3;
+
+   psi.c1=(*v).c13;
+   psi.c2=(*v).c23;
+   psi.c3=(*v).c33;
+   su3xsu3vec(u,&psi,&chi);
+   (*w).c13=chi.c1;
+   (*w).c23=chi.c2;
+   (*w).c33=chi.c3;
+}
+PRAGMA_OMP_END
+
+PRAGMA_OMP_BEGIN
+DEVICE_KEYWORD void su3dagxsu3dag(su3_dble *w, su3_dble *u, su3_dble *v)
+{
+   su3_vector_dble psi,chi;
+
+   psi.c1.re= (*v).c11.re;
+   psi.c1.im=-(*v).c11.im;
+   psi.c2.re= (*v).c12.re;
+   psi.c2.im=-(*v).c12.im;
+   psi.c3.re= (*v).c13.re;
+   psi.c3.im=-(*v).c13.im;
+   su3dagxsu3vec(u,&psi,&chi);
+   (*w).c11=chi.c1;
+   (*w).c21=chi.c2;
+   (*w).c31=chi.c3;
+
+   psi.c1.re= (*v).c21.re;
+   psi.c1.im=-(*v).c21.im;
+   psi.c2.re= (*v).c22.re;
+   psi.c2.im=-(*v).c22.im;
+   psi.c3.re= (*v).c23.re;
+   psi.c3.im=-(*v).c23.im;
+   su3dagxsu3vec(u,&psi,&chi);
+   (*w).c12=chi.c1;
+   (*w).c22=chi.c2;
+   (*w).c32=chi.c3;
+
+   psi.c1.re= (*v).c31.re;
+   psi.c1.im=-(*v).c31.im;
+   psi.c2.re= (*v).c32.re;
+   psi.c2.im=-(*v).c32.im;
+   psi.c3.re= (*v).c33.re;
+   psi.c3.im=-(*v).c33.im;
+   su3dagxsu3vec(u,&psi,&chi);
+   (*w).c13=chi.c1;
+   (*w).c23=chi.c2;
+   (*w).c33=chi.c3;
+}
+PRAGMA_OMP_END
+
+#endif // SU3PROD_H

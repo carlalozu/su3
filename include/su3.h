@@ -15,15 +15,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include "random.h"
+#include "global.h"
 
 typedef struct
 {
     double re, im;
-} complex;
+} complex_dble;
 
 typedef struct
 {
-    complex c1, c2, c3;
+    complex_dble c1, c2, c3;
 } su3_vec_c;
 
 typedef struct
@@ -39,28 +41,98 @@ typedef struct {
 
 typedef struct
 {
-    complex c11, c12, c13, c21, c22, c23, c31, c32, c33;
-} su3_mat_c;
+    complex_dble c11, c12, c13, c21, c22, c23, c31, c32, c33;
+} su3_dble;
 
-// SU3 initialization
-#pragma omp declare target
-void unit_su3mat(su3_mat_c *su3_mat);
-void random_su3mat(su3_mat_c *su3_mat, uint64_t *state);
-void unit_su3vec(su3_vec_c *su3_vec);
-#pragma omp end declare target
+typedef struct
+{
+   double q[2];
+} qflt;
 
-// Algebra
-complex add(const complex a, const complex b);
-void vec_add(su3_vec_c *res, const su3_vec_c *u, const su3_vec_c *v);
+typedef struct
+{
+   complex_dble c1,c2,c3;
+} su3_vector_dble;
 
-#pragma omp declare target
-complex su3mat_trace(const su3_mat_c *u);
-double su3matxsu3mat_retrace(const su3_mat_c *u, const su3_mat_c *v);
-void su3matxsu3vec(su3_vec_c *res, const su3_mat_c *u, const su3_vec_c *v);
-void su3matdagxsu3vec(su3_vec_c*, const su3_mat_c*, const su3_vec_c*);
-void su3matxsu3vec(su3_vec_c *res, const su3_mat_c *u, const su3_vec_c *v);
-void su3matxsu3mat(su3_mat_c *res, const su3_mat_c *u, const su3_mat_c *v);
-void su3matdagxsu3matdag(su3_mat_c *res, const su3_mat_c *u, const su3_mat_c *v);
-#pragma omp end declare target
+typedef union
+{
+   su3_vector_dble v;
+   double r[6];
+} vector_dble_t;
+
+typedef union
+{
+   su3_dble u;
+   su3_vector_dble v[3];
+} matrix_dble_t;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern void random_su3_dble(su3_dble *su3_mat);
+#ifdef __cplusplus
+}
+#endif
+
+#define _vector_prod_re(r,s) \
+   (r).c1.re*(s).c1.re+(r).c1.im*(s).c1.im+ \
+   (r).c2.re*(s).c2.re+(r).c2.im*(s).c2.im+ \
+   (r).c3.re*(s).c3.re+(r).c3.im*(s).c3.im
+
+#define _vector_cross_prod(v,w,z) \
+   (v).c1.re= (w).c2.re*(z).c3.re-(w).c2.im*(z).c3.im  \
+             -(w).c3.re*(z).c2.re+(w).c3.im*(z).c2.im; \
+   (v).c1.im= (w).c3.re*(z).c2.im+(w).c3.im*(z).c2.re  \
+             -(w).c2.re*(z).c3.im-(w).c2.im*(z).c3.re; \
+   (v).c2.re= (w).c3.re*(z).c1.re-(w).c3.im*(z).c1.im  \
+             -(w).c1.re*(z).c3.re+(w).c1.im*(z).c3.im; \
+   (v).c2.im= (w).c1.re*(z).c3.im+(w).c1.im*(z).c3.re  \
+             -(w).c3.re*(z).c1.im-(w).c3.im*(z).c1.re; \
+   (v).c3.re= (w).c1.re*(z).c2.re-(w).c1.im*(z).c2.im  \
+             -(w).c2.re*(z).c1.re+(w).c2.im*(z).c1.im; \
+   (v).c3.im= (w).c2.re*(z).c1.im+(w).c2.im*(z).c1.re  \
+             -(w).c1.re*(z).c2.im-(w).c1.im*(z).c2.re
+
+
+#define _su3_multiply(r,u,s) \
+   (r).c1.re= (u).c11.re*(s).c1.re-(u).c11.im*(s).c1.im  \
+             +(u).c12.re*(s).c2.re-(u).c12.im*(s).c2.im  \
+             +(u).c13.re*(s).c3.re-(u).c13.im*(s).c3.im; \
+   (r).c1.im= (u).c11.re*(s).c1.im+(u).c11.im*(s).c1.re  \
+             +(u).c12.re*(s).c2.im+(u).c12.im*(s).c2.re  \
+             +(u).c13.re*(s).c3.im+(u).c13.im*(s).c3.re; \
+   (r).c2.re= (u).c21.re*(s).c1.re-(u).c21.im*(s).c1.im  \
+             +(u).c22.re*(s).c2.re-(u).c22.im*(s).c2.im  \
+             +(u).c23.re*(s).c3.re-(u).c23.im*(s).c3.im; \
+   (r).c2.im= (u).c21.re*(s).c1.im+(u).c21.im*(s).c1.re  \
+             +(u).c22.re*(s).c2.im+(u).c22.im*(s).c2.re  \
+             +(u).c23.re*(s).c3.im+(u).c23.im*(s).c3.re; \
+   (r).c3.re= (u).c31.re*(s).c1.re-(u).c31.im*(s).c1.im  \
+             +(u).c32.re*(s).c2.re-(u).c32.im*(s).c2.im  \
+             +(u).c33.re*(s).c3.re-(u).c33.im*(s).c3.im; \
+   (r).c3.im= (u).c31.re*(s).c1.im+(u).c31.im*(s).c1.re  \
+             +(u).c32.re*(s).c2.im+(u).c32.im*(s).c2.re  \
+             +(u).c33.re*(s).c3.im+(u).c33.im*(s).c3.re
+
+
+#define _su3_inverse_multiply(r,u,s) \
+   (r).c1.re= (u).c11.re*(s).c1.re+(u).c11.im*(s).c1.im  \
+             +(u).c21.re*(s).c2.re+(u).c21.im*(s).c2.im  \
+             +(u).c31.re*(s).c3.re+(u).c31.im*(s).c3.im; \
+   (r).c1.im= (u).c11.re*(s).c1.im-(u).c11.im*(s).c1.re  \
+             +(u).c21.re*(s).c2.im-(u).c21.im*(s).c2.re  \
+             +(u).c31.re*(s).c3.im-(u).c31.im*(s).c3.re; \
+   (r).c2.re= (u).c12.re*(s).c1.re+(u).c12.im*(s).c1.im  \
+             +(u).c22.re*(s).c2.re+(u).c22.im*(s).c2.im  \
+             +(u).c32.re*(s).c3.re+(u).c32.im*(s).c3.im; \
+   (r).c2.im= (u).c12.re*(s).c1.im-(u).c12.im*(s).c1.re  \
+             +(u).c22.re*(s).c2.im-(u).c22.im*(s).c2.re  \
+             +(u).c32.re*(s).c3.im-(u).c32.im*(s).c3.re; \
+   (r).c3.re= (u).c13.re*(s).c1.re+(u).c13.im*(s).c1.im  \
+             +(u).c23.re*(s).c2.re+(u).c23.im*(s).c2.im  \
+             +(u).c33.re*(s).c3.re+(u).c33.im*(s).c3.im; \
+   (r).c3.im= (u).c13.re*(s).c1.im-(u).c13.im*(s).c1.re  \
+             +(u).c23.re*(s).c2.im-(u).c23.im*(s).c2.re  \
+             +(u).c33.re*(s).c3.im-(u).c33.im*(s).c3.re
 
 #endif // SU3_H

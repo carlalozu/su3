@@ -3,9 +3,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "su3.h"
+#include "su3prod.h"
 #include "su3v.h"
-#include "ufields.h"
+#include "uflds.h"
 
 #define CUDA_CHECK(call)                                                       \
     do {                                                                       \
@@ -30,13 +30,10 @@ void doublev_cuda_alloc(doublev *d, size_t volume);
 void doublev_cuda_free(doublev *d);
 void doublev_cuda_download(doublev *h, const doublev *d);
 
-// Fused kernel launcher
-void launch_plaq_dble(
-    doublev *d_res,
-    const su3_mat_field *d_u, const su3_mat_field *d_v,
-    const su3_mat_field *d_w, const su3_mat_field *d_x,
-    size_t volume, int threads_per_block);
-
-void launch_flush_cache(double *d_buf, size_t n);
+__global__ static void flush_cache_kernel(double *buf, size_t n)
+{
+    size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i < n) buf[i] += 1.0;
+}
 
 #endif // SU3V_CUDA_CUH

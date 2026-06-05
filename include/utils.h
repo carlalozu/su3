@@ -2,13 +2,16 @@
 #define UTILS_H
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdarg.h>
 #include "global.h"
 #include "su3v.h"
 
 #ifdef _OPENMP
 #include <omp.h>
 
-void is_gpu()
+static void _is_gpu()
 {
     int th_id = omp_get_team_num();
     int te_id = omp_get_thread_num();
@@ -30,7 +33,7 @@ void is_gpu()
     }
 }
 
-void print_parallel_info()
+static void print_parallel_info()
 {
     printf("OpenMP is enabled\n");
     int n_threads = omp_get_max_threads();
@@ -38,16 +41,101 @@ void print_parallel_info()
     printf("Number of size per thread: %d\n", VOLUME / n_threads);
 }
 #else
-void is_gpu()
+static void _is_gpu()
 {
     printf("Running on host\n");
 }
 
-void print_parallel_info()
+static void print_parallel_info()
 {
     printf("OpenMP is not enabled\n");
 }
 
 #endif
+
+
+static inline void acc_qflt(double u,double *qr)
+{
+   double a,b,qp,up;
+   double c,d;
+
+   a=qr[0]+u;
+   qp=a-u;
+   up=a-qp;
+   b=(qr[0]-qp)+(u-up);
+
+   c=qr[1]+b;
+   d=a+c;
+
+   qr[0]=d;
+   qr[1]=c-(d-a);
+}
+
+
+/* Modular arithmetic safe for negative numerators. */
+static inline int safe_mod(int a, int b)
+{
+   return ((a % b) + b) % b;
+}
+
+/* Boundary condition type: 3 = fully periodic (no open/SF boundaries). */
+static inline int bc_type(void) { return 3; }
+
+/* Aligned memory allocation. align is the log2 of the desired alignment
+   (openQCD convention: amalloc(n, 6) gives 64-byte alignment). */
+static inline void *amalloc(size_t n, int align)
+{
+   size_t alignment = (size_t)1 << align;
+   void *raw = malloc(n + alignment + sizeof(void *));
+   if (raw == NULL) return NULL;
+   uintptr_t addr = ((uintptr_t)raw + sizeof(void *) + alignment - 1) & ~(alignment - 1);
+   ((void **)addr)[-1] = raw;
+   return (void *)addr;
+}
+
+static inline void afree(void *ptr)
+{
+   if (ptr) free(((void **)ptr)[-1]);
+}
+
+/* Error handlers — print message and abort. */
+static inline void error(int cond, int no, const char *name, const char *fmt, ...)
+{
+   if (cond) {
+      fprintf(stderr, "Error in %s [code %d]: ", name, no);
+      va_list ap; va_start(ap, fmt); vfprintf(stderr, fmt, ap); va_end(ap);
+      fprintf(stderr, "\n");
+      exit(EXIT_FAILURE);
+   }
+}
+
+static inline void error_root(int cond, int no, const char *name, const char *fmt, ...)
+{
+   if (cond) {
+      fprintf(stderr, "Error in %s [code %d]: ", name, no);
+      va_list ap; va_start(ap, fmt); vfprintf(stderr, fmt, ap); va_end(ap);
+      fprintf(stderr, "\n");
+      exit(EXIT_FAILURE);
+   }
+}
+
+/* set_bc: no-op for periodic boundary conditions. */
+static inline void set_bc(void) {}
+
+static void error_loc(int test,int no,char *name,char *format,...)
+{
+   va_list args;
+
+   if (test!=0)
+   {
+      printf("\nError in %s:\n",name);
+      va_start(args,format);
+      vprintf(format,args);
+      va_end(args);
+      printf("\nProgram aborted\n\n");
+      exit(no);
+   }
+}
+
 
 #endif

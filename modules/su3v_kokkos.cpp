@@ -1,5 +1,5 @@
 #include "su3v_kokkos.hpp"
-#include "ufields.h"
+#include "uflds.h"
 
 static size_t pad(size_t v) { return (v + 7) & ~(size_t)7; }
 
@@ -85,43 +85,32 @@ void doublev_kokkos_download(doublev *h, const KokkosDoublev *d)
 }
 
 // ---------------------------------------------------------------------------
-// Cache flush kernel
+// KokkosSu3Mat memory management
 // ---------------------------------------------------------------------------
 
-void launch_flush_kokkos(KokkosDoublev *buf)
+void su3_aos_kokkos_alloc(KokkosSu3Mat *km, size_t volume)
 {
-    double *ptr = buf->data.data();
-    size_t  n   = buf->dv.volume;
-    Kokkos::parallel_for("flush_cache", n, KOKKOS_LAMBDA(const size_t i) {
-        ptr[i] += 1.0;
-    });
-    Kokkos::fence();
+    km->data   = Kokkos::View<su3_dble*>("aos_mat", volume);
+    km->volume = volume;
 }
 
-// ---------------------------------------------------------------------------
-// Plaquette kernel: res[i] = Re Tr( (u*v) * (w†*x†) )
-// ---------------------------------------------------------------------------
-
-void launch_plaq_dble_kokkos(
-    KokkosDoublev           *d_res,
-    const KokkosSu3MatField *d_u,
-    const KokkosSu3MatField *d_v,
-    const KokkosSu3MatField *d_w,
-    const KokkosSu3MatField *d_x,
-    size_t volume)
+void su3_aos_kokkos_free(KokkosSu3Mat *km)
 {
-    // Capture field descriptors (raw device pointers) by value
-    su3_mat_field u = d_u->field;
-    su3_mat_field v = d_v->field;
-    su3_mat_field w = d_w->field;
-    su3_mat_field x = d_x->field;
-    double *res_base = d_res->data.data();
-
-    Kokkos::parallel_for("plaq_dble", volume, KOKKOS_LAMBDA(const size_t i) {
-        su3_mat_dble temp, res;
-        fsu3matxsu3mat      (&temp, &u, &v, i);
-        fsu3matdagxsu3matdag(&res,  &w, &x, i);
-        res_base[i] = su3matdxsu3matd_retrace(&temp, &res);
-    });
-    Kokkos::fence();
+    km->data   = Kokkos::View<su3_dble*>();
+    km->volume = 0;
 }
+
+void su3_aos_kokkos_upload(KokkosSu3Mat *d, const su3_dble *h)
+{
+    using HV = Kokkos::View<const su3_dble*, Kokkos::HostSpace,
+                             Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
+    Kokkos::deep_copy(d->data, HV(h, d->volume));
+}
+
+void su3_aos_kokkos_download(su3_dble *h, const KokkosSu3Mat *d)
+{
+    using HV = Kokkos::View<su3_dble*, Kokkos::HostSpace,
+                             Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
+    Kokkos::deep_copy(HV(h, d->volume), d->data);
+}
+

@@ -6,17 +6,10 @@
 #include <stdio.h>
 #include <string.h>
 #include "su3v.h"
+#include "su3.h"
 #include "global.h"
 
 
-void random_su3vec_field(su3_vec_field *su3vf)
-{
-    size_t n = 6 * su3vf->volume;
-    double *d = su3vf->base;
-
-    for (size_t i = 0; i < n; i++)
-        d[i] = (double)rand() / (double)RAND_MAX;
-}
 
 void unit_su3vec_field(su3_vec_field *su3vf)
 {
@@ -27,11 +20,23 @@ void unit_su3vec_field(su3_vec_field *su3vf)
         d[i] = 1.0;
 }
 
-void random_su3mat_field(su3_mat_field *su3mf)
+void random_su3_dble_field(su3_mat_field *uv, int ix)
 {
-    random_su3vec_field(&su3mf->c1);
-    random_su3vec_field(&su3mf->c2);
-    random_su3vec_field(&su3mf->c3);
+    su3_dble u;
+    random_su3_dble(&u);
+
+    uv->c1.c1re[ix]=u.c11.re; uv->c1.c1im[ix]=u.c11.im;
+    uv->c1.c2re[ix]=u.c12.re; uv->c1.c2im[ix]=u.c12.im;
+    uv->c1.c3re[ix]=u.c13.re; uv->c1.c3im[ix]=u.c13.im;
+
+    uv->c2.c1re[ix]=u.c21.re; uv->c2.c1im[ix]=u.c21.im;
+    uv->c2.c2re[ix]=u.c22.re; uv->c2.c2im[ix]=u.c22.im;
+    uv->c2.c3re[ix]=u.c23.re; uv->c2.c3im[ix]=u.c23.im;
+
+    uv->c3.c1re[ix]=u.c31.re; uv->c3.c1im[ix]=u.c31.im;
+    uv->c3.c2re[ix]=u.c32.re; uv->c3.c2im[ix]=u.c32.im;
+    uv->c3.c3re[ix]=u.c33.re; uv->c3.c3im[ix]=u.c33.im;
+
 }
 
 void unit_su3mat_field(su3_mat_field *su3mf)
