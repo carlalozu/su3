@@ -33,15 +33,6 @@
 #define ALIGN 64
 #define CACHELINE 128
 
-#ifdef _OPENMP
-#include <omp.h>
-#else
-    #define omp_get_num_threads() 1
-    #define omp_get_num_teams() 1
-    #define omp_is_initial_device() 1
-    #define omp_get_team_num() 0
-    #define omp_get_thread_num() 0
-#endif
 
 #define VOLUME_TRD (L0_TRD*L1_TRD*L2_TRD*L3_TRD)
 #define NTHREAD (VOLUME/VOLUME_TRD)
