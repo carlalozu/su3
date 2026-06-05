@@ -29,13 +29,11 @@ int main(int argc, char *argv[])
     if (argc > 1) reps = atoi(argv[1]);
     if (argc > 2) idx  = atoi(argv[2]);
 
-    omp_set_num_threads(NTHREAD);
 
     printf("\nplaq_dble SoA CUDA kernel benchmark\n");
     printf("------------------------------------------\n");
     printf("Volume:      %d\n", VOLUME);
     printf("Repetitions: %d\n", reps);
-    printf("OpenMP threads: %d\n", NTHREAD);
     printf("Data structure: SoA\n");
     printf("Lattice geometry: %ix%ix%ix%i\n", L0,L1,L2,L3);
     printf("Local lattice geometry: %ix%ix%ix%i\n\n", L0_TRD,L1_TRD,L2_TRD,L3_TRD);

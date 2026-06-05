@@ -55,13 +55,10 @@ int main(int argc, char *argv[])
     int reps = 100;
     if (argc > 1) reps = atoi(argv[1]);
 
-    omp_set_num_threads(NTHREAD);
-
     printf("\nPlaquette sum CUDA kernel benchmark\n");
     printf("------------------------------------\n");
     printf("Volume:      %d\n", VOLUME);
     printf("Repetitions: %d\n", reps);
-    printf("OpenMP threads: %d\n", NTHREAD);
     printf("Data structure: AoS\n");
     printf("Lattice geometry: %ix%ix%ix%i\n", L0,L1,L2,L3);
     printf("Local lattice geometry: %ix%ix%ix%i\n\n", L0_TRD,L1_TRD,L2_TRD,L3_TRD);

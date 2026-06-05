@@ -4,18 +4,19 @@
 #include <Kokkos_Timer.hpp>
 #include "global.h"
 #include "su3prod.h"
-#include "ufields.h"
+#include "lattice.h"
+#include "uflds.h"
 #include "su3v_kokkos.hpp"
 
 static const size_t FLUSH_NELEMS = 15728640UL;
 
 void launch_plaq_aos_kokkos(
     KokkosDoublev      *d_res,
-    const KokkosSu3Mat *d_fld,
+    const KokkosSu3Mat       *d_fld,
     size_t volume)
 {
-    const su3_dble *fld = d_fld->data.data();
-    double          *res = d_res->data.data();
+    su3_dble *fld = d_fld->data.data();
+    double   *res = d_res->data.data();
 
     Kokkos::parallel_for("plaq_aos", volume, KOKKOS_LAMBDA(const size_t i) {
         su3_dble tmp_a, tmp_b;

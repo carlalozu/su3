@@ -1,5 +1,5 @@
 #include "su3v_kokkos.hpp"
-#include "ufields.h"
+#include "uflds.h"
 
 static size_t pad(size_t v) { return (v + 7) & ~(size_t)7; }
 
