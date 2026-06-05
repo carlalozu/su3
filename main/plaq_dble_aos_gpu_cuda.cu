@@ -40,12 +40,12 @@ int main(int argc, char *argv[])
     // -----------------------------------------------------------------------
     // Host fields
     // -----------------------------------------------------------------------
-    su3_dble  *h_fld = udfld();
-    double    *h_res = (double  *)malloc(VOLUME * sizeof(double));
-
     start_ranlux(0, 12345);
     geometry();
     random_ud();
+    
+    double    *h_res = (double  *)malloc(VOLUME * sizeof(double));
+    su3_dble  *h_fld = udfld();
 
     // -----------------------------------------------------------------------
     // Device fields
