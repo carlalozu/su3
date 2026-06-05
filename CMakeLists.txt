@@ -23,12 +23,10 @@ add_library(su3lib
 )
 target_include_directories(su3lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-option(ENABLE_OPENMP "Enable OpenMP parallelization" ON)
-if(ENABLE_OPENMP)
-    find_package(OpenMP REQUIRED)
-    target_link_libraries(su3lib PUBLIC OpenMP::OpenMP_C)
-    target_compile_definitions(su3lib PUBLIC SU3_USE_OPENMP)
-endif()
+find_package(OpenMP REQUIRED)
+target_link_libraries(su3lib PUBLIC OpenMP::OpenMP_C)
+target_compile_definitions(su3lib PUBLIC SU3_USE_OPENMP)
+
 
 
 option(ENABLE_GPU_OFFLOAD "Enable OpenMP GPU Offloading" OFF)
@@ -39,8 +37,8 @@ if(ENABLE_GPU_OFFLOAD)
     target_include_directories(su3openmp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
     target_link_libraries(su3openmp PUBLIC su3lib)
 
-    if (CMAKE_C_COMPILER_ID MATCHES "nvc")
-        message(STATUS "Setting OpenMP compiler flags for nvc")
+    if (CMAKE_C_COMPILER_ID MATCHES "NVHPC")
+        message(STATUS "Setting OpenMP compiler flags for NVHPC")
         set(OMP_OFFLOAD_FLAGS -mp=gpu -gpu=cc90)
 
         target_compile_options(su3lib PUBLIC ${OMP_OFFLOAD_FLAGS})
@@ -93,6 +91,12 @@ if(ENABLE_CUDA)
         CUDA_SEPARABLE_COMPILATION ON
     )
 
+    target_link_libraries(su3cudakernel PUBLIC "-L${MPICH_PREFIX}/lib -lmpi_gtl_cuda")
+    target_link_options(su3cudakernel PUBLIC 
+        -Wl,-rpath,${MPICH_PREFIX}/lib
+        -Wl,-rpath,/user-environment/linux-neoverse_v2/cray-gtl-8.1.32-6o2l3dln5utnr3ykymkc22xsfnwqvymp/lib
+    )
+
     message(STATUS "CUDA native kernel enabled (SM_90)")
 else()
     message(STATUS "CUDA native kernel NOT enabled")
@@ -100,41 +104,44 @@ endif()
 
 
 option(ENABLE_KOKKOS "Enable Kokkos kernel" OFF)
+
 if(ENABLE_KOKKOS)
-    enable_language(CXX)
+  enable_language(CXX)
 
-    option(Kokkos_ENABLE_CUDA   "Kokkos CUDA backend"   OFF)
-    option(Kokkos_ENABLE_OPENMP "Kokkos OpenMP backend" OFF)
+  # Find the system-installed Kokkos (provided by the module)
+  find_package(Kokkos REQUIRED)
 
-    if(Kokkos_ENABLE_CUDA)
-        enable_language(CUDA)
-    endif()
+  # Query the backends that were baked into the installed Kokkos
+  kokkos_check(DEVICES "Cuda"   RETURN_VALUE Kokkos_ENABLE_CUDA)
+  kokkos_check(DEVICES "OpenMP" RETURN_VALUE Kokkos_ENABLE_OPENMP)
 
-    include(FetchContent)
-    FetchContent_Declare(
-        Kokkos
-        GIT_REPOSITORY https://github.com/kokkos/kokkos.git
-        GIT_TAG        4.5.01
-    )
-    FetchContent_MakeAvailable(Kokkos)
+  if(Kokkos_ENABLE_CUDA)
+    enable_language(CUDA)
+  endif()
 
-    add_library(su3kokkoskernel STATIC
-        modules/su3v_kokkos.cpp
-    )
-    target_include_directories(su3kokkoskernel PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-    target_link_libraries(su3kokkoskernel PUBLIC su3lib Kokkos::kokkos)
+  add_library(su3kokkoskernel STATIC
+    modules/su3v_kokkos.cpp
+  )
+  target_include_directories(su3kokkoskernel PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+  target_link_libraries(su3kokkoskernel PUBLIC su3lib Kokkos::kokkos)
 
     if(Kokkos_ENABLE_CUDA)
-        set_source_files_properties(modules/su3v_kokkos.cpp PROPERTIES LANGUAGE CUDA)
-        set_target_properties(su3kokkoskernel PROPERTIES CUDA_ARCHITECTURES "90")
-        target_compile_options(su3kokkoskernel PRIVATE
-            $<$<COMPILE_LANGUAGE:CUDA>:--extended-lambda>
-        )
+    set_source_files_properties(modules/su3v_kokkos.cpp PROPERTIES LANGUAGE CUDA)
+    set_target_properties(su3kokkoskernel PROPERTIES CUDA_ARCHITECTURES "90")
+    target_compile_options(su3kokkoskernel PRIVATE
+        $<$<COMPILE_LANGUAGE:CUDA>:--extended-lambda>
+        $<$<COMPILE_LANGUAGE:CUDA>:-ccbin ${CMAKE_CXX_COMPILER}>
+        $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler -fopenmp>
+    )
+
+    target_link_options(su3kokkoskernel PRIVATE
+        $<$<LINK_LANGUAGE:CUDA>:-Xlinker -fopenmp>
+    )
     endif()
 
-    message(STATUS "Kokkos kernel enabled")
+  message(STATUS "Kokkos kernel enabled (CUDA=${Kokkos_ENABLE_CUDA}, OpenMP=${Kokkos_ENABLE_OPENMP})")
 else()
-    message(STATUS "Kokkos kernel NOT enabled")
+  message(STATUS "Kokkos kernel NOT enabled")
 endif()
 
 

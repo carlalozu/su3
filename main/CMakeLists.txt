@@ -38,26 +38,9 @@ if(ENABLE_CUDA)
 endif()
 
 if(ENABLE_KOKKOS)
-    add_executable(soa_gpu_kokkos soa_gpu_kokkos.cpp)
-    target_link_libraries(soa_gpu_kokkos PRIVATE su3kokkoskernel)
+  add_executable(plaq_dble_soa_gpu_kokkos plaq_dble_soa_gpu_kokkos.cpp)
+  target_link_libraries(plaq_dble_soa_gpu_kokkos PRIVATE su3kokkoskernel)
 
-    add_executable(aos_gpu_kokkos aos_gpu_kokkos.cpp)
-    target_link_libraries(aos_gpu_kokkos PRIVATE su3kokkoskernel)
-
-    if(Kokkos_ENABLE_CUDA)
-        set_source_files_properties(soa_gpu_kokkos.cpp PROPERTIES LANGUAGE CUDA)
-        set_target_properties(soa_gpu_kokkos PROPERTIES CUDA_ARCHITECTURES "90")
-
-        set_source_files_properties(aos_gpu_kokkos.cpp PROPERTIES LANGUAGE CUDA)
-        set_target_properties(aos_gpu_kokkos PROPERTIES CUDA_ARCHITECTURES "90")
-
-        target_compile_options(su3kokkoskernel PRIVATE
-            $<$<COMPILE_LANGUAGE:CUDA>:--extended-lambda>)
-
-        target_compile_options(soa_gpu_kokkos PRIVATE
-            $<$<COMPILE_LANGUAGE:CUDA>:--extended-lambda>)
-
-        target_compile_options(aos_gpu_kokkos PRIVATE
-            $<$<COMPILE_LANGUAGE:CUDA>:--extended-lambda>)
-    endif()
+  add_executable(plaq_dble_aos_gpu_kokkos plaq_dble_aos_gpu_kokkos.cpp)
+  target_link_libraries(plaq_dble_aos_gpu_kokkos PRIVATE su3kokkoskernel)
 endif()
