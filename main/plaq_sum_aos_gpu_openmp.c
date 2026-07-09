@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
      * Warm-up
      * ----------------------------------------------------------------------- */
     for (int r = 0; r < 3; r++)
-        plaq_sum_dble(1);
+        plaq_sum_dble_gpu(1);
 
     prof_reset(&compute);
 
