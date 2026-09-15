@@ -36,6 +36,18 @@ if(ENABLE_GPU_OFFLOAD)
     add_library(su3openmp STATIC modules/su3v_openmp.c)
     target_include_directories(su3openmp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
     target_link_libraries(su3openmp PUBLIC su3lib)
+    target_link_libraries(su3lib PUBLIC m)
+    target_link_libraries(su3openmp PUBLIC m)
+
+    if(CMAKE_C_COMPILER_ID MATCHES "GNU")
+        message(STATUS "Setting OpenMP compiler flags for GCC")
+        set(OMP_OFFLOAD_FLAGS -fopenmp -foffload=nvptx-none)
+        
+        target_compile_options(su3lib PUBLIC ${OMP_OFFLOAD_FLAGS})
+        target_link_options(su3lib PUBLIC ${OMP_OFFLOAD_FLAGS})
+        target_compile_options(su3openmp PUBLIC ${OMP_OFFLOAD_FLAGS})
+        target_link_options(su3openmp PUBLIC ${OMP_OFFLOAD_FLAGS})
+    endif()
 
     if (CMAKE_C_COMPILER_ID MATCHES "NVHPC")
         message(STATUS "Setting OpenMP compiler flags for NVHPC")
